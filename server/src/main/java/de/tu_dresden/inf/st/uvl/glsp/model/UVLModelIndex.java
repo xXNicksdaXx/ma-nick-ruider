@@ -16,7 +16,7 @@ import org.eclipse.glsp.server.utils.BiIndex;
 
 import java.util.*;
 
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getAllGroups;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelInfoUtil.getAllGroups;
 import static de.tu_dresden.inf.st.uvl.glsp.utils.GroupUtil.convertGroupTypeToModelType;
 
 public class UVLModelIndex extends GModelIndexImpl {

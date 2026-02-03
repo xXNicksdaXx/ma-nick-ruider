@@ -32,6 +32,7 @@ public class UVLModelStateImpl extends DefaultGModelState implements UVLModelSta
     public void init() {
         this.clientSessionManager.addListener(this, this.clientId);
         setCommandStack(new GModelCommandStack());
+        LOGGER.trace("Created UVLModelState for client {}", this.clientId);
     }
 
     @Override

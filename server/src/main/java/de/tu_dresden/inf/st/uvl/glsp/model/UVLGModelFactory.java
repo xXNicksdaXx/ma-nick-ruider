@@ -24,8 +24,9 @@ import org.eclipse.glsp.server.utils.ClientOptionsUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+
+import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelInfoUtil.getAllGroups;
 
 public class UVLGModelFactory implements GModelFactory {
 
@@ -60,10 +61,7 @@ public class UVLGModelFactory implements GModelFactory {
                 .map(this::createFeature)
                 .forEachOrdered(root.getChildren()::add);
 
-        featureModel.getFeatureMap().values().stream()
-                .map(Feature::getParentGroup)
-                .filter(Objects::nonNull)
-                .distinct()
+        getAllGroups(featureModel).stream()
                 .map(this::createEdge)
                 .flatMap(Collection::stream)
                 .forEachOrdered(root.getChildren()::add);

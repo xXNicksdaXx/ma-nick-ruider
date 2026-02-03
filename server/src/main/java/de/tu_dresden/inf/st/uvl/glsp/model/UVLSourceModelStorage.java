@@ -39,6 +39,9 @@ public class UVLSourceModelStorage extends GModelStorage implements SourceModelS
     @Inject
     protected UVLModelState modelState;
 
+    @Inject
+    protected UVLGModelFactory gModelFactory;
+
     @Override
     public void loadSourceModel(RequestModelAction action) {
         File featureModelFile = convertToFile(action.getOptions());
@@ -79,6 +82,8 @@ public class UVLSourceModelStorage extends GModelStorage implements SourceModelS
                 if (isEmpty) {
                     GModelRoot newRoot = createNewEmptyRoot(modelState);
                     modelState.updateRoot(newRoot);
+                    gModelFactory.createGModel();
+                    saveGModel(notationFile);
                     return;
                 }
                 throw new IOException("Could not deserialize GModel file contents of: " + notationFile.toURI());

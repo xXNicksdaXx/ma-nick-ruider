@@ -7,6 +7,7 @@ package de.tu_dresden.inf.st.uvl.glsp;
 
 import com.google.inject.Singleton;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLApplyLabelEditOperationHandler;
+import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateFeatureOperationHandler;
 import de.tu_dresden.inf.st.uvl.glsp.layout.UVLTreeLayoutEngine;
 import org.eclipse.glsp.server.actions.ActionHandler;
 import org.eclipse.glsp.server.di.DiagramModule;
@@ -81,6 +82,8 @@ public class UVLDiagramModule extends DiagramModule {
         binding.add(GModelPasteOperationHandler.class);
 
         binding.add(UVLApplyLabelEditOperationHandler.class);
+
+        binding.add(UVLCreateFeatureOperationHandler.class);
     }
 
     @Override

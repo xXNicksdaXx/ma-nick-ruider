@@ -21,7 +21,8 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
                                 false, false, false, false,
                                 List.of(UVLModelTypes.FEATURE)),
                         new ShapeTypeHint(UVLModelTypes.FEATURE,
-                                true, true, false, true)
+                                true, true, false, true,
+                                List.of(UVLModelTypes.FEATURE))
                 );
         }
 

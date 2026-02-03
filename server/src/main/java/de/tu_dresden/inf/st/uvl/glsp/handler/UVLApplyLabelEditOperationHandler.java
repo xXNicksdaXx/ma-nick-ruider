@@ -17,7 +17,7 @@ import org.eclipse.glsp.server.gmodel.GModelApplyLabelEditOperationHandler;
 import java.util.Objects;
 import java.util.Optional;
 
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.renameFeature;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelEditUtil.renameFeature;
 
 public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOperationHandler {
 

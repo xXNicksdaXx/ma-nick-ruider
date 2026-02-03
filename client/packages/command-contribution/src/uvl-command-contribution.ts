@@ -9,7 +9,7 @@ import { CommandContext, GlspVscodeConnector } from '@eclipse-glsp/vscode-integr
 import { promises as fs } from 'fs';
 import * as vscode from 'vscode';
 
-import { getNotationTemplate, getUvlTemplate, getWorkspaceRoot, showInput } from './utils';
+import { getUvlTemplate, getWorkspaceRoot, showInput } from './utils';
 
 export function configureUVLCommandContributions(context: CommandContext) {
     // keep track of diagram specific element selection.
@@ -50,7 +50,6 @@ async function createNewDiagramFromPrompt(connector: GlspVscodeConnector): Promi
 
         try {
             await fs.writeFile(uvlFileUri.fsPath, getUvlTemplate(),'utf-8');
-            await fs.writeFile(notationFileUri.fsPath, getNotationTemplate(),'utf-8');
             await vscode.workspace.openTextDocument(uvlFileUri);
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to create files: ${error}`);

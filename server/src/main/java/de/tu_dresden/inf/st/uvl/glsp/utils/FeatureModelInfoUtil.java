@@ -5,7 +5,6 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp.utils;
 
-import de.vill.main.UVLModelFactory;
 import de.vill.model.Feature;
 import de.vill.model.FeatureModel;
 import de.vill.model.Group;
@@ -15,16 +14,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class FeatureModelUtil {
+public class FeatureModelInfoUtil {
 
-    public static FeatureModel renameFeature(FeatureModel featureModel, Feature feature, String newName) {
-        String featureModelText = featureModel.toString();
-
-        String oldName = feature.getFeatureName();
-        String updatedText = featureModelText.replace(oldName, newName);
-
-        UVLModelFactory uvlModelFactory = new UVLModelFactory();
-        return uvlModelFactory.parse(updatedText);
+    public static boolean hasRootFeature(FeatureModel featureModel) {
+        boolean isEmpty = featureModel.getFeatureMap().isEmpty();
+        boolean hasRoot = featureModel.getRootFeature() != null;
+        return !isEmpty && hasRoot;
     }
 
     public static List<String> getAllFeatureEdges(Feature feature) {

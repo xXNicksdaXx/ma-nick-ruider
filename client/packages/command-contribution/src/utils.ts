@@ -37,10 +37,3 @@ export function getWorkspaceRoot(): vscode.Uri {
 export function getUvlTemplate(): string {
     return `features\n\t\nconstraints\n\t\n`;
 }
-
-export function getNotationTemplate(): string {
-    return JSON.stringify({
-        elements: {},
-        edges: {}
-    }, null, 2) + '\n';
-}
