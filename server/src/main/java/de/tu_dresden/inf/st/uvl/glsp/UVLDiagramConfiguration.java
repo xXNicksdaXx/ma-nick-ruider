@@ -30,11 +30,11 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
         public List<EdgeTypeHint> getEdgeTypeHints() {
                 return List.of(
                         new EdgeTypeHint(UVLModelTypes.MANDATORY,
-                                true, true, true,
+                                true, true, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
                         new EdgeTypeHint(UVLModelTypes.OPTIONAL,
-                                true, true, true,
+                                true, true, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
                         new EdgeTypeHint(UVLModelTypes.ALTERNATIVE,
@@ -42,7 +42,7 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
                         new EdgeTypeHint(UVLModelTypes.GROUP_CARDINALITY,
-                                true, true, true,
+                                true, true, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
                         new EdgeTypeHint(UVLModelTypes.OR,

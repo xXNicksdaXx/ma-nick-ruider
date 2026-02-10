@@ -24,29 +24,13 @@
     }
   ],
   "publisher": "NickRuider",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
   "main": "dist/uvl-extension",
-  "files": [
-    "dist"
+  "activationEvents": [
+    "onStartupFinished"
   ],
-  "workspaces": {
-    "nohoist": [
-      "**/@vscode/codicons",
-      "**/@vscode/codicons/**"
-    ]
-  },
-  "scripts": {
-    "build": "yarn compile && yarn bundle",
-    "bundle": "webpack",
-    "bundle:prod": "webpack --config ./webpack.prod.js",
-    "clean": "rimraf lib dist tsconfig.tsbuildinfo uvl-vscode.vsix",
-    "compile": "tsc -b",
-    "lint": "eslint --ext .ts,.tsx ./src",
-    "lint:fix": "eslint --ext .ts,.tsx ./src --fix",
-    "lint:ci": "yarn lint --output-file eslint_report.json --format json",
-    "package": "vsce package --yarn --out uvl-vscode.vsix",
-    "watch": "tsc -w",
-    "watch:bundle": "webpack --watch"
-  },
   "contributes": {
     "commands": [
       {
@@ -167,10 +151,28 @@
       }
     ]
   },
-  "activationEvents": [
-    "onStartupFinished",
-    "workspaceContains:**/*.uvl"
+  "files": [
+    "dist"
   ],
+  "workspaces": {
+    "nohoist": [
+      "**/@vscode/codicons",
+      "**/@vscode/codicons/**"
+    ]
+  },
+  "scripts": {
+    "build": "yarn compile && yarn bundle",
+    "bundle": "webpack",
+    "bundle:prod": "webpack --config ./webpack.prod.js",
+    "clean": "rimraf lib dist tsconfig.tsbuildinfo uvl-vscode.vsix",
+    "compile": "tsc -b",
+    "lint": "eslint --ext .ts,.tsx ./src",
+    "lint:fix": "eslint --ext .ts,.tsx ./src --fix",
+    "lint:ci": "yarn lint --output-file eslint_report.json --format json",
+    "package": "vsce package --yarn --out uvl-vscode.vsix",
+    "watch": "tsc -w",
+    "watch:bundle": "webpack --watch"
+  },
   "dependencies": {
     "@vscode/codicons": "^0.0.35"
   },
@@ -183,15 +185,12 @@
     "ts-loader": "^9.5.4",
     "uvl-command-contribution": "0.0.1",
     "uvl-vscode-webview": "0.0.1",
-    "webpack": "^5.102.1",
+    "webpack": "5.104.1",
     "webpack-cli": "^5.1.4",
     "webpack-merge": "^5.10.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.9",
     "utf-8-validate": "^6.0.5"
-  },
-  "engines": {
-    "vscode": "^1.80.0"
   }
 }

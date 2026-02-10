@@ -10,14 +10,13 @@ import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
 import de.vill.model.Feature;
 import de.vill.model.FeatureModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import de.vill.model.Group;
 import org.eclipse.emf.common.command.Command;
-import org.eclipse.glsp.graph.*;
+import org.eclipse.glsp.graph.DefaultTypes;
+import org.eclipse.glsp.graph.GNode;
+import org.eclipse.glsp.graph.GPoint;
 import org.eclipse.glsp.graph.builder.impl.GLabelBuilder;
-import org.eclipse.glsp.graph.builder.impl.GLayoutOptions;
 import org.eclipse.glsp.graph.builder.impl.GNodeBuilder;
-import org.eclipse.glsp.graph.util.GConstants;
 import org.eclipse.glsp.graph.util.GraphUtil;
 import org.eclipse.glsp.server.actions.ActionDispatcher;
 import org.eclipse.glsp.server.actions.SelectAction;
@@ -28,12 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelEditUtil.addFeature;
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelInfoUtil.hasRootFeature;
-
 public class UVLCreateFeatureOperationHandler extends GModelCreateOperationHandler<CreateNodeOperation> {
-
-    protected static Logger LOGGER = LogManager.getLogger(UVLCreateFeatureOperationHandler.class.getSimpleName());
 
     @Inject
     protected UVLModelState modelState;
@@ -51,79 +45,130 @@ public class UVLCreateFeatureOperationHandler extends GModelCreateOperationHandl
     }
 
     protected void executeCreation(CreateNodeOperation operation) {
-        if (!hasRootFeature(modelState.getFeatureModel())) {
-            GNode rootNode = createGNode(operation.getLocation());
-            createFeature(Optional.empty());
-            selectElement(rootNode);
-        } else {
-            Feature parentFeature = getInitialFeatureLink(operation.getContainerId());
-            GNode parentNode = modelState.getIndex().getGModelElement(parentFeature, GNode.class).orElseThrow(() ->
-                    new IllegalStateException("No GNode found for parent feature: " + parentFeature.getFeatureName()));
-            GPoint location = calculateNewFeatureLocation(parentNode.getPosition());
-            GNode newNode = createGNode(Optional.of(location));
-            createFeature(Optional.of(parentFeature));
-            selectElement(newNode);
+        if (isMissingRootFeature()) {
+            createRootFeature(operation);
+            return;
         }
+
+        // get parent feature and its corresponding GNode
+        Feature parentFeature = getInitialFeatureLink(operation.getContainerId());
+        GNode parentNode = modelState.getIndex().getGModelElement(parentFeature, GNode.class).orElseThrow(() ->
+                new IllegalStateException("No GNode found for parent feature: " + parentFeature.getFeatureName()));
+
+        // create new GNode based on parent position
+        GPoint location = calculateNewFeatureLocation(parentNode.getPosition());
+        GNode featureNode = createGNode(location);
+        modelState.getRoot().getChildren().add(featureNode);
+
+        // create and add new Feature to the model
+        createFeature(parentFeature);
+
+        // select the new feature node
+        selectElement(featureNode);
+
+        // update the model index
+        modelState.updateIndex();
+    }
+
+    protected void createRootFeature(CreateNodeOperation operation) {
+        // create root GNode
+        GPoint location = operation.getLocation().orElse(null);
+        GNode rootNode = createGNode(location);
+        modelState.getRoot().getChildren().add(rootNode);
+
+        // create root Feature
+        String featureName = getFeatureName();
+        Feature rootFeature = new Feature(featureName);
+
+        // add root feature to the model and set it as the root feature
+        FeatureModel featureModel = modelState.getFeatureModel();
+        featureModel.getFeatureMap().put(featureName, rootFeature);
+        featureModel.setRootFeature(rootFeature);
+        modelState.setFeatureModel(featureModel);
+
+        // select the new root node
+        selectElement(rootNode);
+
+        // update the model index
         modelState.updateIndex();
     }
 
     protected Feature getInitialFeatureLink(String containerId) {
         Optional<Feature> parentFeature = modelState.getIndex().getUVLObject(containerId, Feature.class);
-        if (parentFeature.isPresent()) {
-            return parentFeature.get();
-        } else {
-            LOGGER.trace("No parent feature found for container ID: {}. Using root feature as parent.", containerId);
-            return modelState.getFeatureModel().getRootFeature();
-        }
+        // if no parent feature found, return the root feature
+        return parentFeature.orElseGet(() -> {
+            String rootId = modelState.getIndex().getIdFor(modelState.getFeatureModel().getRootFeature()).orElseThrow(
+                    () -> new IllegalStateException("Root feature not indexed in the model")
+            );
+            return modelState.getIndex().getUVLObject(rootId, Feature.class).orElseThrow(
+                    () -> new IllegalStateException("Root feature not found in the model")
+            );
+        });
     }
 
-    protected GNode createGNode(Optional<GPoint> location) {
+    protected GNode createGNode(GPoint location) {
         String id = UUID.randomUUID().toString();
 
+        // generate a new GNode with a label containing the feature name
         GNodeBuilder nodeBuilder = new GNodeBuilder(UVLModelTypes.FEATURE)
                 .id(id)
-                .layout(GConstants.Layout.VBOX)
-                .layoutOptions(new GLayoutOptions()
-                        .paddingTop(2)
-                        .paddingLeft(2)
-                        .paddingRight(2)
-                        .paddingBottom(2.0))
                 .add(new GLabelBuilder(DefaultTypes.LABEL)
                         .id(id + "_label")
                         .text(getFeatureName())
                         .build())
                 .size(64, 32);
 
-        if (location.isPresent()) {
-            nodeBuilder.position(location.get().getX(), location.get().getY());
+        // set position based on the provided location or default to (0, 0)
+        if (location != null) {
+            nodeBuilder.position(location.getX(), location.getY());
         } else {
             nodeBuilder.position(0, 0);
         }
 
-        GNode node = nodeBuilder.build();
-        modelState.getRoot().getChildren().add(node);
-        return node;
+        return nodeBuilder.build();
     }
 
-    protected void createFeature(Optional<Feature> parentFeatureOpt) {
+    protected void createFeature(Feature parentFeature) {
+        // create new Feature
         Feature feature = new Feature(getFeatureName());
-        FeatureModel featureModel = addFeature(modelState.getFeatureModel(), feature, parentFeatureOpt);
-        modelState.setFeatureModel(featureModel);
+
+        List<Group> children = parentFeature.getChildren();
+        if (children.isEmpty()) {
+            // create new optional group, linking parent feature and new feature
+            Group newGroup = new Group(Group.GroupType.OPTIONAL);
+            newGroup.setParentFeature(parentFeature);
+            newGroup.getFeatures().add(feature);
+            parentFeature.getChildren().add(newGroup);
+        } else {
+            // add new feature to the first existing group
+            Group firstGroup = children.getFirst();
+            firstGroup.getFeatures().add(feature);
+        }
+
+        modelState.getFeatureModel().getFeatureMap().put(feature.getFeatureName(), feature);
     }
 
-    protected void selectElement(GNode node) {
-        actionDispatcher.dispatchAfterNextUpdate(SelectAction.setSelection(List.of(node.getId())));
-    }
-
-    private String getFeatureName() {
+    protected String getFeatureName() {
         int currentFeatureCount = modelState.getFeatureModel().getFeatureMap().size();
         return "Feature" + (currentFeatureCount + 1);
     }
 
-    private GPoint calculateNewFeatureLocation(GPoint parentPosition) {
-        final double level_spacing = 80.0;
-        double x = parentPosition.getX() + (Math.random() * 256 - 128);
-        double y = parentPosition.getY() + level_spacing;
+    protected GPoint calculateNewFeatureLocation(GPoint parentPosition) {
+        final double verticalSpacing = 80.0;
+        double randomOffset = Math.random() * 256 - 128;
+        double x = parentPosition.getX() + randomOffset;
+        double y = parentPosition.getY() + verticalSpacing;
         return GraphUtil.point(x, y);
+    }
+
+    public boolean isMissingRootFeature() {
+        FeatureModel featureModel = modelState.getFeatureModel();
+        boolean isEmpty = featureModel.getFeatureMap().isEmpty();
+        boolean noRoot = featureModel.getRootFeature() == null;
+        return isEmpty && noRoot;
+    }
+
+    protected void selectElement(GNode node) {
+        actionDispatcher.dispatchAfterNextUpdate(SelectAction.setSelection(List.of(node.getId())));
     }
 }

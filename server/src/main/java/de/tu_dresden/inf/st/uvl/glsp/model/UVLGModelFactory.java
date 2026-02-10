@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelInfoUtil.getAllGroups;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getAllGroups;
 
 public class UVLGModelFactory implements GModelFactory {
 

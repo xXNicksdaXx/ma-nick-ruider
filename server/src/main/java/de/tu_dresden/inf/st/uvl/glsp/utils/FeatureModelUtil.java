@@ -14,13 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class FeatureModelInfoUtil {
-
-    public static boolean hasRootFeature(FeatureModel featureModel) {
-        boolean isEmpty = featureModel.getFeatureMap().isEmpty();
-        boolean hasRoot = featureModel.getRootFeature() != null;
-        return !isEmpty && hasRoot;
-    }
+public class FeatureModelUtil {
 
     public static List<String> getAllFeatureEdges(Feature feature) {
         List<String> featureEdges = new ArrayList<>();
