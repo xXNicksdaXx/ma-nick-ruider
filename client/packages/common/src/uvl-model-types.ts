@@ -15,6 +15,11 @@ import { DefaultTypes } from '@eclipse-glsp/client';
  */
 export namespace UVLModelTypes {
     export const FEATURE = `${DefaultTypes.NODE}:feature`;
+    export const FEATURE_NAME = `${DefaultTypes.LABEL}:feature`;
+
+    export const ATTRIBUTE = `${DefaultTypes.COMPARTMENT}:attribute`;
+    export const ATTRIBUTE_NAME = `${DefaultTypes.LABEL}:attributeName`;
+    export const ATTRIBUTE_VALUE = `${DefaultTypes.LABEL}:attributeValue`;
 
     export const MANDATORY = `${DefaultTypes.EDGE}:mandatory`;
     export const OPTIONAL = `${DefaultTypes.EDGE}:optional`;

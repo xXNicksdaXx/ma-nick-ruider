@@ -13,12 +13,12 @@ import {
     ContainerConfiguration,
     defaultModule,
     DefaultTypes,
+    GCompartmentView,
     GEdge,
     GEdgeView,
     GLabel,
     GLabelView,
-    GLSPPolylineEdgeRouter,
-    GNode,
+    GLSPPolylineEdgeRouter, GModelElement,
     GShapedPreRenderedElement,
     helperLineModule,
     HelperLineType,
@@ -28,7 +28,6 @@ import {
     LogLevel,
     overrideModelElement,
     PreRenderedView,
-    RectangularNodeView,
     TYPES
 } from '@eclipse-glsp/client';
 import { Container, ContainerModule } from 'inversify';
@@ -40,9 +39,9 @@ import '../css/diagram.css';
 
 import { CenteredAnchor } from "./features/center-anchor-computer";
 import { FeatureCompartmentSelectionFeedback } from './features/feedback';
-import { EditableGLabel } from "./model";
-import { CircleEdgeView, DoubleArrowEdgeView, SectorEdgeView, SingleArrowEdgeView } from "./views";
 import { UVLPolylineEdgeRouter } from "./features/uvl-polyline-edge-router";
+import { EditableGLabel, FeatureCompartment, LabeledNode } from "./model";
+import { CircleEdgeView, DoubleArrowEdgeView, FeatureNodeView, SectorEdgeView, SingleArrowEdgeView } from "./views";
 
 const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     const context = {bind, unbind, isBound, rebind};
@@ -56,6 +55,7 @@ const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
             HelperLineType.Top, HelperLineType.Middle, HelperLineType.Bottom
         ],
         viewportLines: [],
+        alignmentElementFilter: (element: GModelElement) => element.type === UVLModelTypes.FEATURE,
         minimumMoveDelta: { x: 16, y: 16 },
         alignmentEpsilon: 0.5
     });
@@ -69,10 +69,13 @@ const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
         enable: [layoutableChildFeature]
     });
 
-    overrideModelElement(context, DefaultTypes.LABEL, EditableGLabel, GLabelView)
-
     // Register custom model elements and their views
-    configureModelElement(context, UVLModelTypes.FEATURE, GNode, RectangularNodeView);
+    configureModelElement(context, UVLModelTypes.FEATURE, LabeledNode, FeatureNodeView);
+    configureModelElement(context, UVLModelTypes.FEATURE_NAME, EditableGLabel, GLabelView);
+
+    configureModelElement(context, UVLModelTypes.ATTRIBUTE, FeatureCompartment, GCompartmentView);
+    configureModelElement(context, UVLModelTypes.ATTRIBUTE_NAME, EditableGLabel, GLabelView);
+    configureModelElement(context, UVLModelTypes.ATTRIBUTE_VALUE, EditableGLabel, GLabelView);
 
     configureModelElement(context, UVLModelTypes.MANDATORY, GEdge, CircleEdgeView);
     configureModelElement(context, UVLModelTypes.OPTIONAL, GEdge, CircleEdgeView);

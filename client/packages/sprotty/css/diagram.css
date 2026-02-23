@@ -63,6 +63,11 @@ svg {
     stroke-width: 1px;
 }
 
+.separator-line {
+    stroke: black;
+    stroke-width: 1px;
+}
+
 /*
  * Label styles for node titles.
  * Used to highlight important text in nodes.
@@ -113,6 +118,11 @@ svg {
 .triangle {
     stroke: black !important;
     fill: white;
+}
+
+.attributes .sprotty-label {
+    font-size: 10px !important;
+    font-weight: normal;
 }
 
 .edge-label {

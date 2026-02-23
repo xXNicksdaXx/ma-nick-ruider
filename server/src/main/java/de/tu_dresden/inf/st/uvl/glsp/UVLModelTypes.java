@@ -17,6 +17,11 @@ import org.eclipse.glsp.graph.DefaultTypes;
 public final class UVLModelTypes {
 
     public static final String FEATURE = DefaultTypes.NODE + ":feature";
+    public static final String FEATURE_NAME = DefaultTypes.LABEL + ":feature";
+
+    public static final String ATTRIBUTE = DefaultTypes.COMPARTMENT + ":attribute";
+    public static final String ATTRIBUTE_NAME = DefaultTypes.LABEL + ":attributeName";
+    public static final String ATTRIBUTE_VALUE = DefaultTypes.LABEL + ":attributeValue";
 
     public static final String MANDATORY = DefaultTypes.EDGE + ":mandatory";
     public static final String OPTIONAL = DefaultTypes.EDGE + ":optional";

@@ -8,6 +8,7 @@ package de.tu_dresden.inf.st.uvl.glsp.model;
 import com.google.inject.Inject;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.utils.GroupUtil;
+import de.vill.model.Attribute;
 import de.vill.model.Feature;
 import de.vill.model.FeatureModel;
 import de.vill.model.Group;
@@ -17,20 +18,14 @@ import de.vill.model.constraint.ImplicationConstraint;
 import de.vill.model.constraint.LiteralConstraint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.glsp.graph.DefaultTypes;
-import org.eclipse.glsp.graph.GEdge;
-import org.eclipse.glsp.graph.GGraph;
-import org.eclipse.glsp.graph.GNode;
+import org.eclipse.glsp.graph.*;
 import org.eclipse.glsp.graph.builder.impl.*;
 import org.eclipse.glsp.graph.util.GConstants;
 import org.eclipse.glsp.server.features.core.model.GModelFactory;
 import org.eclipse.glsp.server.layout.LayoutEngine;
 import org.eclipse.glsp.server.utils.ClientOptionsUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static de.tu_dresden.inf.st.uvl.glsp.layout.UVLTreeLayoutEngine.requiresLayoutOperation;
 import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.convertConstraintTypeToModelType;
@@ -91,14 +86,14 @@ public class UVLGModelFactory implements GModelFactory {
                 .id(id)
                 .layout(GConstants.Layout.VBOX)
                 .layoutOptions(new GLayoutOptions()
-                        .paddingTop(2)
-                        .paddingLeft(2)
-                        .paddingRight(2)
-                        .paddingBottom(2.0))
-                .add(new GLabelBuilder(DefaultTypes.LABEL)
-                        .id(id + "_label")
-                        .text(feature.getFeatureName())
-                        .build());
+                        .paddingTop(0)
+                        .paddingLeft(0)
+                        .paddingRight(0)
+                        .paddingBottom(0.0)
+                        .resizeContainer(true))
+                .add(buildHeader(id, feature.getFeatureName()))
+                .add(buildAttributeCompartment(id, feature));
+
 
         Optional<GNode> node = index.getGModelElement(feature, GNode.class);
         if (node.isPresent()) {
@@ -110,6 +105,73 @@ public class UVLGModelFactory implements GModelFactory {
             nodeBuilder.size(64, 32);
         }
         return nodeBuilder.build();
+    }
+
+    private GCompartment buildHeader(final String id, final String name) {
+        GLabel headerLabel = new GLabelBuilder(UVLModelTypes.FEATURE_NAME)
+                .id(id + "_header_label")
+                .text(name)
+                .build();
+        return new GCompartmentBuilder(DefaultTypes.COMPARTMENT_HEADER)
+                .id(id + "_header")
+                .layout(GConstants.Layout.HBOX)
+                .layoutOptions(new GLayoutOptions()
+                        .paddingTop(4)
+                        .paddingLeft(4)
+                        .paddingRight(4)
+                        .paddingBottom(4.0)
+                        .hAlign(GConstants.HAlign.CENTER)
+                        .resizeContainer(true))
+                .add(headerLabel)
+                .build();
+    }
+
+    private GCompartment buildAttributeCompartment(final String id, final Feature feature) {
+        GCompartmentBuilder compartmentBuilder = new GCompartmentBuilder(DefaultTypes.COMPARTMENT)
+                .id(id + "_attribute_compartment")
+                .layout(GConstants.Layout.VBOX)
+                .layoutOptions(new GLayoutOptions()
+                        .paddingTop(0)
+                        .paddingLeft(0)
+                        .paddingRight(0)
+                        .paddingBottom(0.0)
+                        .hAlign(GConstants.HAlign.LEFT)
+                        .resizeContainer(true));
+
+        int i = 0;
+        for (Attribute<?> attribute : feature.getAttributes().values()) {
+            compartmentBuilder.add(createAttribute(id, i, attribute));
+            i++;
+        }
+
+        return compartmentBuilder.build();
+    }
+
+    private GCompartment createAttribute(final String id, final int index, final Attribute<?> attribute) {
+        String attributeId = id + "_attribute_" + index;
+
+        return new GCompartmentBuilder(UVLModelTypes.ATTRIBUTE)
+                .id(attributeId)
+                .addCssClass("attribute")
+                .layout(GConstants.Layout.HBOX)
+                .layoutOptions(new GLayoutOptions()
+                        .paddingTop(2)
+                        .paddingLeft(2)
+                        .paddingRight(2)
+                        .paddingBottom(2.0)
+                        .resizeContainer(true))
+                .add(new GLabelBuilder(UVLModelTypes.ATTRIBUTE_NAME)
+                        .id(attributeId + "_name")
+                        .text(attribute.getName())
+                        .build())
+                .add(new GLabelBuilder(DefaultTypes.LABEL)
+                        .text(" = ")
+                        .build())
+                .add(new GLabelBuilder(UVLModelTypes.ATTRIBUTE_VALUE)
+                        .id(attributeId + "_value")
+                        .text(attribute.getValue().toString())
+                        .build())
+                .build();
     }
 
     private Collection<GEdge> createGroupEdges(final Group group) {

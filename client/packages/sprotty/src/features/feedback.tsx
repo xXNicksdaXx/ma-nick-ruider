@@ -5,7 +5,7 @@
  * For a copy, see <https://opensource.org/licenses/MIT>.
  *
  ****************************************************************************/
-import { GModelElement, IVNodePostprocessor } from '@eclipse-glsp/client';
+import {GModelElement, GShapeElement, IVNodePostprocessor} from '@eclipse-glsp/client';
 import { injectable } from 'inversify';
 import { VNode } from 'snabbdom';
 import { svg } from 'sprotty';
@@ -23,15 +23,22 @@ const JSX = { createElement: svg };
 export class FeatureCompartmentSelectionFeedback implements IVNodePostprocessor {
     decorate(vnode: VNode, element: GModelElement): VNode {
         if (element instanceof FeatureCompartment && (element.hoverFeedback || element.selected)) {
-            const vPadding = 1;
-            const hPadding = 2;
+            // get the width of the parent element, if possible
+            const parent = element.parent;
+            let width: number;
+            if (parent && parent instanceof GShapeElement) {
+                width = parent.bounds.width;
+            } else {
+                // if the parent is not available, use the width of the compartment itself
+                width = element.bounds.width;
+            }
 
             const feedback: any = (
                 <rect
-                    x={-hPadding}
-                    y={-vPadding}
-                    width={element.bounds.width + 2 * hPadding}
-                    height={element.bounds.height + 2 * vPadding}
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={element.bounds.height}
                     class-selection-feedback={true}
                     class-hover={element.hoverFeedback}
                     class-selected={element.selected}

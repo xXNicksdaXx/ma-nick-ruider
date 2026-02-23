@@ -11,12 +11,18 @@ import de.vill.model.Group;
 import de.vill.model.constraint.Constraint;
 import de.vill.model.constraint.LiteralConstraint;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.glsp.graph.*;
+import org.eclipse.glsp.graph.GEdge;
+import org.eclipse.glsp.graph.GLabel;
+import org.eclipse.glsp.graph.GModelElement;
+import org.eclipse.glsp.graph.GNode;
 import org.eclipse.glsp.graph.impl.GModelIndexImpl;
 import org.eclipse.glsp.graph.util.RootAdapterUtil;
 import org.eclipse.glsp.server.utils.BiIndex;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.convertConstraintTypeToModelType;
 import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getAllGroups;
@@ -61,6 +67,7 @@ public class UVLModelIndex extends GModelIndexImpl {
                 .filter(node -> {
                     // check children for label with feature name
                     Optional<GLabel> labelElement = node.getChildren().stream()
+                            .flatMap(element -> element.getChildren().stream())
                             .filter(GLabel.class::isInstance)
                             .map(GLabel.class::cast)
                             .filter(label -> {
