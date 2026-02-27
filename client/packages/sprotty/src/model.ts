@@ -62,7 +62,7 @@ export class EditableGLabel extends GLabel implements EditableLabel {
     }
 }
 
-export class FeatureCompartment extends GCompartment implements Selectable, Deletable, Hoverable {
+export class EditableGCompartment extends GCompartment implements Selectable, Deletable, Hoverable {
     selected = false;
     hoverFeedback = false;
 

@@ -5,12 +5,12 @@
  * For a copy, see <https://opensource.org/licenses/MIT>.
  *
  ****************************************************************************/
-import {GChildElement, GModelElement, GShapeElement, IVNodePostprocessor} from '@eclipse-glsp/client';
+import { GChildElement, GModelElement, GShapeElement, IVNodePostprocessor } from '@eclipse-glsp/client';
 import { injectable } from 'inversify';
 import { VNode } from 'snabbdom';
 import { svg } from 'sprotty';
 
-import { FeatureCompartment } from '../model';
+import { EditableGCompartment } from '../model';
 
 // Workaround for typing issues: Creating elements returns a `JSX.Element` instead of a `VNode`, which causes compilation errors.
 // Therefore, type the VNode elements as `any` to avoid these problems.
@@ -20,9 +20,9 @@ import { FeatureCompartment } from '../model';
 const JSX = { createElement: svg };
 
 @injectable()
-export class FeatureCompartmentSelectionFeedback implements IVNodePostprocessor {
+export class EditableCompartmentSelectionFeedback implements IVNodePostprocessor {
     decorate(vnode: VNode, element: GModelElement): VNode {
-        if (element instanceof FeatureCompartment && (element.hoverFeedback || element.selected)) {
+        if (element instanceof EditableGCompartment && (element.hoverFeedback || element.selected)) {
             // get the width of the parent element, if possible
             let parent = element.parent;
             if (parent instanceof GChildElement) {

@@ -99,16 +99,28 @@ svg {
 
 .optional .circle {
     fill: white;
+
+}
+
+.sector {
+    stroke: transparent;
 }
 
 .alternative .sector {
     fill: transparent;
-    stroke: transparent;
 }
 
 .or .sector {
     fill: black;
-    stroke: transparent;
+}
+
+.arc {
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.or .arc {
+    fill: black;
 }
 
 .constraint-edge {

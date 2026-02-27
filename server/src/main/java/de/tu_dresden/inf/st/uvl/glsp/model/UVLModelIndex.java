@@ -5,16 +5,14 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp.model;
 
+import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.vill.model.Feature;
 import de.vill.model.FeatureModel;
 import de.vill.model.Group;
 import de.vill.model.constraint.Constraint;
 import de.vill.model.constraint.LiteralConstraint;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.glsp.graph.GEdge;
-import org.eclipse.glsp.graph.GLabel;
-import org.eclipse.glsp.graph.GModelElement;
-import org.eclipse.glsp.graph.GNode;
+import org.eclipse.glsp.graph.*;
 import org.eclipse.glsp.graph.impl.GModelIndexImpl;
 import org.eclipse.glsp.graph.util.RootAdapterUtil;
 import org.eclipse.glsp.server.utils.BiIndex;
@@ -119,7 +117,7 @@ public class UVLModelIndex extends GModelIndexImpl {
 
     private void indexConstraint(final Constraint constraint, Collection<GModelElement> modelElements) {
         // Find the corresponding GModelElement for the Constraint
-        Optional<String> matchingConstraintId = modelElements.stream()
+        Optional<String> matchingConstraintEdgeId = modelElements.stream()
                 .filter(GEdge.class::isInstance)
                 .map(GEdge.class::cast)
                 .filter(edge -> {
@@ -136,8 +134,26 @@ public class UVLModelIndex extends GModelIndexImpl {
                 .map(GEdge::getId)
                 .findAny();
 
-        if (matchingConstraintId.isPresent()) {
-            String id = matchingConstraintId.get();
+        Optional<String> matchingConstraintCompartmentId = modelElements.stream()
+                .filter(GCompartment.class::isInstance)
+                .map(GCompartment.class::cast)
+                .filter(compartment -> compartment.getType().equals(UVLModelTypes.CONSTRAINT))
+                .filter(compartment -> {
+                    Optional<GLabel> labelElement = compartment.getChildren().stream()
+                            .filter(GLabel.class::isInstance)
+                            .map(GLabel.class::cast)
+                            .filter(label -> label.getText() != null && label.getText().equals(constraint.toString()))
+                            .findAny();
+                    return labelElement.isPresent();
+                })
+                .map(GCompartment::getId)
+                .findFirst();
+
+        if (matchingConstraintEdgeId.isPresent()) {
+            String id = matchingConstraintEdgeId.get();
+            uvlIndex.putIfAbsent(id, constraint);
+        } else if (matchingConstraintCompartmentId.isPresent()) {
+            String id = matchingConstraintCompartmentId.get();
             uvlIndex.putIfAbsent(id, constraint);
         } else {
             String uuid = UUID.randomUUID().toString();

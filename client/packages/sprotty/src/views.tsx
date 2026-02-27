@@ -29,7 +29,7 @@ import { LabeledNode } from "./model";
 const JSX = { createElement: svg };
 
 @injectable()
-export class FeatureNodeView extends RectangularNodeView {
+export class LabeledNodeView extends RectangularNodeView {
 
     override render(node: LabeledNode, context: RenderingContext, args?: IViewArgs): VNode | undefined {
         if (!this.isVisible(node, context)) {
@@ -127,17 +127,25 @@ export class SectorEdgeView extends GEdgeView {
 
             const largeArcFlag = this.calculateLargeArcFlag(s1, s2, source);
 
+            const arc = (
+                <path
+                    class-sprotty-edge={true}
+                    class-arc={true}
+                    d={`
+                        M ${s1.x} ${s1.y} A ${this.RADIUS} ${this.RADIUS} 0 ${largeArcFlag} 1 ${s2.x} ${s2.y}
+                    `}
+                />
+            );
             const sector = (
                 <path
                     class-sprotty-edge={true}
                     class-sector={true}
                     d={`
-                        M ${s1.x} ${s1.y} A ${this.RADIUS} ${this.RADIUS} 0 ${largeArcFlag} 1 ${s2.x} ${s2.y} 
-                        M ${source.x} ${source.y} L ${s1.x} ${s1.y} L ${s2.x} ${s2.y} Z
+                        M ${s1.x} ${s1.y} L ${source.x} ${source.y} L ${s2.x} ${s2.y} Z
                     `}
                 />
-            );
-            additionals.push(sector);
+            )
+            additionals.push(arc, sector);
         }
 
         return additionals;

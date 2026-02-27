@@ -8,6 +8,10 @@ package de.tu_dresden.inf.st.uvl.glsp.utils;
 import de.vill.model.Feature;
 import de.vill.model.FeatureModel;
 import de.vill.model.Group;
+import de.vill.model.constraint.Constraint;
+import de.vill.model.constraint.EquivalenceConstraint;
+import de.vill.model.constraint.ImplicationConstraint;
+import de.vill.model.constraint.LiteralConstraint;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +44,22 @@ public class FeatureModelUtil {
                 .map(Feature::getParentGroup)
                 .filter(Objects::nonNull)
                 .distinct()
+                .toList();
+    }
+
+    public static Collection<Constraint> getEdgeConstraints(FeatureModel featureModel) {
+        return featureModel.getOwnConstraints().stream()
+                .filter(constraint -> constraint instanceof ImplicationConstraint || constraint instanceof EquivalenceConstraint)
+                .filter(constraint -> constraint.getConstraintSubParts().stream()
+                        .filter(subConstraint -> subConstraint instanceof LiteralConstraint)
+                        .toList().size() == 2)
+                .toList();
+    }
+
+    public static Collection<Constraint> getComplexConstraints(FeatureModel featureModel) {
+        Collection<Constraint> edgeConstraints = getEdgeConstraints(featureModel);
+        return featureModel.getOwnConstraints().stream()
+                .filter(constraint -> !edgeConstraints.contains(constraint))
                 .toList();
     }
 

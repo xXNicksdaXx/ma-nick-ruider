@@ -24,7 +24,12 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
                                 true, true, false, true,
                                 List.of(UVLModelTypes.FEATURE, UVLModelTypes.ATTRIBUTE, UVLModelTypes.CARDINALITY_LABEL)),
                         new ShapeTypeHint(UVLModelTypes.ATTRIBUTE,
-                                false, true, false, false)
+                                false, true, false, false),
+                        new ShapeTypeHint(UVLModelTypes.CONSTRAINT_BOX,
+                                true, false, false, false,
+                                List.of(UVLModelTypes.CONSTRAINT)),
+                        new ShapeTypeHint(UVLModelTypes.CONSTRAINT,
+                                false, true, false, true)
                 );
         }
 

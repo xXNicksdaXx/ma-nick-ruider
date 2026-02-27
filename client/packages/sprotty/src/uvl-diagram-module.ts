@@ -39,17 +39,17 @@ import 'balloon-css/balloon.min.css';
 import '../css/diagram.css';
 
 import { CenteredAnchor } from "./features/center-anchor-computer";
-import { FeatureCompartmentSelectionFeedback } from './features/feedback';
+import { EditableCompartmentSelectionFeedback } from './features/feedback';
 import { UVLPolylineEdgeRouter } from "./features/uvl-polyline-edge-router";
-import { EditableGLabel, FeatureCompartment, LabeledNode } from "./model";
-import { CircleEdgeView, DoubleArrowEdgeView, FeatureNodeView, SectorEdgeView, SingleArrowEdgeView } from "./views";
+import { EditableGLabel, EditableGCompartment, LabeledNode } from "./model";
+import { CircleEdgeView, DoubleArrowEdgeView, LabeledNodeView, SectorEdgeView, SingleArrowEdgeView } from "./views";
 
 const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     const context = {bind, unbind, isBound, rebind};
     rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
     rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
 
-    bind(TYPES.IVNodePostprocessor).to(FeatureCompartmentSelectionFeedback);
+    bind(TYPES.IVNodePostprocessor).to(EditableCompartmentSelectionFeedback);
     bind(TYPES.IHelperLineOptions).toConstantValue({
         elementLines: [
             HelperLineType.Left, HelperLineType.Center, HelperLineType.Right,
@@ -71,10 +71,14 @@ const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
     });
 
     // Register custom model elements and their views
-    configureModelElement(context, UVLModelTypes.FEATURE, LabeledNode, FeatureNodeView);
+    configureModelElement(context, UVLModelTypes.CONSTRAINT_BOX, LabeledNode, LabeledNodeView);
+    configureModelElement(context, UVLModelTypes.CONSTRAINT, EditableGCompartment, GCompartmentView);
+    configureModelElement(context, UVLModelTypes.CONSTRAINT_TEXT, EditableGLabel, GLabelView);
+
+    configureModelElement(context, UVLModelTypes.FEATURE, LabeledNode, LabeledNodeView);
     configureModelElement(context, UVLModelTypes.FEATURE_NAME, EditableGLabel, GLabelView);
 
-    configureModelElement(context, UVLModelTypes.ATTRIBUTE, FeatureCompartment, GCompartmentView);
+    configureModelElement(context, UVLModelTypes.ATTRIBUTE, EditableGCompartment, GCompartmentView);
     configureModelElement(context, UVLModelTypes.ATTRIBUTE_NAME, EditableGLabel, GLabelView);
     configureModelElement(context, UVLModelTypes.ATTRIBUTE_VALUE, EditableGLabel, GLabelView);
 
