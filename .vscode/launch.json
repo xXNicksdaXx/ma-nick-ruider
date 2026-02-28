@@ -7,6 +7,10 @@
       "request": "launch",
       "mainClass": "de.tu_dresden.inf.st.uvl.glsp.launch.UVLServerLauncher",
       "projectName": "uvl.glsp",
+      "classPaths": [
+        "${workspaceFolder}/server/uvl.glsp/target/classes",
+        "${workspaceFolder}/server/uvl.glsp/target/dependency/*"
+      ],
       "args": [
         "--port",
         "5007"

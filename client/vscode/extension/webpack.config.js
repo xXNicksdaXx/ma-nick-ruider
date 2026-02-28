@@ -2,7 +2,7 @@
 
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
-const serverModule = path.resolve(__dirname, '..', '..', '..', 'server');
+const serverModule = path.resolve(__dirname, '..', '..', '..', 'server', 'uvl.glsp');
 
 /**@type {import('webpack').Configuration}*/
 const config = {

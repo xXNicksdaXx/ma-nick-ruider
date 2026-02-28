@@ -13,7 +13,8 @@ UVL specifies variability models with a tree-like structure to represent the hie
 
 The project is organized as follows:
 
-- **[`server/`](./server):** Java-based Eclipse GLSP server for diagram editing
+- **[`server/`](./server):** Java-based Eclipse GLSP server for UVL diagram editing and BP-extension
+  - **[`uvl.glsp/`](./server/uvl.glsp):** Eclipse GLSP server for diagram editing
 - **[`client/`](./client):** TypeScript/JavaScript client applications and extensions
     - **[`vscode/`](./client/vscode):** VS Code extension
         - **[`extension/`](./client/vscode/extension):** Extension host process
