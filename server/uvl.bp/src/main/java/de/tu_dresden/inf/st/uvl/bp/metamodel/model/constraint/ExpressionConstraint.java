@@ -1,0 +1,124 @@
+package de.tu_dresden.inf.st.uvl.bp.metamodel.model.constraint;
+
+import de.tu_dresden.inf.st.uvl.bp.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.bp.metamodel.model.building.VariableReference;
+import de.tu_dresden.inf.st.uvl.bp.metamodel.model.expression.Expression;
+import de.tu_dresden.inf.st.uvl.bp.metamodel.util.ConstantSymbols;
+
+import java.util.*;
+
+public abstract class ExpressionConstraint extends Constraint {
+    private Expression left;
+    private Expression right;
+    private final String expressionSymbol;
+
+    public ExpressionConstraint(Expression left, Expression right, String expressionSymbol) {
+        this.left = left;
+        this.right = right;
+        this.expressionSymbol = expressionSymbol;
+    }
+
+    public Expression getLeft() {
+        return left;
+    }
+
+    public Expression getRight() {
+        return right;
+    }
+
+    public void setLeft(Expression expression) {
+        left = expression;
+    }
+
+    public void setRight(Expression expression) {
+        right = expression;
+    }
+
+    public String getExpressionSymbol() {
+        return expressionSymbol;
+    }
+
+    @Override
+    public String toString(boolean withSubmodels, String currentAlias) {
+        return left.toString(withSubmodels, currentAlias) +
+            " " +
+            expressionSymbol +
+            " " +
+            right.toString(withSubmodels, currentAlias);
+    }
+
+    @Override
+    public List<Constraint> getConstraintSubParts() {
+        return Collections.emptyList();
+    }
+
+    public List<Expression> getExpressionSubParts() {
+        return Arrays.asList(left, right);
+    }
+
+    public void replaceExpressionSubPart(Expression oldSubExpression, Expression newSubExpression) {
+        if (left == oldSubExpression) {
+            left = newSubExpression;
+        } else if (right == oldSubExpression) {
+            right = newSubExpression;
+        }
+    }
+
+    @Override
+    public void replaceConstraintSubPart(Constraint oldSubConstraint, Constraint newSubConstraint) {
+        // no sub constraints
+    }
+
+    public boolean evaluate(Set<Feature> selectedFeatures) {
+        double leftResult = left.evaluate(selectedFeatures);
+        double rightResult = right.evaluate(selectedFeatures);
+        if (Double.isNaN(leftResult) || Double.isNaN(rightResult) || Double.isInfinite(leftResult) || Double.isInfinite(rightResult)){
+            return false;
+        }
+
+        if (ConstantSymbols.EQUALS.equals(expressionSymbol)) {
+            return leftResult == rightResult;
+        } else if (ConstantSymbols.LOWER.equals(expressionSymbol)) {
+            return leftResult < rightResult;
+        } else if (ConstantSymbols.GREATER.equals(expressionSymbol)) {
+            return leftResult > rightResult;
+        } else if (ConstantSymbols.GREATER_OR_EQUAL.equals(expressionSymbol)) {
+            return leftResult >= rightResult;
+        } else if (ConstantSymbols.LOWER_OR_EQUAL.equals(expressionSymbol)) {
+            return leftResult <= rightResult;
+        } else if (ConstantSymbols.NOT_EQUALS.equals(expressionSymbol)) {
+            return leftResult != rightResult;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(int level) {
+        final int prime = 31;
+        int result = prime * level + (left == null ? 0 : left.hashCode());
+        result = prime * result + (right == null ? 0 : right.hashCode());
+        result = prime * result + (expressionSymbol == null ? 0 : expressionSymbol.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ExpressionConstraint other = (ExpressionConstraint) obj;
+        return Objects.equals(expressionSymbol, other.expressionSymbol) && Objects.equals(left, other.left)
+            && Objects.equals(right, other.right);
+    }
+
+    @Override
+    public List<VariableReference> getReferences() {
+        List<VariableReference> references = new ArrayList<>();
+        references.addAll(left.getReferences());
+        references.addAll(right.getReferences());
+        return references;
+    }
+}

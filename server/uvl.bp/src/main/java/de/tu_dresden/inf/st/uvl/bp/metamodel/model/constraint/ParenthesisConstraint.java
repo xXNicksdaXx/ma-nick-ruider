@@ -1,0 +1,66 @@
+package de.tu_dresden.inf.st.uvl.bp.metamodel.model.constraint;
+
+import de.tu_dresden.inf.st.uvl.bp.metamodel.model.building.VariableReference;
+import de.tu_dresden.inf.st.uvl.bp.metamodel.util.ConstantSymbols;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+public class ParenthesisConstraint extends Constraint {
+    private Constraint content;
+
+    public ParenthesisConstraint(Constraint content) {
+        this.content = content;
+    }
+
+    public Constraint getContent() {
+        return content;
+    }
+
+    @Override
+    public String toString(boolean withSubmodels, String currentAlias) {
+        return ConstantSymbols.PAREN_OPEN +
+                content.toString(withSubmodels, currentAlias) +
+                ConstantSymbols.PAREN_CLOSE;
+    }
+
+    @Override
+    public List<Constraint> getConstraintSubParts() {
+        return Arrays.asList(content);
+    }
+
+    @Override
+    public void replaceConstraintSubPart(Constraint oldSubConstraint, Constraint newSubConstraint) {
+        if (content == oldSubConstraint) {
+            content = newSubConstraint;
+        }
+    }
+
+    @Override
+    public Constraint clone() {
+        return new ParenthesisConstraint(content.clone());
+    }
+
+    @Override
+    public int hashCode(int level) {
+        return 31 * level + (content == null ? 0 : content.hashCode(1 + level));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ParenthesisConstraint other = (ParenthesisConstraint) obj;
+        return Objects.equals(content, other.content);
+    }
+
+    @Override
+    public List<VariableReference> getReferences() {
+        return content.getReferences();
+    }
+}

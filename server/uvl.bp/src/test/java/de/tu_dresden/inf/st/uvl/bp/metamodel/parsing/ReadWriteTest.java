@@ -1,0 +1,37 @@
+package de.tu_dresden.inf.st.uvl.bp.metamodel.parsing;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.Test;
+
+import de.tu_dresden.inf.st.uvl.bp.metamodel.main.UVLModelFactory;
+import de.tu_dresden.inf.st.uvl.bp.metamodel.model.FeatureModel;
+
+public class ReadWriteTest {
+    
+    private final static String TEMP_PATH = "temp.uvl";
+    private final static String TEST_MODEL_ONE = "src/test/resources/complex/bike.uvl";
+
+    @Test
+    void testReadWrite() throws Exception {
+        UVLModelFactory uvlModelFactory = new UVLModelFactory();
+        
+        // Read
+        String content = new String(Files.readAllBytes(Paths.get(TEST_MODEL_ONE)));
+        FeatureModel featureModel = uvlModelFactory.parse(content);
+        assert(featureModel != null);
+
+        // Write
+        Files.write(Paths.get(TEMP_PATH), featureModel.toString().getBytes());
+
+        // Try reading again
+        content = new String(Files.readAllBytes(Paths.get(TEMP_PATH)));
+        FeatureModel reFeatureModel = uvlModelFactory.parse(content);
+        assert(reFeatureModel != null);
+        assert(reFeatureModel.getFeatureMap().size() == featureModel.getFeatureMap().size());
+        assert(reFeatureModel.getOwnConstraints().size() == featureModel.getOwnConstraints().size());
+
+        Files.delete(Paths.get(TEMP_PATH));
+    }
+}
