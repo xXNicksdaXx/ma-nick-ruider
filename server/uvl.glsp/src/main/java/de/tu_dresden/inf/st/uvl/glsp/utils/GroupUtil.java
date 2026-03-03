@@ -6,8 +6,8 @@
 package de.tu_dresden.inf.st.uvl.glsp.utils;
 
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
-import de.vill.model.Feature;
-import de.vill.model.Group;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
 
 public class GroupUtil {
 
@@ -45,12 +45,5 @@ public class GroupUtil {
             case UVLModelTypes.OR -> Group.GroupType.OR;
             default -> throw new IllegalArgumentException("Unknown model type: " + modelType);
         };
-    }
-
-    public static String getCardinalityText(Group group) {
-        if (group.GROUPTYPE == Group.GroupType.GROUP_CARDINALITY) {
-            return group.getLowerBound() + ".." + group.getUpperBound();
-        }
-        return "";
     }
 }

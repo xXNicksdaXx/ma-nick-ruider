@@ -6,11 +6,11 @@
 package de.tu_dresden.inf.st.uvl.glsp.model;
 
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
-import de.vill.model.Feature;
-import de.vill.model.FeatureModel;
-import de.vill.model.Group;
-import de.vill.model.constraint.Constraint;
-import de.vill.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.glsp.graph.*;
 import org.eclipse.glsp.graph.impl.GModelIndexImpl;
@@ -127,8 +127,8 @@ public class UVLModelIndex extends GModelIndexImpl {
                 })
                 .filter(edge -> {
                     // check for identical source and target nodes
-                    Optional<String> sourceId = getIdFor(((LiteralConstraint) constraint.getConstraintSubParts().getFirst()).getFeature());
-                    Optional<String> targetId = getIdFor(((LiteralConstraint) constraint.getConstraintSubParts().getLast()).getFeature());
+                    Optional<String> sourceId = getIdFor(((LiteralConstraint) constraint.getConstraintSubParts().getFirst()).getReference());
+                    Optional<String> targetId = getIdFor(((LiteralConstraint) constraint.getConstraintSubParts().getLast()).getReference());
                     return sourceId.isPresent() && targetId.isPresent() && edge.getSourceId().equals(sourceId.get()) && edge.getTargetId().equals(targetId.get());
                 })
                 .map(GEdge::getId)

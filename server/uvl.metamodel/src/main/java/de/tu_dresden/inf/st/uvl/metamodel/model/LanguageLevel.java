@@ -17,7 +17,7 @@ public enum LanguageLevel {
 
     // MINOR LEVELS (logic: val % 2 == 0)
     GROUP_CARDINALITY(2, "group-cardinality"),
-    FEATURE_CARDINALITY(6, "feature-cardinality"),
+    FEATURE_CARDINALITY(4, "feature-cardinality"),
     AGGREGATE_FUNCTION(4, "aggregate-function"),
     STRING_CONSTRAINTS(8, "string-constraints"),
     NUMERIC_CONSTRAINTS(8, "numeric-constraints"),

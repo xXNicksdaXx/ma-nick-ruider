@@ -5,13 +5,14 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp.utils;
 
-import de.vill.model.Feature;
-import de.vill.model.FeatureModel;
-import de.vill.model.Group;
-import de.vill.model.constraint.Constraint;
-import de.vill.model.constraint.EquivalenceConstraint;
-import de.vill.model.constraint.ImplicationConstraint;
-import de.vill.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Cardinality;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,6 +66,39 @@ public class FeatureModelUtil {
 
     public static boolean includesFeatureCardinality(FeatureModel featureModel) {
         return featureModel.getFeatureMap().values().stream()
-                .anyMatch(feature -> feature.getLowerBound() != null && feature.getUpperBound() != null);
+                .anyMatch(feature -> feature.getCardinality() != null);
+    }
+
+    public static Cardinality createCardinality(String cardinalityString) {
+        if (cardinalityString == null || cardinalityString.isEmpty()) {
+            return null;
+        }
+        String[] parts = cardinalityString.split("\\.\\.");
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Invalid cardinality format: " + cardinalityString);
+        }
+
+        // allow upper bound to be "*" for unbounded cardinality -> Integer.MAX_VALUE
+        if (parts[1].equals("*")) {
+            parts[1] = String.valueOf(Integer.MAX_VALUE);
+        }
+
+        try {
+            int lowerBound = Integer.parseInt(parts[0]);
+            int upperBound = Integer.parseInt(parts[1]);
+            return new Cardinality(lowerBound, upperBound);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Cardinality bounds must be integers: " + cardinalityString, e);
+        }
+    }
+
+    public static String getCardinalityText(Cardinality cardinality) {
+        if (cardinality == null) {
+            return "";
+        }
+        String upperBoundText = cardinality.upper == Integer.MAX_VALUE
+                ? "*"
+                : String.valueOf(cardinality.upper);
+        return cardinality.lower + ".." + upperBoundText;
     }
 }

@@ -6,15 +6,15 @@
 package de.tu_dresden.inf.st.uvl.glsp.utils;
 
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
-import de.vill.model.Feature;
-import de.vill.model.FeatureModel;
-import de.vill.model.constraint.Constraint;
-import de.vill.model.constraint.EquivalenceConstraint;
-import de.vill.model.constraint.ExpressionConstraint;
-import de.vill.model.constraint.ImplicationConstraint;
-import de.vill.model.constraint.LiteralConstraint;
-import de.vill.model.expression.Expression;
-import de.vill.model.expression.LiteralExpression;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ExpressionConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.expression.Expression;
+import de.tu_dresden.inf.st.uvl.metamodel.model.expression.LiteralExpression;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class ConstraintUtil {
 
     public static boolean featureIsInConstraint(Feature feature, FeatureModel featureModel) {
         for (LiteralConstraint constraint : featureModel.getLiteralConstraints()) {
-            if (constraint.getFeature() == feature) {
+            if (constraint.getReference() == feature) {
                 return true;
             }
         }
@@ -31,7 +31,7 @@ public class ConstraintUtil {
 
     public static LiteralConstraint getLiteralConstraint(Feature feature, FeatureModel featureModel) {
         for (LiteralConstraint constraint : featureModel.getLiteralConstraints()) {
-            if (constraint.getFeature() == feature) {
+            if (constraint.getReference() == feature) {
                 return constraint;
             }
         }
@@ -40,7 +40,7 @@ public class ConstraintUtil {
 
     public static boolean featureAttributeIsInConstraint(Feature feature, String attribute, FeatureModel featureModel) {
         for (LiteralExpression expression : featureModel.getLiteralExpressions()) {
-            if (expression.getFeatureName().equals(feature.getFeatureName()) && expression.getAttributeName().equals(attribute)) {
+            if (expression.getContent().getIdentifier().contains(feature.getFeatureName()) && expression.getContent().getIdentifier().contains(attribute)) {
                 return true;
             }
         }
@@ -62,8 +62,9 @@ public class ConstraintUtil {
     public static void replaceExpression(Expression expression, Feature feature, String oldAttributeName, String newAttributeName) {
         for (Expression expressionSubPart : expression.getExpressionSubParts()) {
             if (expressionSubPart instanceof LiteralExpression literalExpression) {
-                if (literalExpression.getFeatureName().equals(feature.getFeatureName()) && literalExpression.getAttributeName().equals(oldAttributeName)) {
-                    expression.replaceExpressionSubPart(literalExpression, new LiteralExpression(feature, newAttributeName));
+                if (literalExpression.getContent().getIdentifier().contains(feature.getFeatureName()) && literalExpression.getContent().getIdentifier().contains(oldAttributeName)) {
+                    // TODO: check new LiteralExpression constructor for correct parameters
+                    // expression.replaceExpressionSubPart(literalExpression, new LiteralExpression(feature, newAttributeName));
                 }
             } else {
                 replaceExpression(expressionSubPart, feature, oldAttributeName, newAttributeName);
@@ -86,8 +87,9 @@ public class ConstraintUtil {
     public static void removeExpression(Expression expression, Feature feature, String attributeName) {
         for (Expression expressionSubPart : expression.getExpressionSubParts()) {
             if (expressionSubPart instanceof LiteralExpression literalExpression) {
-                if (literalExpression.getFeatureName().equals(feature.getFeatureName()) && literalExpression.getAttributeName().equals(attributeName)) {
-                    expression.replaceExpressionSubPart(literalExpression, new LiteralExpression(feature, ""));
+                if (literalExpression.getContent().getIdentifier().contains(feature.getFeatureName()) && literalExpression.getContent().getIdentifier().contains(attributeName)) {
+                    // TODO: check new LiteralExpression constructor for correct parameters
+                    // expression.replaceExpressionSubPart(literalExpression, new LiteralExpression(feature, ""));
                 }
             } else {
                 removeExpression(expressionSubPart, feature, attributeName);

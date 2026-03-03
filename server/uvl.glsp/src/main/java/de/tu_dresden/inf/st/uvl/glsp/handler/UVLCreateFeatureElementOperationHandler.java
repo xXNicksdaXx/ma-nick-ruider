@@ -8,9 +8,10 @@ package de.tu_dresden.inf.st.uvl.glsp.handler;
 import com.google.inject.Inject;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
-import de.vill.model.Attribute;
-import de.vill.model.Feature;
-import de.vill.model.LanguageLevel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Attribute;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Cardinality;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.LanguageLevel;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.glsp.server.gmodel.GModelCreateOperationHandler;
 import org.eclipse.glsp.server.operations.CreateNodeOperation;
@@ -50,14 +51,13 @@ public class UVLCreateFeatureElementOperationHandler extends GModelCreateOperati
         // create new Attribute and add it to the parent feature
         int attributeSize = feature.getAttributes().size();
         String name = "Attribute" + (attributeSize + 1);
-        Attribute<Boolean> newAttribute = new Attribute<>(name, true);
+        Attribute<Boolean> newAttribute = new Attribute<>(name, true, feature);
         feature.getAttributes().put(name, newAttribute);
     }
 
     protected void createFeatureCardinality(Feature feature) {
         // set default cardinality for the feature
-        feature.setLowerBound("0");
-        feature.setUpperBound("1");
+        feature.setCardinality(new Cardinality(0));
 
         // add language level if not already present
         modelState.getFeatureModel().getUsedLanguageLevels().add(LanguageLevel.FEATURE_CARDINALITY);

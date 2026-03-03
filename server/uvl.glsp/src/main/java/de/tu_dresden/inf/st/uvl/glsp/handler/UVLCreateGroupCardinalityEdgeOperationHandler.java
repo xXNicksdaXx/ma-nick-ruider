@@ -6,9 +6,10 @@
 package de.tu_dresden.inf.st.uvl.glsp.handler;
 
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
-import de.vill.model.Feature;
-import de.vill.model.Group;
-import de.vill.model.LanguageLevel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Cardinality;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
+import de.tu_dresden.inf.st.uvl.metamodel.model.LanguageLevel;
 import org.eclipse.glsp.graph.GEdge;
 import org.eclipse.glsp.server.operations.CreateEdgeOperation;
 
@@ -50,8 +51,7 @@ public class UVLCreateGroupCardinalityEdgeOperationHandler  extends UVLCreateRel
 
     protected void createGroupWithCardinality(Feature source, Feature target) {
         Group group = new Group(Group.GroupType.GROUP_CARDINALITY);
-        group.setLowerBound("0");
-        group.setUpperBound("*");
+        group.setCardinality(new Cardinality(0));
         group.setParentFeature(source);
         group.getFeatures().add(target);
         source.getChildren().add(group);

@@ -5,7 +5,7 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp.model;
 
-import de.vill.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import org.eclipse.glsp.server.model.GModelState;
 
 public interface UVLModelState extends GModelState {

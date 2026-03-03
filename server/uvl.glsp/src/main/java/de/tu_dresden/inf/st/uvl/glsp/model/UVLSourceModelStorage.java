@@ -6,9 +6,9 @@
 package de.tu_dresden.inf.st.uvl.glsp.model;
 
 import com.google.inject.Inject;
-import de.vill.exception.ParseErrorList;
-import de.vill.main.UVLModelFactory;
-import de.vill.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.exception.ParseErrorList;
+import de.tu_dresden.inf.st.uvl.metamodel.main.UVLModelFactory;
+import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.glsp.graph.*;

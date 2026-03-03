@@ -8,10 +8,10 @@ package de.tu_dresden.inf.st.uvl.glsp.handler;
 import com.google.inject.Inject;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
-import de.vill.model.Feature;
-import de.vill.model.constraint.EquivalenceConstraint;
-import de.vill.model.constraint.ImplicationConstraint;
-import de.vill.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.glsp.graph.GEdge;
 import org.eclipse.glsp.server.gmodel.GModelCreateOperationHandler;
@@ -61,9 +61,7 @@ public class UVLCreateBiConstraintEdgeOperationHandler extends GModelCreateOpera
                 .orElseThrow(
                         () -> new IllegalStateException("Source feature not found for ID: " + operation.getSourceElementId()));
 
-        LiteralConstraint sourceConstraint = new LiteralConstraint(source.getFeatureName());
-        sourceConstraint.setFeature(source);
-        return sourceConstraint;
+        return new LiteralConstraint(source);
     }
 
     protected LiteralConstraint getTargetConstraint(CreateEdgeOperation operation) {
@@ -72,9 +70,7 @@ public class UVLCreateBiConstraintEdgeOperationHandler extends GModelCreateOpera
                 .orElseThrow(
                         () -> new IllegalStateException("Target feature not found for ID: " + operation.getTargetElementId()));
 
-        LiteralConstraint targetConstraint = new LiteralConstraint(target.getFeatureName());
-        targetConstraint.setFeature(target);
-        return targetConstraint;
+        return new LiteralConstraint(target);
     }
 
     protected Optional<GEdge> findExistingEdge(CreateEdgeOperation operation) {

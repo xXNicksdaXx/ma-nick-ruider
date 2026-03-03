@@ -7,13 +7,12 @@ package de.tu_dresden.inf.st.uvl.glsp.model;
 
 import com.google.inject.Inject;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
+import de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.GroupUtil;
-import de.vill.model.Attribute;
-import de.vill.model.Feature;
-import de.vill.model.FeatureModel;
-import de.vill.model.Group;
-import de.vill.model.constraint.Constraint;
-import de.vill.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.*;
+import de.tu_dresden.inf.st.uvl.metamodel.model.building.VariableReference;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.glsp.graph.DefaultTypes;
@@ -106,7 +105,7 @@ public class UVLGModelFactory implements GModelFactory {
                         .paddingRight(0)
                         .paddingBottom(0.0)
                         .resizeContainer(true))
-                .add(buildHeader(id, feature.getFeatureName(), feature.getLowerBound(), feature.getUpperBound()))
+                .add(buildHeader(id, feature.getFeatureName(), feature.getCardinality()))
                 .add(buildAttributeCompartment(id, feature));
 
         Optional<GNode> node = index.getGModelElement(feature, GNode.class);
@@ -121,7 +120,7 @@ public class UVLGModelFactory implements GModelFactory {
         return nodeBuilder.build();
     }
 
-    private GCompartment buildHeader(final String id, final String name, String lower, String upper) {
+    private GCompartment buildHeader(final String id, final String name, final Cardinality cardinality) {
         GLabel headerLabel = new GLabelBuilder(UVLModelTypes.FEATURE_NAME)
                 .id(id + "_header_label")
                 .text(name)
@@ -138,10 +137,10 @@ public class UVLGModelFactory implements GModelFactory {
                         .resizeContainer(true))
                 .add(headerLabel);
 
-        if (lower != null && upper != null) {
+        if (cardinality != null) {
             GLabel cardinalityLabel = new GLabelBuilder(UVLModelTypes.CARDINALITY_LABEL)
                     .id(id + "_cardinality_label")
-                    .text(lower + ".." + upper)
+                    .text(FeatureModelUtil.getCardinalityText(cardinality))
                     .build();
             headerBuilder
                     .add(new GLabelBuilder(DefaultTypes.LABEL)
@@ -243,7 +242,7 @@ public class UVLGModelFactory implements GModelFactory {
             if (requiresCardinalityLabel) {
                 edgeBuilder.add(new GLabelBuilder(UVLModelTypes.CARDINALITY_LABEL)
                         .id(groupId + "_" + targetId + "_label")
-                        .text(GroupUtil.getCardinalityText(group))
+                        .text(FeatureModelUtil.getCardinalityText(group.getCardinality()))
                         .addCssClass("edge-label")
                         .edgePlacement(new GEdgePlacementBuilder()
                                 .side(GConstants.EdgeSide.LEFT)
@@ -271,22 +270,22 @@ public class UVLGModelFactory implements GModelFactory {
 
         Constraint sourceConstraint = constraint.getConstraintSubParts().getFirst();
         if (sourceConstraint instanceof LiteralConstraint sourceLiteralConstraint) {
-            Feature sourceFeature = sourceLiteralConstraint.getFeature();
-            sourceId = index.getIdFor(sourceFeature).orElseThrow(
-                    () -> new IllegalStateException("Source feature of implication constraint not indexed: " + sourceFeature.getFeatureName())
+            VariableReference sourceReference = sourceLiteralConstraint.getReference();
+            sourceId = index.getIdFor(sourceReference).orElseThrow(
+                    () -> new IllegalStateException("Source feature of implication constraint not indexed: " + sourceReference.getIdentifier())
             );
         } else {
             throw new IllegalStateException("Unsupported source constraint type for implication: " + sourceConstraint.getClass().getName());
         }
 
-        Constraint targetConstraint = constraint.getConstraintSubParts().getLast();
-        if (targetConstraint instanceof LiteralConstraint targetLiteralConstraint) {
-            Feature targetFeature = targetLiteralConstraint.getFeature();
+        Constraint targetReference = constraint.getConstraintSubParts().getLast();
+        if (targetReference instanceof LiteralConstraint targetLiteralConstraint) {
+            VariableReference targetFeature = targetLiteralConstraint.getReference();
             targetId = index.getIdFor(targetFeature).orElseThrow(
-                    () -> new IllegalStateException("Target feature of implication constraint not indexed: " + targetFeature.getFeatureName())
+                    () -> new IllegalStateException("Target feature of implication constraint not indexed: " + targetFeature.getIdentifier())
             );
         } else {
-            throw new IllegalStateException("Unsupported target constraint type for implication: " + targetConstraint.getClass().getName());
+            throw new IllegalStateException("Unsupported target constraint type for implication: " + targetReference.getClass().getName());
         }
 
         String type = convertConstraintTypeToModelType(constraint);

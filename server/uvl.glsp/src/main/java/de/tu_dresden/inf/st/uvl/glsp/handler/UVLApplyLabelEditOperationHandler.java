@@ -12,10 +12,7 @@ import de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.GModelUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.TypeCastingUtil;
-import de.vill.model.Attribute;
-import de.vill.model.Feature;
-import de.vill.model.Group;
-import de.vill.model.LanguageLevel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.*;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.glsp.graph.GLabel;
 import org.eclipse.glsp.graph.GModelElement;
@@ -89,7 +86,7 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
         label.setText(newName);
 
         // update Feature Attribute
-        Attribute<?> newAttribute = new Attribute<>(newName, previousAttribute.getValue());
+        Attribute<?> newAttribute = new Attribute<>(newName, previousAttribute.getValue(), feature);
         feature.getAttributes().putIfAbsent(newName, newAttribute);
         feature.getAttributes().remove(previousName);
 
@@ -123,7 +120,8 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
         // update Feature Attribute
         Attribute<?> newAttribute = new Attribute<>(
                 previousAttribute.getName(),
-                TypeCastingUtil.convertStringToBestType(newValue)
+                TypeCastingUtil.convertStringToBestType(newValue),
+                feature
         );
         feature.getAttributes().replace(attributeKey, newAttribute);
     }
@@ -131,8 +129,7 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
     protected void updateFeatureCardinality(GLabel label, Feature feature, String newName) {
         if (newName.isBlank()) {
             // remove feature cardinality if the new name is empty
-            feature.setLowerBound(null);
-            feature.setUpperBound(null);
+            feature.setCardinality(null);
 
             // remove language level if no other feature uses cardinality
             if (!FeatureModelUtil.includesFeatureCardinality(modelState.getFeatureModel())) {
@@ -150,9 +147,8 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
         label.setText(newName);
 
         // update Feature
-        String[] bounds = newName.split("\\.\\.");
-        feature.setLowerBound(bounds[0]);
-        feature.setUpperBound(bounds[1]);
+        Cardinality cardinality = FeatureModelUtil.createCardinality(newName);
+        feature.setCardinality(cardinality);
     }
 
     protected void updateGroupCardinality(GLabel label, Group group, String newName) {
@@ -165,9 +161,8 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
         label.setText(newName);
 
         // update Group
-        String[] bounds = newName.split("\\.\\.");
-        group.setLowerBound(bounds[0]);
-        group.setUpperBound(bounds[1]);
+        Cardinality cardinality = FeatureModelUtil.createCardinality(newName);
+        group.setCardinality(cardinality);
     }
 
 

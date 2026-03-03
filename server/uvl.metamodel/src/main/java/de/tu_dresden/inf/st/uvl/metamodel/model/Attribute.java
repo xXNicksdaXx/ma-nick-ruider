@@ -26,13 +26,14 @@ public class Attribute<T> implements VariableReference {
     /**
      * The constructor of the attribute class takes an attribute name (does not contain the feature name) and a value of type T
      *
-     * @param name  the name of the attribute (must be different from all other attributes of the feature)
-     * @param value the value of the attribute
+     * @param name                 the name of the attribute (must be different from all other attributes of the feature)
+     * @param value                the value of the attribute
+     * @param correspondingFeature the feature this attribute belongs to
      */
     public Attribute(String name, T value, Feature correspondingFeature) {
         this.name = Objects.requireNonNull(name);
         this.value = Objects.requireNonNull(value);
-        this.feature = correspondingFeature;
+        this.feature = Objects.requireNonNull(correspondingFeature);
     }
 
     public int getLine() {

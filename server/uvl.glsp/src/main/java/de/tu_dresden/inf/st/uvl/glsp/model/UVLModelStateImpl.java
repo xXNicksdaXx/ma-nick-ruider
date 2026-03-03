@@ -7,7 +7,7 @@ package de.tu_dresden.inf.st.uvl.glsp.model;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import de.vill.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.glsp.graph.GModelRoot;
