@@ -1,6 +1,6 @@
 {
   "name": "uvl-command-contribution",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "private": "true",
   "description": "Command contribution package for the UVL GLSP VSCode client",
   "keywords": [

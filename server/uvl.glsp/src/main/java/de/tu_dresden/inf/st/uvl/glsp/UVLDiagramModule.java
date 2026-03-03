@@ -6,14 +6,13 @@
 package de.tu_dresden.inf.st.uvl.glsp;
 
 import com.google.inject.Singleton;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLApplyLabelEditOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateFeatureElementOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateBiConstraintEdgeOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateFeatureOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateGroupCardinalityEdgeOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateRelationEdgeOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLDeleteOperationHandler;
+import de.tu_dresden.inf.st.uvl.glsp.handler.*;
 import de.tu_dresden.inf.st.uvl.glsp.layout.UVLTreeLayoutEngine;
+import de.tu_dresden.inf.st.uvl.glsp.model.UVLGModelFactory;
+import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
+import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelStateImpl;
+import de.tu_dresden.inf.st.uvl.glsp.model.UVLSourceModelStorage;
+import de.tu_dresden.inf.st.uvl.glsp.palette.UVLToolPaletteItemProvider;
 import org.eclipse.glsp.server.actions.ActionHandler;
 import org.eclipse.glsp.server.di.DiagramModule;
 import org.eclipse.glsp.server.di.MultiBinding;
@@ -21,19 +20,9 @@ import org.eclipse.glsp.server.diagram.DiagramConfiguration;
 import org.eclipse.glsp.server.features.core.model.GModelFactory;
 import org.eclipse.glsp.server.features.core.model.SourceModelStorage;
 import org.eclipse.glsp.server.features.toolpalette.ToolPaletteItemProvider;
-import org.eclipse.glsp.server.gmodel.GModelChangeBoundsOperationHandler;
-import org.eclipse.glsp.server.gmodel.GModelChangeRoutingPointsHandler;
-import org.eclipse.glsp.server.gmodel.GModelPasteOperationHandler;
-import org.eclipse.glsp.server.gmodel.GModelReconnectEdgeOperationHandler;
-import org.eclipse.glsp.server.gmodel.GModelRequestClipboardDataActionHandler;
+import org.eclipse.glsp.server.gmodel.*;
 import org.eclipse.glsp.server.layout.LayoutEngine;
 import org.eclipse.glsp.server.operations.OperationHandler;
-
-import de.tu_dresden.inf.st.uvl.glsp.model.UVLGModelFactory;
-import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
-import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelStateImpl;
-import de.tu_dresden.inf.st.uvl.glsp.model.UVLSourceModelStorage;
-import de.tu_dresden.inf.st.uvl.glsp.palette.UVLToolPaletteItemProvider;
 
 public class UVLDiagramModule extends DiagramModule {
 

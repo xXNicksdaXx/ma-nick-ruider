@@ -4,12 +4,9 @@
              xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>de.tu_dresden.inf.st</groupId>
-        <artifactId>server</artifactId>
-        <version>0.0.1</version>
-    </parent>
+    <groupId>de.tu_dresden.inf.st</groupId>
     <artifactId>uvl.glsp</artifactId>
+    <version>0.2.0</version>
     <description>GLSP server component</description>
     <url>https://git-st.inf.tu-dresden.de/stgroup/student-projects/2026/ma-nick-ruider</url>
 
@@ -55,7 +52,7 @@
         <eclipse.core.version>3.7.100</eclipse.core.version>
         <eclipse.lsp4j.version>0.24.0</eclipse.lsp4j.version>
         <apache.logging.log4j.version>2.25.1</apache.logging.log4j.version>
-        <uvl.metamodel.version>1.0</uvl.metamodel.version>
+        <uvl.metamodel.version>1.2.0</uvl.metamodel.version>
     </properties>
 
     <dependencies>
@@ -97,7 +94,7 @@
         <dependency>
             <groupId>de.tu_dresden.inf.st</groupId>
             <artifactId>uvl.metamodel</artifactId>
-            <version>0.0.1</version>
+            <version>${uvl.metamodel.version}</version>
         </dependency>
     </dependencies>
 

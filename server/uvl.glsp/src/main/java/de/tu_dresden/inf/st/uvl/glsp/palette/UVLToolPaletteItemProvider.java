@@ -5,15 +5,14 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp.palette;
 
-import java.util.List;
-import java.util.Map;
-
+import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import org.eclipse.glsp.server.actions.TriggerEdgeCreationAction;
 import org.eclipse.glsp.server.actions.TriggerNodeCreationAction;
 import org.eclipse.glsp.server.features.toolpalette.PaletteItem;
 import org.eclipse.glsp.server.features.toolpalette.ToolPaletteItemProvider;
 
-import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
+import java.util.List;
+import java.util.Map;
 
 public class UVLToolPaletteItemProvider implements ToolPaletteItemProvider {
 

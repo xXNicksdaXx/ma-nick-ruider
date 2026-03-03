@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const port = JSON.parse(process.env.GLSP_SERVER_PORT || DEFAULT_SERVER_PORT);
 
     if (process.env.GLSP_SERVER_DEBUG !== 'true') {
-        const modulePath = vscode.Uri.joinPath(context.extensionUri, 'dist', 'uvl-0.0.1-glsp.jar').fsPath;
+        const modulePath = vscode.Uri.joinPath(context.extensionUri, 'dist', 'uvl-0.2.0-glsp.jar').fsPath;
         serverProcess = new GlspSocketServerLauncher({
             executable: modulePath,
             socketConnectionOptions: { port: port },

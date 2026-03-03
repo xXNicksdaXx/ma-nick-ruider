@@ -5,12 +5,12 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp;
 
-import java.util.List;
-
 import org.eclipse.glsp.graph.DefaultTypes;
 import org.eclipse.glsp.server.diagram.BaseDiagramConfiguration;
 import org.eclipse.glsp.server.types.EdgeTypeHint;
 import org.eclipse.glsp.server.types.ShapeTypeHint;
+
+import java.util.List;
 
 public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
 

@@ -8,11 +8,7 @@ package de.tu_dresden.inf.st.uvl.glsp.utils;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ExpressionConstraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.*;
 import de.tu_dresden.inf.st.uvl.metamodel.model.expression.Expression;
 import de.tu_dresden.inf.st.uvl.metamodel.model.expression.LiteralExpression;
 

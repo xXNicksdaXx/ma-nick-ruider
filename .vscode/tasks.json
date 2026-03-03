@@ -22,7 +22,7 @@
       "label": "Start UVL Server",
       "type": "shell",
       "group": "test",
-      "command": "java -jar target/uvl.glsp-0.0.1-glsp.jar",
+      "command": "java -jar target/uvl.glsp-0.2.0-glsp.jar",
       "options": {
         "cwd": "${workspaceFolder}/server/uvl.glsp"
       },

@@ -5,14 +5,13 @@
  */
 package de.tu_dresden.inf.st.uvl.glsp.launch;
 
+import de.tu_dresden.inf.st.uvl.glsp.UVLDiagramModule;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.glsp.server.di.ServerModule;
 import org.eclipse.glsp.server.launch.DefaultCLIParser;
 import org.eclipse.glsp.server.launch.GLSPServerLauncher;
 import org.eclipse.glsp.server.launch.SocketGLSPServerLauncher;
 import org.eclipse.glsp.server.utils.LaunchUtil;
-
-import de.tu_dresden.inf.st.uvl.glsp.UVLDiagramModule;
 
 /**
  * Entry point for launching the UVL GLSP server as a standalone process.

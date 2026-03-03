@@ -1,6 +1,6 @@
 {
   "name": "uvl-common",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "private": "true",
   "description": "Package for common utilities for the UVL GLSP client",
   "keywords": [

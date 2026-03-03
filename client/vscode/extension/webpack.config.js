@@ -50,8 +50,8 @@ const config = {
                     to: path.resolve(__dirname, 'dist')
                 },
                 {
-                    from: path.resolve(serverModule, 'target', 'uvl.glsp-0.0.1-glsp.jar'),
-                    to: path.resolve(__dirname, 'dist', 'uvl-0.0.1-glsp.jar')
+                    from: path.resolve(serverModule, 'target', 'uvl.glsp-0.2.0-glsp.jar'),
+                    to: path.resolve(__dirname, 'dist', 'uvl-0.2.0-glsp.jar')
                 }
             ]
         })

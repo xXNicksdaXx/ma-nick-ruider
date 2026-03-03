@@ -1,6 +1,6 @@
 {
   "name": "uvl-vscode-webview",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "private": "true",
   "description": "UVL GLSP diagrams in a VS Code extensions (WebView part)",
   "keywords": [
@@ -48,7 +48,7 @@
     "source-map-loader": "^5.0.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.4",
-    "uvl-sprotty": "0.0.1",
+    "uvl-sprotty": "0.2.0",
     "webpack": "^5.102.1",
     "webpack-cli": "^5.1.4",
     "webpack-merge": "^5.10.0"

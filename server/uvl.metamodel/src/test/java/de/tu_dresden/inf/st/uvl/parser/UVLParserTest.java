@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import de.tu_dresden.inf.st.uvl.parser.UVLJavaLexer;
+import de.tu_dresden.inf.st.uvl.parser.UVLJavaParser;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

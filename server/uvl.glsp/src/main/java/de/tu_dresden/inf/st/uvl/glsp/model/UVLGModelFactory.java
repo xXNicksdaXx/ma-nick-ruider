@@ -15,19 +15,8 @@ import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.glsp.graph.DefaultTypes;
-import org.eclipse.glsp.graph.GCompartment;
-import org.eclipse.glsp.graph.GEdge;
-import org.eclipse.glsp.graph.GGraph;
-import org.eclipse.glsp.graph.GLabel;
-import org.eclipse.glsp.graph.GNode;
-import org.eclipse.glsp.graph.builder.impl.GCompartmentBuilder;
-import org.eclipse.glsp.graph.builder.impl.GEdgeBuilder;
-import org.eclipse.glsp.graph.builder.impl.GEdgePlacementBuilder;
-import org.eclipse.glsp.graph.builder.impl.GGraphBuilder;
-import org.eclipse.glsp.graph.builder.impl.GLabelBuilder;
-import org.eclipse.glsp.graph.builder.impl.GLayoutOptions;
-import org.eclipse.glsp.graph.builder.impl.GNodeBuilder;
+import org.eclipse.glsp.graph.*;
+import org.eclipse.glsp.graph.builder.impl.*;
 import org.eclipse.glsp.graph.util.GConstants;
 import org.eclipse.glsp.server.features.core.model.GModelFactory;
 import org.eclipse.glsp.server.layout.LayoutEngine;
@@ -40,9 +29,7 @@ import java.util.Optional;
 
 import static de.tu_dresden.inf.st.uvl.glsp.layout.UVLTreeLayoutEngine.requiresLayoutOperation;
 import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.convertConstraintTypeToModelType;
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getAllGroups;
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getComplexConstraints;
-import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getEdgeConstraints;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.*;
 
 public class UVLGModelFactory implements GModelFactory {
     protected static Logger LOGGER = LogManager.getLogger(UVLGModelFactory.class.getSimpleName());
