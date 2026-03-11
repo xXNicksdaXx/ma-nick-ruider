@@ -17,7 +17,7 @@ import static de.tu_dresden.inf.st.uvl.metamodel.util.Util.addNecessaryQuotes;
  * This class represents a feature model and all its sub feature models if the
  * model is composed.
  */
-public class FeatureModel {
+public class FeatureModel implements UVLObject {
     private final Set<LanguageLevel> usedLanguageLevels = new HashSet<>();
     {
     	usedLanguageLevels.add(LanguageLevel.BOOLEAN_LEVEL);

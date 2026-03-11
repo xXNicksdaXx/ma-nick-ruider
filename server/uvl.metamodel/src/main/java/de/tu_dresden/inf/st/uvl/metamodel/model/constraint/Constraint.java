@@ -1,10 +1,11 @@
 package de.tu_dresden.inf.st.uvl.metamodel.model.constraint;
 
+import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
 import de.tu_dresden.inf.st.uvl.metamodel.model.building.VariableReference;
 
 import java.util.List;
 
-public abstract class Constraint {
+public abstract class Constraint implements UVLObject {
     public int getLineNumber() {
         return lineNumber;
     }

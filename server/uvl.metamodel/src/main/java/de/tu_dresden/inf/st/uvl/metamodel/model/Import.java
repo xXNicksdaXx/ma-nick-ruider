@@ -6,7 +6,7 @@ import java.util.Objects;
  * This class represents an import of a feature model in another feature model and
  * is used when uvl feature models are decomposed.
  */
-public class Import {
+public class Import implements UVLObject {
 
     private String relativeImportPath; // Only for nested imports
 	private final String namespace;

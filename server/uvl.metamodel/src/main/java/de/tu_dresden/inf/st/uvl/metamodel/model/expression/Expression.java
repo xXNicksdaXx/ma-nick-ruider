@@ -1,12 +1,13 @@
 package de.tu_dresden.inf.st.uvl.metamodel.model.expression;
 
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
 import de.tu_dresden.inf.st.uvl.metamodel.model.building.VariableReference;
 
 import java.util.List;
 import java.util.Set;
 
-public abstract class Expression {
+public abstract class Expression implements UVLObject {
     public int getLineNumber() {
         return lineNumber;
     }

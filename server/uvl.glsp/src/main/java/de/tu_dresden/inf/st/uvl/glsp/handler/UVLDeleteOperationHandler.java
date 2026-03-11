@@ -12,6 +12,7 @@ import de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.GModelUtil;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
+import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,12 +54,12 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
     }
 
     protected boolean delete(final String elementId) {
-        Optional<Object> element = modelState.getIndex().getUVLObject(elementId);
+        Optional<UVLObject> element = modelState.getIndex().getUVLObject(elementId);
         if (element.isEmpty()) {
             return deleteSubElement(elementId);
         }
 
-        Set<Object> objectsToDelete = new LinkedHashSet<>();
+        Set<UVLObject> objectsToDelete = new LinkedHashSet<>();
         collectUvlDependents(objectsToDelete, element.get());
 
         objectsToDelete.forEach(this::deleteUvlObject);
@@ -82,7 +83,7 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
         return true;
     }
 
-    protected void deleteUvlObject(final Object uvlObject) {
+    protected void deleteUvlObject(final UVLObject uvlObject) {
         switch (uvlObject) {
             case Feature feature -> {
                 Group parentGroup = feature.getParentGroup();
@@ -124,7 +125,7 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
         return true;
     }
 
-    protected void collectUvlDependents(final Set<Object> dependents, final Object objectToDelete) {
+    protected void collectUvlDependents(final Set<UVLObject> dependents, final UVLObject objectToDelete) {
         if (dependents.contains(objectToDelete)) {
             // Already collected as dependent of another object, no need to collect again
             return;

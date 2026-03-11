@@ -10,7 +10,7 @@ import java.util.*;
  * This class represents all kinds of groups (or, alternative, mandatory,
  * optional, cardinality)
  */
-public class Group {
+public class Group implements UVLObject {
     /**
      * An enum with all possible group types.
      */

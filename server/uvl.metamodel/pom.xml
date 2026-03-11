@@ -6,7 +6,7 @@
 
     <groupId>de.tu_dresden.inf.st</groupId>
     <artifactId>uvl.metamodel</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <description>Fork of java-fm-metamodel and uvl-parser of UVL to extend it for Behavioral Programming (BP) usage</description>
     <url>https://git-st.inf.tu-dresden.de/stgroup/student-projects/2026/ma-nick-ruider</url>
 

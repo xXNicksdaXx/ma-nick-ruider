@@ -52,7 +52,7 @@
     <eclipse.core.version>3.7.100</eclipse.core.version>
     <eclipse.lsp4j.version>0.24.0</eclipse.lsp4j.version>
     <apache.logging.log4j.version>2.25.1</apache.logging.log4j.version>
-    <uvl.metamodel.version>1.2.0</uvl.metamodel.version>
+    <uvl.metamodel.version>1.2.1</uvl.metamodel.version>
     <uvl.glsp.version>0.2.0</uvl.glsp.version>
 </properties>
 

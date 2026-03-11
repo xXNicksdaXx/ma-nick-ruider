@@ -41,7 +41,7 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
         GLabel label = findLabel(operation).orElseThrow(
                 () -> new IllegalArgumentException("Element with provided ID cannot be found or is not a GLabel"));
         GModelElement parentElement = GModelUtil.findParent(label);
-        Object uvlObject = modelState.getIndex().getUVLObject(parentElement.getId())
+        UVLObject uvlObject = modelState.getIndex().getUVLObject(parentElement.getId())
                 .orElseGet(() -> modelState.getIndex()
                         .getUVLObject(parentElement.getId().split("_")[0])
                         .orElseThrow(() -> new IllegalArgumentException("No UVL object found for parent element with ID " + parentElement.getId()))

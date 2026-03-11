@@ -9,6 +9,7 @@ import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
+import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import org.eclipse.emf.ecore.EObject;
@@ -28,7 +29,7 @@ import static de.tu_dresden.inf.st.uvl.glsp.utils.GroupUtil.convertGroupTypeToMo
 
 public class UVLModelIndex extends GModelIndexImpl {
 
-    protected BiIndex<String, Object> uvlIndex;
+    protected BiIndex<String, UVLObject> uvlIndex;
 
     protected UVLModelIndex(final EObject target) {
         super(target);
@@ -161,19 +162,19 @@ public class UVLModelIndex extends GModelIndexImpl {
         }
     }
 
-    public Optional<Object> getUVLObject(final String id) {
+    public Optional<UVLObject> getUVLObject(final String id) {
         return Optional.ofNullable(uvlIndex.get(id));
     }
 
-    public <T> Optional<T> getUVLObject(final String id, final Class<T> clazz) {
+    public <T extends UVLObject> Optional<T> getUVLObject(final String id, final Class<T> clazz) {
         return safeCast(Optional.ofNullable(uvlIndex.get(id)), clazz);
     }
 
-    public Optional<Object> getUVLObject(final GModelElement gModelElement) {
+    public Optional<UVLObject> getUVLObject(final GModelElement gModelElement) {
         return getUVLObject(gModelElement.getId());
     }
 
-    public <T> Optional<T> getUVLObject(final GModelElement gModelElement, final Class<T> clazz) {
+    public <T extends UVLObject> Optional<T> getUVLObject(final GModelElement gModelElement, final Class<T> clazz) {
         return getUVLObject(gModelElement.getId(), clazz);
     }
 
@@ -185,15 +186,15 @@ public class UVLModelIndex extends GModelIndexImpl {
         return safeCast(get(id), clazz);
     }
 
-    public Optional<GModelElement> getGModelElement(final Object object) {
+    public Optional<GModelElement> getGModelElement(final UVLObject object) {
         return getGModelElement(uvlIndex.getKey(object));
     }
 
-    public <T extends GModelElement> Optional<T> getGModelElement(final Object object, final Class<T> clazz) {
+    public <T extends GModelElement> Optional<T> getGModelElement(final UVLObject object, final Class<T> clazz) {
         return getGModelElement(uvlIndex.getKey(object), clazz);
     }
 
-    public Optional<String> getIdFor(final Object object) {
+    public Optional<String> getIdFor(final UVLObject object) {
         return Optional.ofNullable(uvlIndex.getKey(object));
     }
 

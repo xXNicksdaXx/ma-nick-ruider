@@ -6,6 +6,7 @@
 package de.tu_dresden.inf.st.uvl.glsp.gmodel;
 
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
+import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
 import org.eclipse.glsp.graph.GEdge;
 import org.eclipse.glsp.graph.GModelElement;
 
@@ -14,7 +15,7 @@ import org.eclipse.glsp.graph.builder.impl.GEdgeBuilder;
 
 import java.util.Optional;
 
-public abstract class AbstractGModelFactory<E extends Object, T extends GModelElement> {
+public abstract class AbstractGModelFactory<E extends UVLObject, T extends GModelElement> {
 
     @Inject
     protected UVLModelState modelState;
