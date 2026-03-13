@@ -1,0 +1,55 @@
+image: node:20-bookworm
+
+stages:
+  - build
+  - test
+
+# Define a reusable anchor for the setup steps
+.setup_env: &setup_env
+  before_script:
+    - apt-get update -qq
+    # Install Java 21, Maven
+    - apt-get install -y -qq openjdk-21-jdk maven
+    # Install Lerna
+    - npm install -g lerna
+
+build_server:
+  stage: build
+  <<: *setup_env
+  script:
+    - cd server
+    - mvn --batch-mode clean verify
+  artifacts:
+    paths:
+      - server/
+    expire_in: 1 hour
+
+build_client:
+  stage: build
+  <<: *setup_env
+  script:
+    - cd client
+    - yarn cache clean
+    - yarn
+  artifacts:
+    paths:
+      - client/
+    expire_in: 1 hour
+
+run_playwright_tests:
+  stage: test
+  <<: *setup_env
+  script:
+    - cd test
+    - yarn cache clean
+    - yarn
+    - yarn test
+  needs:
+    - build_server
+    - build_client
+  artifacts:
+    when: always
+    paths:
+      - test/playwright-report/
+      - test/test-results/
+    expire_in: 7 days
