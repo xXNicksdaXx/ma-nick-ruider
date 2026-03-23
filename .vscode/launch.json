@@ -17,6 +17,21 @@
       ]
     },
     {
+      "type": "java",
+      "name": "Launch UVL BP GLSP Server",
+      "request": "launch",
+      "mainClass": "de.tu_dresden.inf.st.uvl.bp.glsp.launch.BPServerLauncher",
+      "projectName": "uvl.bp.glsp",
+      "classPaths": [
+        "${workspaceFolder}/server/uvl.bp.glsp/target/classes",
+        "${workspaceFolder}/server/uvl.bp.glsp/target/dependency/*"
+      ],
+      "args": [
+        "--port",
+        "5007"
+      ]
+    },
+    {
       "name": "Launch UVL VS Code Extension (Embedded GLSP Server)",
       "type": "extensionHost",
       "request": "launch",
