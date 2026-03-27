@@ -20,15 +20,19 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
                         new ShapeTypeHint(DefaultTypes.GRAPH,
                                 false, false, false, false,
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new ShapeTypeHint(UVLModelTypes.FEATURE,
                                 true, true, false, true,
                                 List.of(UVLModelTypes.FEATURE, UVLModelTypes.ATTRIBUTE, UVLModelTypes.CARDINALITY_LABEL)),
+
                         new ShapeTypeHint(UVLModelTypes.ATTRIBUTE,
                                 false, true, false, false,
                                 List.of(UVLModelTypes.ATTRIBUTE)),
+
                         new ShapeTypeHint(UVLModelTypes.CONSTRAINT_BOX,
                                 true, false, false, false,
                                 List.of(UVLModelTypes.CONSTRAINT)),
+
                         new ShapeTypeHint(UVLModelTypes.CONSTRAINT,
                                 false, true, false, true)
                 );
@@ -41,26 +45,32 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
                                 false, false, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new EdgeTypeHint(UVLModelTypes.OPTIONAL,
                                 false, false, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new EdgeTypeHint(UVLModelTypes.ALTERNATIVE,
                                 false, false, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new EdgeTypeHint(UVLModelTypes.GROUP_CARDINALITY,
                                 false, false, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new EdgeTypeHint(UVLModelTypes.OR,
                                 false, false, false,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new EdgeTypeHint(UVLModelTypes.IMPLICATION,
                                 false, true, true,
                                 List.of(UVLModelTypes.FEATURE),
                                 List.of(UVLModelTypes.FEATURE)),
+
                         new EdgeTypeHint(UVLModelTypes.EQUIVALENCE,
                                 false, true, true,
                                 List.of(UVLModelTypes.FEATURE),

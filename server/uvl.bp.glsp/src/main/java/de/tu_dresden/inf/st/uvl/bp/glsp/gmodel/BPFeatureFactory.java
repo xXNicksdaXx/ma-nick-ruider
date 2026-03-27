@@ -10,6 +10,7 @@ import de.tu_dresden.inf.st.uvl.bp.glsp.utils.BTypeUtil;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.gmodel.UVLFeatureFactory;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelIndex;
+import de.tu_dresden.inf.st.uvl.glsp.utils.GModelUtil;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Attribute;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Cardinality;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
@@ -102,14 +103,12 @@ public class BPFeatureFactory extends UVLFeatureFactory {
                         .hAlign(GConstants.HAlign.LEFT)
                         .resizeContainer(true));
 
-        int i = 0;
-        for (Attribute<?> attribute : feature.getAttributes().values()) {
+        for (Map.Entry<String, Attribute<?>> entry : feature.getAttributes().entrySet()) {
+            Attribute<?> attribute = entry.getValue();
             if (isBThreadAttribute(attribute) || isBEventAttribute(attribute)) {
                 continue;
-            } else {
-                compartmentBuilder.add(createAttribute(id, i, attribute));
             }
-            i++;
+            compartmentBuilder.add(createAttribute(id, entry.getKey(), attribute));
         }
 
         return compartmentBuilder.build();
@@ -127,20 +126,19 @@ public class BPFeatureFactory extends UVLFeatureFactory {
                         .hAlign(GConstants.HAlign.LEFT)
                         .resizeContainer(true));
 
-        int i = 0;
-        for (Attribute<?> attribute : feature.getAttributes().values()) {
+        for (Map.Entry<String, Attribute<?>> entry : feature.getAttributes().entrySet()) {
+            Attribute<?> attribute = entry.getValue();
             if (isBEventAttribute(attribute)) {
-                compartmentBuilder.add(createEvent(id, i, attribute));
-                i++;
+                compartmentBuilder.add(createEvent(id, entry.getKey(), attribute));
             }
         }
 
         return compartmentBuilder.build();
     }
 
-    public GCompartment createEvent(String id, int index, Attribute<?> attribute) {
+    public GCompartment createEvent(String id, String eventName, Attribute<?> attribute) {
         BTypeUtil.BEventType eventType = BTypeUtil.getBEventType(attribute);
-        String eventId = id + "_event_" + index;
+        String eventId = GModelUtil.appendEventSegment(id, eventName);
         return switch (eventType) {
             case REQUESTED -> createRequestedEvent(eventId, attribute);
             case BLOCKED -> createBlockedEvent(eventId, attribute);
@@ -218,6 +216,7 @@ public class BPFeatureFactory extends UVLFeatureFactory {
                 .build();
 
         return new GCompartmentBuilder(BPModelTypes.BLOCKED_EVENT)
+                .id(eventId)
                 .layout(GConstants.Layout.HBOX)
                 .layoutOptions(new GLayoutOptions()
                         .paddingTop(2)

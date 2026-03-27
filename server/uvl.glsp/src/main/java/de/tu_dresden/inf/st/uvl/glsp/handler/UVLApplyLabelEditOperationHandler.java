@@ -51,13 +51,7 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
 
         // update label for each type
         if (uvlObject instanceof Feature feature) {
-            switch (label.getType()) {
-                case UVLModelTypes.FEATURE_NAME -> updateFeatureName(label, feature, operation.getText());
-                case UVLModelTypes.ATTRIBUTE_NAME -> updateAttributeName(label, feature, operation.getText());
-                case UVLModelTypes.ATTRIBUTE_VALUE -> updateAttributeValue(label, feature, operation.getText());
-                case UVLModelTypes.CARDINALITY_LABEL -> updateFeatureCardinality(label, feature, operation.getText());
-                default -> throw new IllegalArgumentException("Label type " + label.getType() + " is not supported for Feature elements.");
-            }
+            handleFeatureLabelEdit(label, feature, operation.getText());
         } else if (uvlObject instanceof Group group) {
             updateGroupCardinality(label, group, operation.getText());
         } else {
@@ -66,6 +60,16 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
 
         // update the model index
         modelState.updateIndex();
+    }
+
+    protected void handleFeatureLabelEdit(final GLabel label, final Feature feature, final String newText) {
+        switch (label.getType()) {
+            case UVLModelTypes.FEATURE_NAME -> updateFeatureName(label, feature, newText);
+            case UVLModelTypes.ATTRIBUTE_NAME -> updateAttributeName(label, feature, newText);
+            case UVLModelTypes.ATTRIBUTE_VALUE -> updateAttributeValue(label, feature, newText);
+            case UVLModelTypes.CARDINALITY_LABEL -> updateFeatureCardinality(label, feature, newText);
+            default -> throw new IllegalArgumentException("Label type " + label.getType() + " is not supported for Feature elements.");
+        }
     }
 
     protected void updateFeatureName(GLabel label, Feature feature, String newName) {

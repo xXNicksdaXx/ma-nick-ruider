@@ -10,6 +10,9 @@ import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import org.eclipse.glsp.graph.GLabel;
 import org.eclipse.glsp.graph.GModelElement;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GModelUtil {
+    private static final Pattern ATTRIBUTE_OR_EVENT_SEGMENT_PATTERN = Pattern.compile("_(attribute|event)\\[([^\\]]+)]");
 
     /**
      * Finds the parent GModelElement of a given GLabel by extracting the UUID from the label's ID and traversing up the model hierarchy.
@@ -67,51 +71,43 @@ public class GModelUtil {
     }
 
     /**
-     * Extracts the attribute index from a given string.
-     * @param input The string containing the attribute index (e.g., "550e8400-e29b-41d4-a716-446655440000_attribute_0_name")
-     * @return The extracted attribute index as an integer, or -1 if no valid index is found.
+     * Extracts a name-based attribute/event path from a potentially nested element id.
+     * Example: "<featureId>_attribute[name]_attribute[nested]_name" -> ["name", "nested"].
      */
-    public static int extractAttributeIndex(String input) {
-        if (input == null) return -1;
-
-        // Regex pattern to match "attribute_{index}", "attribute_{index}_name" or "attribute_{index}_value"
-        String regex = "attribute_(\\d+)(?:_name|_value)?";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-
-        if (matcher.find()) {
-            String indexString = matcher.group(1);
-            try {
-                return Integer.parseInt(indexString);
-            } catch (Exception e) {
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Extracts all attribute indices from a potentially nested attribute id.
-     * Example: "<featureId>_attribute_0_attribute_2_name" -> [0, 2].
-     */
-    public static List<Integer> extractAttributePath(final String input) {
+    public static List<String> extractAttributePath(final String input) {
         if (input == null) {
             return Collections.emptyList();
         }
 
-        Matcher matcher = Pattern.compile("attribute_(\\d+)").matcher(input);
-        List<Integer> path = new ArrayList<>();
+        Matcher matcher = ATTRIBUTE_OR_EVENT_SEGMENT_PATTERN.matcher(input);
+        List<String> path = new ArrayList<>();
         while (matcher.find()) {
-            path.add(Integer.parseInt(matcher.group(1)));
+            path.add(decodeIdSegment(matcher.group(2)));
         }
         return path;
+    }
+
+    public static String appendAttributeSegment(final String parentId, final String attributeName) {
+        return parentId + "_attribute[" + encodeIdSegment(attributeName) + "]";
+    }
+
+    public static String appendEventSegment(final String parentId, final String eventName) {
+        return parentId + "_event[" + encodeIdSegment(eventName) + "]";
+    }
+
+    public static String encodeIdSegment(final String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    public static String decodeIdSegment(final String value) {
+        return URLDecoder.decode(value, StandardCharsets.UTF_8);
     }
 
     public static Optional<ResolvedAttribute> resolveAttribute(final Feature feature, final String elementId) {
         return resolveAttribute(feature, extractAttributePath(elementId));
     }
 
-    public static Optional<ResolvedAttribute> resolveAttribute(final Feature feature, final List<Integer> path) {
+    public static Optional<ResolvedAttribute> resolveAttribute(final Feature feature, final List<String> path) {
         if (feature == null || path == null || path.isEmpty()) {
             return Optional.empty();
         }
@@ -121,14 +117,12 @@ public class GModelUtil {
         String currentKey = null;
 
         for (int depth = 0; depth < path.size(); depth++) {
-            int index = path.get(depth);
-            Map.Entry<String, Attribute<?>> entryAtIndex = entryAtIndex(currentMap, index);
-            if (entryAtIndex == null) {
+            String name = path.get(depth);
+            currentAttribute = currentMap.get(name);
+            if (currentAttribute == null) {
                 return Optional.empty();
             }
-
-            currentKey = entryAtIndex.getKey();
-            currentAttribute = entryAtIndex.getValue();
+            currentKey = name;
 
             if (depth < path.size() - 1) {
                 Optional<Map<String, Attribute<?>>> nextMap = asAttributeMap(currentAttribute);
@@ -155,24 +149,10 @@ public class GModelUtil {
         return Optional.of((Map<String, Attribute<?>>) rawMap);
     }
 
-    private static Map.Entry<String, Attribute<?>> entryAtIndex(final Map<String, Attribute<?>> attributes, final int index) {
-        if (attributes == null || index < 0 || index >= attributes.size()) {
-            return null;
-        }
-        int i = 0;
-        for (Map.Entry<String, Attribute<?>> entry : attributes.entrySet()) {
-            if (i == index) {
-                return entry;
-            }
-            i++;
-        }
-        return null;
-    }
-
     public record ResolvedAttribute(
             Attribute<?> attribute,
             Map<String, Attribute<?>> parentMap,
             String mapKey,
-            List<Integer> path
+            List<String> path
     ) {}
 }

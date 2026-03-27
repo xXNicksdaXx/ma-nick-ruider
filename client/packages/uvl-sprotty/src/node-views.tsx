@@ -14,7 +14,7 @@ import { injectable } from 'inversify';
 import { VNode } from 'snabbdom';
 import { svg } from 'sprotty';
 
-import {ConstraintBoxNode, FeatureNode, LabeledNode} from "./model";
+import { ConstraintBoxNode, FeatureNode, LabeledNode } from "./model";
 
 // Workaround for typing issues: Creating elements returns a `JSX.Element` instead of a `VNode`, which causes compilation errors.
 // Therefore, type the VNode elements as `any` to avoid these problems.

@@ -71,13 +71,15 @@ public class UVLModelIndex extends GModelIndexImpl {
                             .map(GLabel.class::cast)
                             .filter(label -> {
                                 String labelText = label.getText();
-                                return labelText != null && labelText.equals(feature.getFeatureName());
+                                return UVLModelTypes.FEATURE_NAME.equals(label.getType())
+                                        && labelText != null
+                                        && labelText.equals(feature.getFeatureName());
                             })
                             .findFirst();
                     return labelElement.isPresent();
                 })
                 .map(GNode::getId)
-                .findAny();
+                .findFirst();
 
         if (matchingNodeId.isPresent()) {
             String id = matchingNodeId.get();

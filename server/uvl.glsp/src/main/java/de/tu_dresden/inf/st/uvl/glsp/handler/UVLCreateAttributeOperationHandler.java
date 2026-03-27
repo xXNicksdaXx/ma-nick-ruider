@@ -57,7 +57,7 @@ public class UVLCreateAttributeOperationHandler extends GModelCreateOperationHan
     }
 
     protected Map<String, Attribute<?>> resolveTargetAttributes(final Feature feature, final String containerId) {
-        List<Integer> path = GModelUtil.extractAttributePath(containerId);
+        List<String> path = GModelUtil.extractAttributePath(containerId);
         if (path.isEmpty()) {
             return feature.getAttributes();
         }

@@ -40,7 +40,7 @@ import '../css/diagram.css';
 
 import { CircleEdgeView, DoubleArrowEdgeView, SectorEdgeView, SingleArrowEdgeView } from "./edge-views";
 import { CenteredAnchor } from "./features/center-anchor-computer";
-import { EditableCompartmentSelectionFeedback } from './features/feedback';
+import { EditableCompartmentSelectionFeedback } from './features/selection-feedback';
 import { UVLPolylineEdgeRouter } from "./features/uvl-polyline-edge-router";
 import { ConstraintBoxNode, EditableGCompartment, EditableGLabel, FeatureNode } from "./model";
 import { ConstraintBoxNodeView, FeatureNodeView } from './node-views';

@@ -9,6 +9,7 @@ import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.gmodel.generic.AbstractSingleGModelFactory;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelIndex;
 import de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil;
+import de.tu_dresden.inf.st.uvl.glsp.utils.GModelUtil;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Attribute;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Cardinality;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
@@ -105,17 +106,15 @@ public class UVLFeatureFactory extends AbstractSingleGModelFactory<Feature, GNod
                         .hAlign(GConstants.HAlign.LEFT)
                         .resizeContainer(true));
 
-        int i = 0;
-        for (Attribute<?> attribute : feature.getAttributes().values()) {
-            compartmentBuilder.add(createAttribute(id, i, attribute));
-            i++;
+        for (Map.Entry<String, Attribute<?>> entry : feature.getAttributes().entrySet()) {
+            compartmentBuilder.add(createAttribute(id, entry.getKey(), entry.getValue()));
         }
 
         return compartmentBuilder.build();
     }
 
-    protected GCompartment createAttribute(final String id, final int index, final Attribute<?> attribute) {
-        return createAttribute(id + "_attribute_" + index, attribute, 0);
+    protected GCompartment createAttribute(final String id, final String attributeName, final Attribute<?> attribute) {
+        return createAttribute(GModelUtil.appendAttributeSegment(id, attributeName), attribute, 0);
     }
 
     protected GCompartment createAttribute(final String attributeId, final Attribute<?> attribute, final int indentLevel) {
@@ -157,10 +156,12 @@ public class UVLFeatureFactory extends AbstractSingleGModelFactory<Feature, GNod
                         .hAlign(GConstants.HAlign.LEFT)
                         .resizeContainer(true));
 
-        int childIndex = 0;
-        for (Attribute<?> subAttribute : subAttributes.values()) {
-            childrenCompartmentBuilder.add(createAttribute(attributeId + "_attribute_" + childIndex, subAttribute, indentLevel + 1));
-            childIndex++;
+        for (Map.Entry<String, Attribute<?>> entry : subAttributes.entrySet()) {
+            childrenCompartmentBuilder.add(createAttribute(
+                    GModelUtil.appendAttributeSegment(attributeId, entry.getKey()),
+                    entry.getValue(),
+                    indentLevel + 1
+            ));
         }
 
         return attributeCompartmentBuilder

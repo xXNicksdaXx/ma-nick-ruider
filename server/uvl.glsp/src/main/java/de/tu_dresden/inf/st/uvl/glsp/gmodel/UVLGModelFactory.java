@@ -105,6 +105,7 @@ public class UVLGModelFactory implements GModelFactory {
                                 .resizeContainer(true))
                         .add(new GLabelBuilder(DefaultTypes.LABEL)
                                 .id("constraint_box_header_label")
+                                .addCssClass("bold-title")
                                 .text("Constraints")
                                 .build())
                         .build())

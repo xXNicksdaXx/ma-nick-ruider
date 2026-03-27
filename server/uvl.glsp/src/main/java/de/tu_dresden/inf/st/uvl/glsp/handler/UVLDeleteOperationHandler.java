@@ -109,7 +109,7 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
         }
 
         GModelElement element = gModelElement.get();
-        if (element.getType().equals(UVLModelTypes.ATTRIBUTE)) {
+        if (isDeletableAttributeElement(element.getType())) {
             String featureId = GModelUtil.extractUUID(elementId);
             if (featureId == null) {
                 throw new IllegalStateException("Feature ID not found for attribute: " + elementId);
@@ -132,6 +132,10 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
         }
         modelState.updateIndex();
         return true;
+    }
+
+    protected boolean isDeletableAttributeElement(final String elementType) {
+        return UVLModelTypes.ATTRIBUTE.equals(elementType);
     }
 
     protected void collectUvlDependents(final Set<UVLObject> dependents, final UVLObject objectToDelete) {
