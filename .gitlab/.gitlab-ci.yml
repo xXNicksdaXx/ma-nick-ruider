@@ -1,5 +1,5 @@
 variables:
-  NODE_VERSION: 20
+  NODE_VERSION: 24
   JAVA_VERSION: 25
   DEBIAN_FRONTEND: "noninteractive"
 
@@ -82,3 +82,24 @@ create_release:
           url: '$CI_PROJECT_URL/-/jobs/artifacts/$CI_COMMIT_TAG/raw/client/vscode/extension/uvl-vscode.vsix?job=build_uvl'
         - name: 'uvl-bp-vscode.vsix'
           url: '$CI_PROJECT_URL/-/jobs/artifacts/$CI_COMMIT_TAG/raw/client/vscode/extension/uvl-bp-vscode.vsix?job=build_uvl_bp'
+
+publish_open_vsx:
+  stage: release
+  image: ubuntu:24.04
+  needs:
+    - job: build_uvl
+      artifacts: true
+    - job: build_uvl_bp
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG # Ensures this only runs when a tag is pushed (e.g., v1.0.0)
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq curl ca-certificates gnupg
+    - curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash -
+    - apt-get install -y -qq nodejs
+    - npm install -g @openvsx/publish-extension
+  script:
+    - echo "Publishing extensions to Open VSX for tag $CI_COMMIT_TAG"
+    - ovsx publish client/vscode/extension/uvl-vscode.vsix -p $OPEN_VSX_TOKEN
+    - ovsx publish client/vscode/extension/uvl-bp-vscode.vsix -p $OPEN_VSX_TOKEN
