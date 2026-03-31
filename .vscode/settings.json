@@ -48,8 +48,10 @@
     }
   },
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.checkstyle.version": "8.44",
-  "java.checkstyle.configuration": "https://raw.githubusercontent.com/eclipse-emfcloud/emfcloud/master/codestyle/org.eclipse.emfcloud.checkstyle/src/main/resources/emfcloud-checkstyle-8.44.xml",
+  "java.checkstyle.version": "10.26.1",
+  "[java]": {
+    "editor.defaultFormatter": "josevseb.google-java-format-for-vs-code"
+  },
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.debug.settings.onBuildFailureProceed": true
 }

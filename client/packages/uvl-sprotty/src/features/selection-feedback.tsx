@@ -37,7 +37,7 @@ export class EditableCompartmentSelectionFeedback implements IVNodePostprocessor
                 width = element.bounds.width;
             }
 
-            const feedback: any = (
+            const feedback: VNode = (
                 <rect
                     x={0}
                     y={0}

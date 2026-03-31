@@ -13,27 +13,27 @@ import { DefaultTypes } from '@eclipse-glsp/client';
  * <p>
  * For corresponding server-side types, see <code>UVLModelTypes.java</code>.
  */
-export namespace UVLModelTypes {
-    export const CONSTRAINT_BOX = `${DefaultTypes.NODE}:constraintBox`;
-    export const CONSTRAINT = `${DefaultTypes.COMPARTMENT}:constraint`;
-    export const CONSTRAINT_TEXT = `${DefaultTypes.LABEL}:constraint`;
+export const UVLModelTypes = {
+    CONSTRAINT_BOX: `${DefaultTypes.NODE}:constraintBox`,
+    CONSTRAINT: `${DefaultTypes.COMPARTMENT}:constraint`,
+    CONSTRAINT_TEXT: `${DefaultTypes.LABEL}:constraint`,
 
-    export const FEATURE = `${DefaultTypes.NODE}:feature`;
-    export const FEATURE_NAME = `${DefaultTypes.LABEL}:feature`;
+    FEATURE: `${DefaultTypes.NODE}:feature`,
+    FEATURE_NAME: `${DefaultTypes.LABEL}:feature`,
 
-    export const ATTRIBUTE = `${DefaultTypes.COMPARTMENT}:attribute`;
-    export const ATTRIBUTE_NAME = `${DefaultTypes.LABEL}:attributeName`;
-    export const ATTRIBUTE_VALUE = `${DefaultTypes.LABEL}:attributeValue`;
+    ATTRIBUTE: `${DefaultTypes.COMPARTMENT}:attribute`,
+    ATTRIBUTE_NAME: `${DefaultTypes.LABEL}:attributeName`,
+    ATTRIBUTE_VALUE: `${DefaultTypes.LABEL}:attributeValue`,
 
-    export const MANDATORY = `${DefaultTypes.EDGE}:mandatory`;
-    export const OPTIONAL = `${DefaultTypes.EDGE}:optional`;
-    export const ALTERNATIVE = `${DefaultTypes.EDGE}:alternative`;
-    export const GROUP_CARDINALITY = `${DefaultTypes.EDGE}:groupCardinality`;
-    export const OR = `${DefaultTypes.EDGE}:or`;
+    MANDATORY: `${DefaultTypes.EDGE}:mandatory`,
+    OPTIONAL: `${DefaultTypes.EDGE}:optional`,
+    ALTERNATIVE: `${DefaultTypes.EDGE}:alternative`,
+    GROUP_CARDINALITY: `${DefaultTypes.EDGE}:groupCardinality`,
+    OR: `${DefaultTypes.EDGE}:or`,
 
-    export const EQUIVALENCE = `${DefaultTypes.EDGE}:equivalence`;
-    export const IMPLICATION = `${DefaultTypes.EDGE}:implication`;
+    EQUIVALENCE: `${DefaultTypes.EDGE}:equivalence`,
+    IMPLICATION: `${DefaultTypes.EDGE}:implication`,
 
-    export const CARDINALITY_LABEL = `${DefaultTypes.LABEL}:cardinality`;
-    export const CONSTRAINT_LABEL = `${DefaultTypes.LABEL}:constraint`;
-}
+    CARDINALITY_LABEL: `${DefaultTypes.LABEL}:cardinality`,
+    CONSTRAINT_LABEL: `${DefaultTypes.LABEL}:constraint`
+} as const;

@@ -7,6 +7,25 @@
  ****************************************************************************/
 import * as vscode from 'vscode';
 
+function containsInvalidFileNameCharacter(input: string): boolean {
+    for (const char of input) {
+        const codePoint = char.codePointAt(0);
+        if (codePoint === undefined) {
+            continue;
+        }
+        if (codePoint <= 0x1f || codePoint === 0x7f) {
+            return true;
+        }
+        if (codePoint >= 0xfdd0 && codePoint <= 0xfdef) {
+            return true;
+        }
+        if (codePoint === 0xfffe || codePoint === 0xffff) {
+            return true;
+        }
+    }
+    return /[<>:"/\\|?*]/.test(input);
+}
+
 export async function showInput(prefix: string, hint: string): Promise<string | undefined> {
     return vscode.window.showInputBox({
         prompt: prefix,
@@ -16,8 +35,7 @@ export async function showInput(prefix: string, hint: string): Promise<string | 
             if (!input || input.trim().length === 0) {
                 return 'Name cannot be empty';
             }
-            const invalidChars = /[<>:"/\\|?*\x00-\x1F\x7F]|[\u{FDD0}-\u{FDEF}]|[\u{FFFE}\u{FFFF}]/gu;
-            if (invalidChars.test(input)) {
+            if (containsInvalidFileNameCharacter(input)) {
                 return 'Name contains invalid characters';
             }
             return undefined;

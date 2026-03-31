@@ -13,24 +13,21 @@ import { DefaultTypes } from '@eclipse-glsp/client';
  * <p>
  * For corresponding server-side types, see <code>BPModelTypes.java</code>.
  */
-export namespace BPModelTypes {
-    export const BP_ENV = `${DefaultTypes.NODE}:env`;
-    export const BP_CONFIG = `${DefaultTypes.NODE}:config`;
+export const BPModelTypes = {
+    BP_ENV: `${DefaultTypes.NODE}:env`,
+    BP_CONFIG: `${DefaultTypes.NODE}:config`,
 
-    export const B_THREAD = `${DefaultTypes.NODE}:b-thread`;
+    B_THREAD: `${DefaultTypes.NODE}:b-thread`,
 
-    export const REQUESTED_EVENT = `${DefaultTypes.COMPARTMENT}:requested-event`;
-    export const BLOCKED_EVENT = `${DefaultTypes.COMPARTMENT}:blocked-event`;
-    export const WAITED_FOR_EVENT = `${DefaultTypes.COMPARTMENT}:waited-for-event`;
-    export const EVENT_NAME = `${DefaultTypes.LABEL}:eventName`;
-    export const EVENT_PRIORITY = `${DefaultTypes.LABEL}:eventPriority`;
+    REQUESTED_EVENT: `${DefaultTypes.COMPARTMENT}:requested-event`,
+    BLOCKED_EVENT: `${DefaultTypes.COMPARTMENT}:blocked-event`,
+    WAITED_FOR_EVENT: `${DefaultTypes.COMPARTMENT}:waited-for-event`,
+    EVENT_NAME: `${DefaultTypes.LABEL}:eventName`,
+    EVENT_PRIORITY: `${DefaultTypes.LABEL}:eventPriority`,
 
-    export const REQUESTED  = `${DefaultTypes.EDGE}:requested`;
-    export const BLOCKED     = `${DefaultTypes.EDGE}:blocked`;
-    export const WAITED_FOR  = `${DefaultTypes.EDGE}:waited-for`;
-    export const SELECTED    = `${DefaultTypes.EDGE}:selected`;
-    export const CONFLICTING = `${DefaultTypes.EDGE}:conflicting`;
-
-}
-
-
+    REQUESTED: `${DefaultTypes.EDGE}:requested`,
+    BLOCKED: `${DefaultTypes.EDGE}:blocked`,
+    WAITED_FOR: `${DefaultTypes.EDGE}:waited-for`,
+    SELECTED: `${DefaultTypes.EDGE}:selected`,
+    CONFLICTING: `${DefaultTypes.EDGE}:conflicting`
+} as const;

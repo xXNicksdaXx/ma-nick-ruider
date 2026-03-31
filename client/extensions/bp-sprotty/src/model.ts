@@ -19,7 +19,7 @@ export class BThreadNode extends FeatureNode {
     }
 
     hasEvents(): boolean {
-        let container = this.eventContainer;
+        const container = this.eventContainer;
         if (container) {
             return container.children.length !== 0;
         }

@@ -74,8 +74,8 @@ export class SectorEdgeView extends GEdgeView {
             const neighborSegments = this.edgeRouterRegistry.route(neighbor)
             const neighborTarget = neighborSegments[1];
 
-            let s1 = this.getSectorPoint(source, originalTarget, this.RADIUS);
-            let s2 = this.getSectorPoint(source, neighborTarget, this.RADIUS);
+            const s1 = this.getSectorPoint(source, originalTarget, this.RADIUS);
+            const s2 = this.getSectorPoint(source, neighborTarget, this.RADIUS);
 
             if (this.isToTheRight(source, s1, s2)) {
                 continue;
@@ -151,7 +151,7 @@ export abstract class TrimmedGEdgeView extends GEdgeView {
     protected abstract readonly shortenDistance: number; // distance to trim at both ends
     protected abstract readonly trimFirstSegment: boolean; // whether to trim the first segment
 
-    protected override renderLine(_edge: GEdge, segments: Point[], _context: RenderingContext): VNode {
+    protected override renderLine(_edge: GEdge, segments: Point[]): VNode {
         if (this.shortenDistance <= 0 || segments.length < 2) {
             // If no shortening is needed or not enough segments, return the original path
             return <path d={this.createPathForSegments(segments)} />;

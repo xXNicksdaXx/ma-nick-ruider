@@ -8,9 +8,7 @@
 import {
     GEdge,
     GEdgeView,
-    IViewArgs,
-    Point,
-    RenderingContext
+    Point
 } from '@eclipse-glsp/client';
 import { injectable } from 'inversify';
 import { VNode } from 'snabbdom';
@@ -62,7 +60,7 @@ export class BThreadNodeView extends SeparatorNodeView<BThreadNode> {
  */
 @injectable()
 export class BPEdgeView extends GEdgeView {
-    protected override renderLine(edge: GEdge, segments: Point[], _context: RenderingContext, _args?: IViewArgs): VNode {
+    protected override renderLine(_edge: GEdge, segments: Point[]): VNode {
         const firstPoint = segments[0];
         let path = `M ${firstPoint.x},${firstPoint.y}`;
         for (let i = 1; i < segments.length; i++) {
@@ -76,6 +74,6 @@ export class BPEdgeView extends GEdgeView {
                 stroke-dasharray="6,4"
                 d={path}
             />
-        ) as unknown as VNode;
+        ) as VNode;
     }
 }

@@ -4,7 +4,8 @@
     "esbenp.prettier-vscode",
     "DavidAnson.vscode-markdownlint",
     "shengchen.vscode-checkstyle",
-    "vscjava.vscode-java-pack"
+    "vscjava.vscode-java-pack",
+    "josevseb.google-java-format-for-vs-code"
   ],
   "unwantedRecommendations": []
 }

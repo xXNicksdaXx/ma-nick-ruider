@@ -3,6 +3,7 @@
  * This work is licensed under the terms of the MIT license.
  * For a copy, see <https://opensource.org/licenses/MIT>.
  */
+
 package de.tu_dresden.inf.st.uvl.glsp.model;
 
 import com.google.inject.Inject;
@@ -18,58 +19,58 @@ import org.eclipse.glsp.server.session.ClientSessionListener;
 import org.eclipse.glsp.server.session.ClientSessionManager;
 
 @Singleton
-public class UVLModelStateImpl extends DefaultGModelState implements UVLModelState, ClientSessionListener {
+public class UVLModelStateImpl extends DefaultGModelState
+    implements UVLModelState, ClientSessionListener {
 
-    protected static Logger LOGGER = LogManager.getLogger(UVLModelStateImpl.class.getSimpleName());
+  protected static Logger LOGGER = LogManager.getLogger(UVLModelStateImpl.class.getSimpleName());
 
-    @Inject
-    protected ClientSessionManager clientSessionManager;
+  @Inject protected ClientSessionManager clientSessionManager;
 
-    protected FeatureModel featureModel;
+  protected FeatureModel featureModel;
 
-    @Override
-    @Inject
-    public void init() {
-        this.clientSessionManager.addListener(this, this.clientId);
-        setCommandStack(new GModelCommandStack());
-        LOGGER.trace("Created UVLModelState for client {}", this.clientId);
+  @Override
+  @Inject
+  public void init() {
+    this.clientSessionManager.addListener(this, this.clientId);
+    setCommandStack(new GModelCommandStack());
+    LOGGER.trace("Created UVLModelState for client {}", this.clientId);
+  }
+
+  @Override
+  public UVLModelIndex getIndex() {
+    return (UVLModelIndex) super.getIndex();
+  }
+
+  public void updateIndex() {
+    updateRoot(getRoot());
+  }
+
+  @Override
+  public void updateRoot(final GModelRoot newRoot) {
+    setRoot(newRoot);
+    this.index = getOrUpdateIndex(newRoot);
+    if (getFeatureModel() != null) {
+      getIndex().indexFeatureModel(getFeatureModel());
     }
+  }
 
-    @Override
-    public UVLModelIndex getIndex() {
-        return (UVLModelIndex) super.getIndex();
-    }
+  @Override
+  protected UVLModelIndex getOrUpdateIndex(final GModelRoot newRoot) {
+    return UVLModelIndex.getOrCreate(getRoot());
+  }
 
-    public void updateIndex() {
-        updateRoot(getRoot());
-    }
+  @Override
+  public FeatureModel getFeatureModel() {
+    return this.featureModel;
+  }
 
-    @Override
-    public void updateRoot(final GModelRoot newRoot) {
-        setRoot(newRoot);
-        this.index = getOrUpdateIndex(newRoot);
-        if (getFeatureModel() != null) {
-            getIndex().indexFeatureModel(getFeatureModel());
-        }
-    }
+  @Override
+  public void setFeatureModel(FeatureModel model) {
+    this.featureModel = model;
+  }
 
-    @Override
-    protected UVLModelIndex getOrUpdateIndex(final GModelRoot newRoot) {
-        return UVLModelIndex.getOrCreate(getRoot());
-    }
-
-    @Override
-    public FeatureModel getFeatureModel() {
-        return this.featureModel;
-    }
-
-    @Override
-    public void setFeatureModel(FeatureModel model) {
-        this.featureModel = model;
-    }
-
-    @Override
-    public void sessionDisposed(final ClientSession clientSession) {
-        this.index.clear();
-    }
+  @Override
+  public void sessionDisposed(final ClientSession clientSession) {
+    this.index.clear();
+  }
 }

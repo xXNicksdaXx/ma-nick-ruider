@@ -24,7 +24,7 @@ export class CenteredAnchor implements IAnchorComputer {
         return CenteredAnchor.KIND;
     }
 
-    getAnchor(connectable: GConnectableElement, refPoint: Point, offset: number): Point {
+    getAnchor(connectable: GConnectableElement, refPoint: Point): Point {
         const centerX = connectable.bounds.x + connectable.bounds.width / 2;
         const centerY = connectable.bounds.y + connectable.bounds.height / 2;
         const topY = connectable.bounds.y;

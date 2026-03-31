@@ -5,11 +5,7 @@
  * For a copy, see <https://opensource.org/licenses/MIT>.
  *
  ****************************************************************************/
-import {
-    IViewArgs,
-    RectangularNodeView,
-    RenderingContext,
-} from '@eclipse-glsp/client';
+import { RectangularNodeView, RenderingContext } from '@eclipse-glsp/client';
 import { injectable } from 'inversify';
 import { VNode } from 'snabbdom';
 import { svg } from 'sprotty';
@@ -26,7 +22,7 @@ const JSX = { createElement: svg };
 @injectable()
 export abstract class SeparatorNodeView<T extends LabeledNode> extends RectangularNodeView {
 
-    override render(node: T, context: RenderingContext, args?: IViewArgs): VNode | undefined {
+    override render(node: T, context: RenderingContext): VNode | undefined {
         if (!this.isVisible(node, context)) {
             return undefined;
         }

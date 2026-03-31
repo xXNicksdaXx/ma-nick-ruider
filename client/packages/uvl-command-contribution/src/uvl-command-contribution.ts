@@ -5,7 +5,7 @@
  * For a copy, see <https://opensource.org/licenses/MIT>.
  *
  ****************************************************************************/
-import { CommandContext, GlspVscodeConnector } from '@eclipse-glsp/vscode-integration';
+import { CommandContext } from '@eclipse-glsp/vscode-integration';
 import { promises as fs } from 'fs';
 import * as vscode from 'vscode';
 
@@ -13,16 +13,16 @@ import { getUvlTemplate, getWorkspaceRoot, showInput } from './utils';
 
 export function configureUVLCommandContributions(context: CommandContext) {
     // keep track of diagram specific element selection.
-    const { extensionContext, diagramPrefix, connector } = context;
+    const { extensionContext, diagramPrefix } = context;
 
     extensionContext.subscriptions.push(
         vscode.commands.registerCommand(`${diagramPrefix}.newDiagram`,
-            async () => await createNewDiagramFromPrompt(connector)
-        ),
+            async () => await createNewDiagramFromPrompt()
+        )
     );
 }
 
-async function createNewDiagramFromPrompt(connector: GlspVscodeConnector): Promise<void> {
+async function createNewDiagramFromPrompt(): Promise<void> {
     const modelName = await showInput(
         'Enter name of new UVL file',
         'UVL Name');

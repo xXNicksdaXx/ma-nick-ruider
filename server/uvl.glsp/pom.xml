@@ -1,12 +1,12 @@
-<?xml version="1.0"?>
-    <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns="http://maven.apache.org/POM/4.0.0"
-             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-        <modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.tu_dresden.inf.st</groupId>
     <artifactId>uvl.glsp</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <description>GLSP server component</description>
     <url>https://git-st.inf.tu-dresden.de/stgroup/student-projects/2026/ma-nick-ruider</url>
 
@@ -37,21 +37,25 @@
 
     <properties>
         <!-- General build environment plugin versions -->
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.checkstyle.version>3.2.0</maven.checkstyle.version>
-        <puppycrawl.checkstyle.version>8.44</puppycrawl.checkstyle.version>
-        <maven.build.helper.plugin.version>3.3.0</maven.build.helper.plugin.version>
-        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-        <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
-        <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
+        <maven.checkstyle.version>3.6.0</maven.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.26.1</puppycrawl.checkstyle.version>
+        <maven.build.helper.plugin.version>3.6.1</maven.build.helper.plugin.version>
+        <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
+        <maven.dependency.plugin.version>3.10.0</maven.dependency.plugin.version>
+        <maven.shade.plugin.version>3.6.2</maven.shade.plugin.version>
+        <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
+        <spotless.maven.plugin.version>2.46.1</spotless.maven.plugin.version>
+        <google.java.format.version>1.31.0</google.java.format.version>
+
         <!-- Dependency Versions -->
-        <glsp.version>2.5.0</glsp.version>
+        <apache.logging.log4j.version>2.25.3</apache.logging.log4j.version>
         <eclipse.core.runtime.version>3.7.0</eclipse.core.runtime.version>
         <eclipse.core.version>3.7.100</eclipse.core.version>
-        <eclipse.lsp4j.version>0.24.0</eclipse.lsp4j.version>
-        <apache.logging.log4j.version>2.25.1</apache.logging.log4j.version>
+        <eclipse.lsp4j.version>1.0.0</eclipse.lsp4j.version>
+        <glsp.version>2.6.0</glsp.version>
+        <gson.code.version>2.13.2</gson.code.version>
         <uvl.metamodel.version>1.2.1</uvl.metamodel.version>
     </properties>
 
@@ -70,11 +74,23 @@
             <groupId>org.eclipse.core</groupId>
             <artifactId>org.eclipse.core.runtime</artifactId>
             <version>${eclipse.core.runtime.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.osgi</groupId>
+                    <artifactId>org.eclipse.osgi</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.core</groupId>
             <artifactId>org.eclipse.core.resources</artifactId>
             <version>${eclipse.core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.osgi</groupId>
+                    <artifactId>org.eclipse.osgi</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.lsp4j</groupId>
@@ -89,7 +105,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <version>${gson.code.version}</version>
         </dependency>
         <dependency>
             <groupId>de.tu_dresden.inf.st</groupId>
@@ -138,15 +154,66 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <release>${maven.compiler.target}</release>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${puppycrawl.checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.maven.plugin.version}</version>
+                <configuration>
+                    <java>
+                        <!-- Uses the same formatter engine available in IntelliJ and VS Code extensions -->
+                        <googleJavaFormat>
+                            <version>${google.java.format.version}</version>
+                        </googleJavaFormat>
+                        <removeUnusedImports/>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>spotless-verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>${maven.dependency.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -165,7 +232,6 @@
             </plugin>
         </plugins>
     </build>
-
 
     <profiles>
         <profile>
@@ -202,9 +268,12 @@
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
                                         <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
                                         <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
                                         <exclude>META-INF/DEPENDENCIES</exclude>
                                         <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/eclipse.inf</exclude>
                                         <exclude>.options</exclude>
                                         <exclude>.api_description</exclude>
                                         <exclude>*.profile</exclude>
@@ -221,6 +290,8 @@
                                         <exclude>**/*.mwe2</exclude>
                                         <exclude>**/*.xtext</exclude>
                                         <exclude>**/*.xtextbin</exclude>
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>META-INF/versions/**/module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

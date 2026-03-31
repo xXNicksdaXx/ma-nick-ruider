@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+    <component name="CheckStyle-IDEA" serialisationVersion="2">
+        <checkstyleVersion>10.26.1</checkstyleVersion>
+        <option name="suppressErrors" value="false" />
+        <option name="thirdPartyClasspath" />
+        <option name="activeLocationIds" />
+        <option name="location-1" value="PROJECT_RELATIVE:server/uvl.glsp/checkstyle.xml:UVL Google Checkstyle" />
+        <option name="location-2" value="PROJECT_RELATIVE:server/uvl.bp.glsp/checkstyle.xml:UVL BP Google Checkstyle" />
+    </component>
+</project>

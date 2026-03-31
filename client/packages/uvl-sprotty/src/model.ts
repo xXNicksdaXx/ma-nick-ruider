@@ -64,7 +64,7 @@ export class FeatureNode extends LabeledNode {
     }
 
     hasAttributes(): boolean {
-        let container = this.attributeContainer;
+        const container = this.attributeContainer;
         if (container) {
             return container.children.length !== 0;
         }
@@ -80,7 +80,7 @@ export class ConstraintBoxNode extends LabeledNode {
     }
 
     hasConstraints(): boolean {
-        let container = this.constraintContainer;
+        const container = this.constraintContainer;
         if (container) {
             return container.children.length !== 0;
         }
