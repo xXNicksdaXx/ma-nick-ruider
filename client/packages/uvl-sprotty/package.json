@@ -39,9 +39,9 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@eclipse-glsp/client": "2.5.0",
+    "@eclipse-glsp/client": "2.6.0",
     "balloon-css": "^1.2.0",
-    "inversify": "^6.1.3",
+    "inversify": "^6.2.2",
     "uvl-common": "0.3.0"
   },
   "devDependencies": {

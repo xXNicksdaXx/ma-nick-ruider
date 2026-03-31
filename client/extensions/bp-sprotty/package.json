@@ -40,8 +40,8 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@eclipse-glsp/client": "2.5.0",
-    "inversify": "^6.1.3",
+    "@eclipse-glsp/client": "2.6.0",
+    "inversify": "^6.2.2",
     "uvl-sprotty": "0.3.0"
   },
   "devDependencies": {

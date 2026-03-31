@@ -179,20 +179,20 @@
     "watch:bundle": "webpack --watch"
   },
   "dependencies": {
-    "@vscode/codicons": "^0.0.35"
+    "@vscode/codicons": "^0.0.45"
   },
   "devDependencies": {
-    "@eclipse-glsp/vscode-integration": "2.5.0",
-    "@types/node": "^18.11.9",
+    "@eclipse-glsp/vscode-integration": "2.6.0",
+    "@types/node": "^24.12.0",
     "@types/vscode": "^1.80.0",
     "@vscode/vsce": "^3.7.1",
-    "copy-webpack-plugin": "^13.0.1",
+    "copy-webpack-plugin": "^14.0.0",
     "ts-loader": "^9.5.4",
     "uvl-command-contribution": "0.3.0",
     "uvl-vscode-webview": "0.3.0",
-    "webpack": "5.104.1",
-    "webpack-cli": "^5.1.4",
-    "webpack-merge": "^5.10.0"
+    "webpack": "^5.105.4",
+    "webpack-cli": "^7.0.2",
+    "webpack-merge": "^6.0.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.9",
