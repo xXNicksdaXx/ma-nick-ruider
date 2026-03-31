@@ -42,7 +42,7 @@ build_uvl:
   artifacts:
     paths:
       - "client/vscode/extension/uvl-vscode.vsix"
-    expire_in: 7 days
+    expire_in: 1 hour
 
 build_uvl_bp:
   stage: build-client
@@ -57,7 +57,7 @@ build_uvl_bp:
   artifacts:
     paths:
       - "client/vscode/extension/uvl-bp-vscode.vsix"
-    expire_in: 7 days
+    expire_in: 1 hour
 
 create_release:
   stage: release
