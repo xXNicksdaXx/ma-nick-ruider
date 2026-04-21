@@ -8,9 +8,9 @@ package de.tu_dresden.inf.st.uvl.glsp.actions;
 
 import java.util.Collections;
 import java.util.List;
-import org.eclipse.glsp.server.actions.RequestAction;
+import org.eclipse.glsp.server.actions.Action;
 
-public class HighlightElementAction extends RequestAction<HighlightElementResponseAction> {
+public class HighlightElementAction extends Action {
 
   public static final String KIND = "highlightElement";
 

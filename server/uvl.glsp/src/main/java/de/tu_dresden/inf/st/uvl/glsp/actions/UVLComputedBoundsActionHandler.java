@@ -1,4 +1,4 @@
-package de.tu_dresden.inf.st.uvl.glsp.handler;
+package de.tu_dresden.inf.st.uvl.glsp.actions;
 
 import com.google.inject.Inject;
 import java.util.List;

@@ -8,9 +8,9 @@ package de.tu_dresden.inf.st.uvl.glsp;
 
 import com.google.inject.Singleton;
 import de.tu_dresden.inf.st.uvl.glsp.actions.HighlightElementActionHandler;
+import de.tu_dresden.inf.st.uvl.glsp.actions.UVLComputedBoundsActionHandler;
 import de.tu_dresden.inf.st.uvl.glsp.gmodel.UVLGModelFactory;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLApplyLabelEditOperationHandler;
-import de.tu_dresden.inf.st.uvl.glsp.handler.UVLComputedBoundsActionHandler;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateAttributeOperationHandler;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateBiConstraintEdgeOperationHandler;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateFeatureCardinalityOperationHandler;

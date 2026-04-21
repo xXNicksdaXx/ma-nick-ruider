@@ -34,7 +34,7 @@ public class HighlightElementActionHandler extends AbstractActionHandler<Highlig
           new HighlightElementAction(List.copyOf(existingIds), action.isHighlighted()));
     }
 
-    return listOf(new HighlightElementResponseAction(!existingIds.isEmpty()));
+    return listOf();
   }
 
   protected Set<String> existingModelIds(final Collection<String> ids) {

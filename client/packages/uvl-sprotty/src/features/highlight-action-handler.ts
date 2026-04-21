@@ -6,7 +6,7 @@
  *
  ****************************************************************************/
 
-import { HighlightElementAction, HighlightElementActionResponse } from 'uvl-common';
+import { HighlightElementAction } from 'uvl-common';
 
 import {
     Action,
@@ -22,9 +22,8 @@ import {
 import { inject, injectable } from 'inversify';
 
 const HIGHLIGHT_CLASS = 'highlight-glow';
-const DEFAULT_HIGHLIGHT_TIMEOUT_MS = 2500;
 
-const pendingUnhighlightTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+const activeHighlightsByRoot = new Map<string, Set<string>>();
 
 @injectable()
 export class HighlightElementsActionHandler implements IActionHandler {
@@ -37,18 +36,7 @@ export class HighlightElementsActionHandler implements IActionHandler {
         }
 
         const command = new ApplyHighlightCommand(action.elementIds, action.isHighlighted);
-        return this.commandStack
-            .execute(command)
-            .then(() =>
-                action.requestId
-                    ? HighlightElementActionResponse.create({ ok: true, responseId: action.requestId })
-                    : undefined
-            )
-            .catch(() =>
-                action.requestId
-                    ? HighlightElementActionResponse.create({ ok: false, responseId: action.requestId })
-                    : undefined
-            );
+        return this.commandStack.execute(command).then(() => undefined);
     }
 }
 
@@ -79,80 +67,118 @@ function applyHighlight(
     highlighted: boolean
 ): CommandReturn {
     let modelChanged = false;
+    const activeHighlights = getActiveHighlights(context);
 
-    for (const rawId of elementIds) {
-        const id = rawId?.trim();
-        if (!id) {
-            continue;
+    if (highlighted) {
+        const nextHighlightedIds = new Set<string>();
+
+        for (const rawId of elementIds) {
+            const id = rawId?.trim();
+            if (!id) {
+                continue;
+            }
+
+            const element = context.root.index.getById(id);
+            if (!element) {
+                continue;
+            }
+
+            nextHighlightedIds.add(id);
         }
 
-        const element = context.root.index.getById(id);
-        if (!element) {
-            clearPendingUnhighlight(context, id);
-            continue;
+        if (setsEqual(activeHighlights, nextHighlightedIds)) {
+            return { model: context.root, modelChanged: false };
         }
 
-        const nextClasses = toggleHighlightClass(element.cssClasses, highlighted);
-        const previousClasses = element.cssClasses ?? [];
-        const hasChanged =
-            previousClasses.length !== nextClasses.length
-            || previousClasses.some((cssClass, index) => cssClass !== nextClasses[index]);
+        for (const activeId of activeHighlights) {
+            const activeElement = context.root.index.getById(activeId);
+            if (!activeElement) {
+                continue;
+            }
 
-        if (!hasChanged) {
-            continue;
+            const nextClasses = toggleHighlightClass(activeElement.cssClasses, false);
+            if (!classesChanged(activeElement.cssClasses, nextClasses)) {
+                continue;
+            }
+
+            activeElement.cssClasses = nextClasses;
+            modelChanged = true;
         }
 
-        element.cssClasses = nextClasses;
-        modelChanged = true;
+        activeHighlights.clear();
 
-        if (highlighted) {
-            scheduleUnhighlight(context, id);
-        } else {
-            clearPendingUnhighlight(context, id);
+        for (const id of nextHighlightedIds) {
+            const element = context.root.index.getById(id);
+            if (!element) {
+                continue;
+            }
+
+            const nextClasses = toggleHighlightClass(element.cssClasses, true);
+            if (!classesChanged(element.cssClasses, nextClasses)) {
+                activeHighlights.add(id);
+                continue;
+            }
+
+            element.cssClasses = nextClasses;
+            activeHighlights.add(id);
+            modelChanged = true;
+        }
+    } else {
+        for (const rawId of elementIds) {
+            const id = rawId?.trim();
+            if (!id) {
+                continue;
+            }
+
+            const element = context.root.index.getById(id);
+            activeHighlights.delete(id);
+
+            if (!element) {
+                continue;
+            }
+
+            const nextClasses = toggleHighlightClass(element.cssClasses, false);
+            if (!classesChanged(element.cssClasses, nextClasses)) {
+                continue;
+            }
+
+            element.cssClasses = nextClasses;
+            modelChanged = true;
         }
     }
 
     return { model: context.root, modelChanged };
 }
 
-function scheduleUnhighlight(context: CommandExecutionContext, elementId: string): void {
-    clearPendingUnhighlight(context, elementId);
-    const timerKey = getTimerKey(context, elementId);
-
-    const timeoutHandle = setTimeout(() => {
-        pendingUnhighlightTimeouts.delete(timerKey);
-
-        const element = context.root.index.getById(elementId);
-        if (!element) {
-            return;
-        }
-
-        element.cssClasses = toggleHighlightClass(element.cssClasses, false);
-
-        // Trigger a normal action roundtrip so the diagram refreshes consistently.
-        const dispatcher = (context as unknown as {
-            actionDispatcher?: { dispatch(action: HighlightElementAction): unknown };
-        }).actionDispatcher;
-        dispatcher?.dispatch(HighlightElementAction.create({ elementId, isHighlighted: false }));
-    }, DEFAULT_HIGHLIGHT_TIMEOUT_MS);
-
-    pendingUnhighlightTimeouts.set(timerKey, timeoutHandle);
-}
-
-function clearPendingUnhighlight(context: CommandExecutionContext, elementId: string): void {
-    const timerKey = getTimerKey(context, elementId);
-    const timeoutHandle = pendingUnhighlightTimeouts.get(timerKey);
-    if (!timeoutHandle) {
-        return;
+function getActiveHighlights(context: CommandExecutionContext): Set<string> {
+    const rootId = (context.root as { id?: string }).id ?? 'root';
+    let activeHighlights = activeHighlightsByRoot.get(rootId);
+    if (!activeHighlights) {
+        activeHighlights = new Set<string>();
+        activeHighlightsByRoot.set(rootId, activeHighlights);
     }
 
-    clearTimeout(timeoutHandle);
-    pendingUnhighlightTimeouts.delete(timerKey);
+    return activeHighlights;
 }
 
-function getTimerKey(context: CommandExecutionContext, elementId: string): string {
-    const rootId = (context.root as { id?: string }).id ?? 'root';
-    return `${rootId}:${elementId}`;
+function classesChanged(previousClasses: ReadonlyArray<string> | undefined, nextClasses: ReadonlyArray<string>): boolean {
+    const currentClasses = previousClasses ?? [];
+    return currentClasses.length !== nextClasses.length
+        || currentClasses.some((cssClass, index) => cssClass !== nextClasses[index]);
+}
+
+function setsEqual(left: ReadonlySet<string>, right: ReadonlySet<string>): boolean {
+    if (left.size !== right.size) {
+        return false;
+    }
+
+    for (const value of left) {
+        if (!right.has(value)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function toggleHighlightClass(cssClasses: ReadonlyArray<string> | undefined, highlighted: boolean): string[] {

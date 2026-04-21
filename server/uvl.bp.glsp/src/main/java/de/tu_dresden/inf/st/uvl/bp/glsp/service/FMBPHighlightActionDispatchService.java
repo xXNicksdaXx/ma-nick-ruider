@@ -33,7 +33,7 @@ public class FMBPHighlightActionDispatchService {
   @Inject
   protected void registerDataListener() {
     serverSentEventsService.addDataListener(
-        this::dispatchHighlightAction, "requested", "blocked", "waited_for", "active");
+        this::dispatchHighlightAction, "requested", "blocked", "waited_for");
   }
 
   protected void dispatchHighlightAction(final ParsedServerSentEvent event) {

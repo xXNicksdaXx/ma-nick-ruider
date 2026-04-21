@@ -34,7 +34,7 @@ import {
 } from '@eclipse-glsp/client';
 import { Container, ContainerModule } from 'inversify';
 
-import { HighlightElementAction, HighlightElementActionResponse, UVLModelTypes } from 'uvl-common';
+import { HighlightElementAction, UVLModelTypes } from 'uvl-common';
 
 import 'balloon-css/balloon.min.css';
 import '../css/diagram.css';
@@ -71,7 +71,6 @@ const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
 
     bind(HighlightElementsActionHandler).toSelf().inSingletonScope();
     configureActionHandler(context, HighlightElementAction.KIND, HighlightElementsActionHandler);
-    configureActionHandler(context, HighlightElementActionResponse.KIND, HighlightElementsActionHandler);
 
     configureDefaultModelElements(context);
     overrideModelElement(context, DefaultTypes.SHAPE_PRE_RENDERED, GShapedPreRenderedElement, PreRenderedView, {
