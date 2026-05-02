@@ -22,7 +22,7 @@ const JSX = { createElement: svg };
 @injectable()
 export class EditableCompartmentSelectionFeedback implements IVNodePostprocessor {
     decorate(vnode: VNode, element: GModelElement): VNode {
-        if (element instanceof EditableGCompartment && (element.hoverFeedback || element.selected)) {
+        if (element instanceof EditableGCompartment && element.selected) {
             // get the width of the parent element, if possible
             let parent = element.parent;
             if (parent instanceof GChildElement) {
@@ -44,7 +44,6 @@ export class EditableCompartmentSelectionFeedback implements IVNodePostprocessor
                     width={width}
                     height={element.bounds.height}
                     class-selection-feedback={true}
-                    class-hover={element.hoverFeedback}
                     class-selected={element.selected}
                 />
             );

@@ -36,7 +36,6 @@ export abstract class SeparatorNodeView<T extends LabeledNode> extends Rectangul
                     height={Math.max(0, node.bounds.height)}
                     class-sprotty-node={true}
                     class-selected={node.selected}
-                    class-mouseover={node.hoverFeedback}
                 />
                 {this.renderSeparatorLines(node)}
                 {context.renderChildren(node)}

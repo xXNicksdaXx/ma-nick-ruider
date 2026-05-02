@@ -26,7 +26,6 @@ import {
     HelperLineType,
     initializeDiagramContainer,
     layoutableChildFeature,
-    layoutModule,
     LogLevel,
     overrideModelElement,
     PreRenderedView,
@@ -42,8 +41,8 @@ import '../css/tool-palette.css';
 
 import { CircleEdgeView, DoubleArrowEdgeView, SectorEdgeView, SingleArrowEdgeView } from "./edge-views";
 import { CenteredAnchor } from "./features/center-anchor-computer";
-import { EditableCompartmentSelectionFeedback } from './features/selection-feedback';
 import { HighlightElementsActionHandler } from './features/highlight-action-handler';
+import { EditableCompartmentSelectionFeedback } from './features/selection-feedback';
 import { UVLPolylineEdgeRouter } from "./features/uvl-polyline-edge-router";
 import { ConstraintBoxNode, EditableGCompartment, EditableGLabel, FeatureNode } from "./model";
 import { ConstraintBoxNodeView, FeatureNodeView } from './node-views';
@@ -110,5 +109,5 @@ const uvlDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
  * @returns The initialized container.
  */
 export function initializeUvlDiagramContainer(container: Container, ...containerConfiguration: ContainerConfiguration): Container {
-    return initializeDiagramContainer(container, defaultModule, helperLineModule, layoutModule, uvlDiagramModule, ...containerConfiguration);
+    return initializeDiagramContainer(container, defaultModule, helperLineModule, uvlDiagramModule, ...containerConfiguration);
 }
