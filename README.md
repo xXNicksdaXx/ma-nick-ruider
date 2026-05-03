@@ -5,6 +5,7 @@ It includes:
 
 - 🖥️ A **Java-based GLSP server** for handling diagram-specific logic
 - 🖼️ A **VS Code extension** for integrating the diagram editor into Visual Studio Code
+- 📦 **Multiple profiles** supporting UVL base and BP (Behavioral Programming) extensions
 
 UVL is a concise, extensible language for modeling variability in software product lines.
 UVL specifies variability models with a tree-like structure to represent the hierarchical structure of variability models.
@@ -13,34 +14,40 @@ UVL specifies variability models with a tree-like structure to represent the hie
 
 The project is organized as follows:
 
-- **[`server/`](./server):** Java-based Eclipse GLSP server for UVL diagram editing and BP-extension
-  - **[`uvl.metamodel/`](./server/uvl.metamodel):** UVL metamodel implementation with custom extensions
-  - **[`uvl.glsp/`](./server/uvl.glsp):** Eclipse GLSP server for UVL diagram editing
-  - **[`uvl.bp.glsp/`](./server/uvl.bp.glsp):** Eclipse GLSP server including the BP-extension for UVL diagram editing
-  - **[`client/`](./client):** TypeScript/JavaScript client applications and extensions
-    - **[`packages/`](./client/packages):** Shared packages and components
-      - **[`common/`](./client/packages/common):** Shared types and utilities
-      - **[`uvl-command-contribution/`](client/packages/uvl-command-contribution):** VS Code command handlers
-      - **[`uvl-sprotty/`](client/packages/uvl-sprotty):** Core diagram rendering
-    - **[`vscode/`](./client/vscode):** VS Code extension
-      - **[`extension/`](./client/vscode/extension):** Extension host process
-      - **[`webview/`](./client/vscode/webview):** Webview diagram editor
-    - **[`workspace/`](./client/workspace):** Example workspace
+```
+├── server/                     Java-based Eclipse GLSP server implementation
+│   ├── uvl.metamodel/         UVL metamodel with ANTLR parser
+│   ├── uvl.glsp/              GLSP server for UVL diagram editing  
+│   └── uvl.bp.glsp/           GLSP server with BP-extension support
+├── client/                     TypeScript/JavaScript client applications
+│   ├── packages/              Shared packages and components
+│   │   ├── common/            Shared types and utilities
+│   │   ├── uvl-command-contribution/  VS Code command handlers
+│   │   └── uvl-sprotty/       Core diagram rendering
+│   ├── extensions/            Framework-specific extensions
+│   │   ├── bp-sprotty/        BP diagram rendering (Sprotty)
+│   │   └── sse-command-contribution/  SSE-specific commands
+│   ├── vscode/                VS Code extension
+│   │   ├── extension/         Extension host process
+│   │   └── webview/           Webview diagram editor
+│   └── workspace/             Example workspace and test files
+└── build scripts              Platform-specific build automation
+```
 
 ## Prerequisites
 
 Ensure the following are installed on your system:
 
-- [Node.js](https://nodejs.org/en/) `>=20 <21`
+- [Node.js](https://nodejs.org/en/) `>=20 <25`
 - [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) `>=1.7.0 <2`
-- [Java](https://dev.java/) `>=21`
+- [Java](https://dev.java/) `>=25` (for Eclipse GLSP server)
 - [Maven](https://maven.apache.org/) `>=3.6.0`
 
-This project is compatible with VS Code `>=1.74.0`.
+This project is compatible with VS Code `^1.80.0`.
 
 ## Building the Project
 
-The project consists of two main components that need to be built separately: the Java server and the TypeScript/JavaScript client applications.
+The project consists of two main components: the Java-based GLSP server and the TypeScript/JavaScript client applications.
 
 ### Quick Build (All Components)
 
@@ -56,11 +63,11 @@ Use the provided build scripts to build both server and client:
 ./build.sh
 ```
 
-### Build specific components
+### Build Specific Components
 
-You can also build individual components:
+You can build individual components by specifying a target:
 
-#### Java Server
+#### Java Server Only
 
 ```powershell
 .\build.ps1 server  # Windows
@@ -70,12 +77,13 @@ You can also build individual components:
 ./build.sh server  # Linux/macOS
 ```
 
+Or directly with Maven:
 ```bash
 cd server
 mvn clean verify
 ```
 
-#### Client Applications
+#### Client Applications Only
 
 ```powershell
 .\build.ps1 client  # Windows
@@ -85,34 +93,53 @@ mvn clean verify
 ./build.sh client  # Linux/macOS
 ```
 
+Or directly with Yarn:
 ```bash
 cd client
 yarn
 ```
 
-```bash
-cd client && yarn build:theia  # Build Theia application
+#### VS Code Extension (with embedded server)
+
+Build a complete VS Code extension with an embedded GLSP server:
+
+```powershell
+.\build.ps1 vscode              # Default 'uvl' profile
+.\build.ps1 vscode uvl          # UVL profile
+.\build.ps1 vscode uvl-bp       # UVL with BP extension
 ```
 
 ```bash
-cd client && yarn build:vscode  # Build VS Code extension
+./build.sh vscode              # Default 'uvl' profile
+./build.sh vscode uvl          # UVL profile
+./build.sh vscode uvl-bp       # UVL with BP extension
 ```
+
+### Build Profiles
+
+The VS Code extension supports multiple profiles:
+
+- **`uvl`**: Base UVL diagram editor (default)
+- **`uvl-bp`**: UVL with Behavioral Programming (BP) extension
+
+Each profile can be built independently with different server implementations.
 
 ### Clean Build Artifacts
 
-To clean build artifacts, run:
+To clean build artifacts from both server and client:
 
 ```powershell
 .\build.ps1 clean  # Windows
 ```
+
 ```bash
 ./build.sh clean  # Linux/macOS
 ```
+
+Or clean specific components:
 ```bash
-cd server && mvn clean  # Clean Java server artifacts
-```
-```bash
-cd client && yarn clean  # Clean client artifacts
+cd server && mvn clean      # Clean Java server artifacts
+cd client && yarn clean     # Clean client artifacts
 ```
 
 ## Running the Project
@@ -139,52 +166,43 @@ Use the launch configurations defined in `.vscode/launch.json`. Open the project
 
 ## Packaging the VS Code Extension
 
-To package the VS Code extension as a `.vsix` file, run:
+To package the VS Code extension as a `.vsix` file:
 
 ```bash
 cd client
-yarn package:uvl
+yarn package:uvl              # Default UVL profile
+yarn package:uvl-bp           # UVL with BP extension
 ```
 
-The resulting `.vsix` file will be located in the `vscode/extension/dist` directory and can be installed in VS Code.
-
-Use `yarn package:uvl-bp` to build a BP profile artifact.
-
-The extension package script now delegates to `client/vscode/extension/scripts/build-extension.js`,
-which reads `name`, `displayName`, `description`, and `outFile` from the selected profile in
-`client/vscode/profiles.json`.
-
-Package a specific profile by passing the webpack-style environment argument:
-
-```bash
-cd client/vscode/extension
-yarn package --env profile=uvl-bp
-```
-
-You can also use the root build scripts:
-
+Or use the build scripts:
 ```powershell
-.\build.ps1 vscode uvl
-.\build.ps1 vscode uvl-bp
+.\build.ps1 vscode uvl        # Windows - UVL profile
+.\build.ps1 vscode uvl-bp     # Windows - UVL-BP profile
 ```
 
 ```bash
-./build.sh vscode uvl
-./build.sh vscode uvl-bp
+./build.sh vscode uvl         # Linux/macOS - UVL profile
+./build.sh vscode uvl-bp      # Linux/macOS - UVL-BP profile
 ```
 
-## VS Code Extension Profiles
+The resulting `.vsix` file will be located in the `client/vscode/extension` directory and can be installed in VS Code using:
 
-The extension/webview build now uses static profiles configured in `client/vscode/profiles.json`.
+```bash
+code --install-extension <path-to>.vsix
+```
 
-- `id`: unique profile id (for example `uvl`, `uvl-bp`)
-- `name`: extension identifier used for VSIX packaging
-- `displayName`: extension display name used for VSIX packaging
-- `outFile`: output VSIX file name written by `vsce package --out`
-- `description` (optional): profile-specific extension description
-- `serverJarPath`: path to exactly one embedded GLSP server jar for that profile
-- `containerModuleIds`: sprotty/container module ids enabled in the webview build
-- `commandContributionIds` (optional): command contribution ids enabled in the extension build
+### Extension Profiles
+
+The extension build system uses static profiles configured in `client/vscode/profiles.json`:
+
+- `id`: Unique profile identifier (e.g., `uvl`, `uvl-bp`)
+- `name`: Extension identifier for VSIX packaging
+- `displayName`: Extension display name in the marketplace
+- `outFile`: Output VSIX file name
+- `description`: Profile-specific extension description
+- `serverJarPath`: Path to the embedded GLSP server jar
+- `containerModuleIds`: Sprotty container module IDs for webview
+- `commandContributionIds`: VS Code command contribution IDs
 
 ## Resources
 

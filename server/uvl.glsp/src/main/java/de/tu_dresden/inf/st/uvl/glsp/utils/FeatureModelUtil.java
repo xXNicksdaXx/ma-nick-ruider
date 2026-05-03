@@ -11,9 +11,6 @@ import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -56,15 +53,8 @@ public final class FeatureModelUtil {
     return featureModel.getOwnConstraints().stream()
         .filter(
             constraint ->
-                constraint instanceof ImplicationConstraint
-                    || constraint instanceof EquivalenceConstraint)
-        .filter(
-            constraint ->
-                constraint.getConstraintSubParts().stream()
-                        .filter(subConstraint -> subConstraint instanceof LiteralConstraint)
-                        .toList()
-                        .size()
-                    == 2)
+                ConstraintUtil.isRequiresConstraint(constraint)
+                    || ConstraintUtil.isExcludesConstraint(constraint))
         .toList();
   }
 

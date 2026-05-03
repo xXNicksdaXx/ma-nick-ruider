@@ -10,9 +10,10 @@ import com.google.inject.Inject;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.AndConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.NotConstraint;
 import java.util.Optional;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.glsp.graph.GEdge;
@@ -25,7 +26,7 @@ public class UVLCreateBiConstraintEdgeOperationHandler
   @Inject protected UVLModelState modelState;
 
   UVLCreateBiConstraintEdgeOperationHandler() {
-    super(UVLModelTypes.EQUIVALENCE, UVLModelTypes.IMPLICATION);
+    super(UVLModelTypes.EXCLUDES, UVLModelTypes.REQUIRES);
   }
 
   @Override
@@ -43,12 +44,12 @@ public class UVLCreateBiConstraintEdgeOperationHandler
     modelState.getFeatureModel().getLiteralConstraints().add(sourceConstraint);
     modelState.getFeatureModel().getLiteralConstraints().add(targetConstraint);
 
-    if (operation.getElementTypeId().equals(UVLModelTypes.EQUIVALENCE)) {
+    if (operation.getElementTypeId().equals(UVLModelTypes.EXCLUDES)) {
       modelState
           .getFeatureModel()
           .getOwnConstraints()
-          .add(new EquivalenceConstraint(sourceConstraint, targetConstraint));
-    } else if (operation.getElementTypeId().equals(UVLModelTypes.IMPLICATION)) {
+          .add(new NotConstraint(new AndConstraint(sourceConstraint, targetConstraint)));
+    } else if (operation.getElementTypeId().equals(UVLModelTypes.REQUIRES)) {
       modelState
           .getFeatureModel()
           .getOwnConstraints()

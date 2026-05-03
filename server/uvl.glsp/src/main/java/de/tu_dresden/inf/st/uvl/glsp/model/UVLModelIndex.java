@@ -7,6 +7,8 @@
 package de.tu_dresden.inf.st.uvl.glsp.model;
 
 import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.convertConstraintTypeToModelType;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.getBiConstraintSource;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.getBiConstraintTarget;
 import static de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil.getAllGroups;
 import static de.tu_dresden.inf.st.uvl.glsp.utils.GroupUtil.convertGroupTypeToModelType;
 
@@ -16,7 +18,6 @@ import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
 import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -148,13 +149,9 @@ public class UVLModelIndex extends GModelIndexImpl {
                 edge -> {
                   // check for identical source and target nodes
                   Optional<String> sourceId =
-                      getIdFor(
-                          ((LiteralConstraint) constraint.getConstraintSubParts().getFirst())
-                              .getReference());
+                      getIdFor(getBiConstraintSource(constraint).getReference());
                   Optional<String> targetId =
-                      getIdFor(
-                          ((LiteralConstraint) constraint.getConstraintSubParts().getLast())
-                              .getReference());
+                      getIdFor(getBiConstraintTarget(constraint).getReference());
                   return sourceId.isPresent()
                       && targetId.isPresent()
                       && edge.getSourceId().equals(sourceId.get())

@@ -22,7 +22,6 @@ import org.eclipse.glsp.graph.GPoint;
 import org.eclipse.glsp.graph.builder.impl.GLabelBuilder;
 import org.eclipse.glsp.graph.builder.impl.GNodeBuilder;
 import org.eclipse.glsp.graph.util.GraphUtil;
-import org.eclipse.glsp.server.actions.ActionDispatcher;
 import org.eclipse.glsp.server.actions.SelectAction;
 import org.eclipse.glsp.server.gmodel.GModelCreateOperationHandler;
 import org.eclipse.glsp.server.operations.CreateNodeOperation;
@@ -31,8 +30,6 @@ public class UVLCreateFeatureOperationHandler
     extends GModelCreateOperationHandler<CreateNodeOperation> {
 
   @Inject protected UVLModelState modelState;
-
-  @Inject protected ActionDispatcher actionDispatcher;
 
   protected UVLCreateFeatureOperationHandler(final String... elementTypeIds) {
     super(elementTypeIds);

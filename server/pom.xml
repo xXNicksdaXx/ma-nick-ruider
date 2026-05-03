@@ -6,7 +6,7 @@
 
     <groupId>de.tu_dresden.inf.st</groupId>
     <artifactId>server</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
     <packaging>pom</packaging>
     <url>https://git-st.inf.tu-dresden.de/stgroup/student-projects/2026/ma-nick-ruider</url>
 

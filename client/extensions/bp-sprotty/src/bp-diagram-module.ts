@@ -8,7 +8,6 @@
 import {
     configureModelElement,
     GCompartmentView,
-    GEdge,
     GLabelView,
     GModelElement,
     HelperLineType,
@@ -19,9 +18,9 @@ import { ContainerModule } from 'inversify';
 import { UVLModelTypes } from "uvl-common";
 import { EditableGCompartment, EditableGLabel, FeatureNode, FeatureNodeView } from "uvl-sprotty";
 
-import { BPModelTypes } from './utils/bp-model-types';
 import { BThreadNode } from "./model";
-import { BPEdgeView, BThreadNodeView } from './views';
+import { BPModelTypes } from './utils/bp-model-types';
+import { BThreadNodeView } from './views';
 
 import '../css/diagram.css';
 
@@ -57,10 +56,4 @@ export const bpDiagramModule = new ContainerModule((bind, unbind, isBound, rebin
 
     configureModelElement(context, BPModelTypes.EVENT_NAME, EditableGLabel, GLabelView);
     configureModelElement(context, BPModelTypes.EVENT_PRIORITY, EditableGLabel, GLabelView);
-
-    configureModelElement(context, BPModelTypes.REQUESTED, GEdge, BPEdgeView);
-    configureModelElement(context, BPModelTypes.BLOCKED, GEdge, BPEdgeView);
-    configureModelElement(context, BPModelTypes.WAITED_FOR, GEdge, BPEdgeView);
-    configureModelElement(context, BPModelTypes.SELECTED, GEdge, BPEdgeView);
-    configureModelElement(context, BPModelTypes.CONFLICTING, GEdge, BPEdgeView);
 });

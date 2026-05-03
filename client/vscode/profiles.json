@@ -1,5 +1,5 @@
 {
-  "defaultProfile": "uvl-bp",
+  "defaultProfile": "uvl",
   "profiles": [
     {
       "id": "uvl",
@@ -7,7 +7,7 @@
       "displayName": "UVL VS Code Extension",
       "description": "Extension for the Universal Variability Language (UVL), using a GLSP-based diagram editor inside VSCode",
       "outFile": "uvl-vscode.vsix",
-      "serverJarPath": "../../server/uvl.glsp/target/uvl.glsp-0.4.0-glsp.jar",
+      "serverJarPath": "../../server/uvl.glsp/target/uvl.glsp-0.5.0-glsp.jar",
       "containerModuleIds": ["uvl-core"],
       "commandContributionIds": ["uvl-default"]
     },
@@ -17,7 +17,7 @@
       "displayName": "UVL VS Code Extension (BP)",
       "description": "BP profile variant of the UVL VS Code extension with BP-specific diagram modules.",
       "outFile": "uvl-bp-vscode.vsix",
-      "serverJarPath": "../../server/uvl.bp.glsp/target/uvl.bp.glsp-0.4.0-glsp.jar",
+      "serverJarPath": "../../server/uvl.bp.glsp/target/uvl.bp.glsp-0.5.0-glsp.jar",
       "containerModuleIds": ["uvl-core", "uvl-bp"],
       "commandContributionIds": ["uvl-default", "uvl-bp-sse"]
     }

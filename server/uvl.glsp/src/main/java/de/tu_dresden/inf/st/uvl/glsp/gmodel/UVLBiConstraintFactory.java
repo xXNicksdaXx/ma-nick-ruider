@@ -7,13 +7,13 @@
 package de.tu_dresden.inf.st.uvl.glsp.gmodel;
 
 import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.convertConstraintTypeToModelType;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.getBiConstraintSource;
+import static de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil.getBiConstraintTarget;
 
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.gmodel.generic.AbstractSingleGModelFactory;
 import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelIndex;
-import de.tu_dresden.inf.st.uvl.metamodel.model.building.VariableReference;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
 import org.eclipse.glsp.graph.GEdge;
 import org.eclipse.glsp.graph.builder.impl.GEdgeBuilder;
 import org.eclipse.glsp.graph.builder.impl.GEdgePlacementBuilder;
@@ -32,57 +32,89 @@ public class UVLBiConstraintFactory extends AbstractSingleGModelFactory<Constrai
             .orElseThrow(
                 () ->
                     new IllegalStateException("Constraint not indexed: " + constraint.toString()));
-
-    String sourceId;
-    String targetId;
-
-    Constraint sourceConstraint = constraint.getConstraintSubParts().getFirst();
-    if (sourceConstraint instanceof LiteralConstraint sourceLiteralConstraint) {
-      VariableReference sourceReference = sourceLiteralConstraint.getReference();
-      sourceId =
-          index
-              .getIdFor(sourceReference)
-              .orElseThrow(
-                  () ->
-                      new IllegalStateException(
-                          "Source feature of implication constraint not indexed: "
-                              + sourceReference.getIdentifier()));
-    } else {
-      throw new IllegalStateException(
-          "Unsupported source constraint type for implication: "
-              + sourceConstraint.getClass().getName());
-    }
-
-    Constraint targetReference = constraint.getConstraintSubParts().getLast();
-    if (targetReference instanceof LiteralConstraint targetLiteralConstraint) {
-      VariableReference targetFeature = targetLiteralConstraint.getReference();
-      targetId =
-          index
-              .getIdFor(targetFeature)
-              .orElseThrow(
-                  () ->
-                      new IllegalStateException(
-                          "Target feature of implication constraint not indexed: "
-                              + targetFeature.getIdentifier()));
-    } else {
-      throw new IllegalStateException(
-          "Unsupported target constraint type for implication: "
-              + targetReference.getClass().getName());
-    }
-
     String type = convertConstraintTypeToModelType(constraint);
 
+    if (UVLModelTypes.REQUIRES.equals(type)) {
+      return createRequiresEdge(constraint, index, id);
+    } else if (UVLModelTypes.EXCLUDES.equals(type)) {
+      return createExcludesEdge(constraint, index, id);
+    }
+
+    throw new IllegalStateException("Unsupported bi-constraint type for: " + constraint);
+  }
+
+  protected GEdge createRequiresEdge(
+      final Constraint constraint, final UVLModelIndex index, final String id) {
+    String sourceId =
+        index
+            .getIdFor(getBiConstraintSource(constraint).getReference())
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        "Source feature of requires constraint not indexed for: " + constraint));
+
+    String targetId =
+        index
+            .getIdFor(getBiConstraintTarget(constraint).getReference())
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        "Target feature of requires constraint not indexed for: " + constraint));
+
     GEdgeBuilder edgeBuilder =
-        new GEdgeBuilder(type)
+        new GEdgeBuilder(UVLModelTypes.REQUIRES)
             .id(id)
             .sourceId(sourceId)
             .targetId(targetId)
             .routerKind(GConstants.RouterKind.POLYLINE)
             .addCssClass("constraint-edge")
             .add(
-                new GLabelBuilder(UVLModelTypes.CONSTRAINT_LABEL)
+                new GLabelBuilder(UVLModelTypes.CONSTRAINT_EDGE_LABEL)
                     .id(id + "_label")
                     .text("requires")
+                    .addCssClass("edge-label")
+                    .edgePlacement(
+                        new GEdgePlacementBuilder()
+                            .side(GConstants.EdgeSide.TOP)
+                            .position(0.5d)
+                            .offset(1.5d)
+                            .rotate(false)
+                            .build())
+                    .build());
+
+    applyEdgeData(edgeBuilder, id);
+    return edgeBuilder.build();
+  }
+
+  protected GEdge createExcludesEdge(
+      final Constraint constraint, final UVLModelIndex index, final String id) {
+    String sourceId =
+        index
+            .getIdFor(getBiConstraintSource(constraint).getReference())
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        "Source feature of excludes constraint not indexed for: " + constraint));
+
+    String targetId =
+        index
+            .getIdFor(getBiConstraintTarget(constraint).getReference())
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        "Target feature of excludes constraint not indexed for: " + constraint));
+
+    GEdgeBuilder edgeBuilder =
+        new GEdgeBuilder(UVLModelTypes.EXCLUDES)
+            .id(id)
+            .sourceId(sourceId)
+            .targetId(targetId)
+            .routerKind(GConstants.RouterKind.POLYLINE)
+            .addCssClass("constraint-edge")
+            .add(
+                new GLabelBuilder(UVLModelTypes.CONSTRAINT_EDGE_LABEL)
+                    .id(id + "_label")
+                    .text("excludes")
                     .addCssClass("edge-label")
                     .edgePlacement(
                         new GEdgePlacementBuilder()

@@ -13,12 +13,9 @@ import de.tu_dresden.inf.st.uvl.glsp.utils.ConstraintUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.FeatureModelUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.GModelUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.TypeCastingUtil;
-import de.tu_dresden.inf.st.uvl.metamodel.model.Attribute;
-import de.tu_dresden.inf.st.uvl.metamodel.model.Cardinality;
-import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
-import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
-import de.tu_dresden.inf.st.uvl.metamodel.model.LanguageLevel;
-import de.tu_dresden.inf.st.uvl.metamodel.model.UVLObject;
+import de.tu_dresden.inf.st.uvl.metamodel.main.UVLModelFactory;
+import de.tu_dresden.inf.st.uvl.metamodel.model.*;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,7 +28,7 @@ import org.eclipse.glsp.server.gmodel.GModelApplyLabelEditOperationHandler;
 
 public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOperationHandler {
 
-  @Inject UVLModelState modelState;
+  @Inject protected UVLModelState modelState;
 
   @Override
   public Optional<Command> createCommand(final ApplyLabelEditOperation operation) {
@@ -71,12 +68,12 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
                                         + parentElement.getId())));
 
     // update label for each type
-    if (uvlObject instanceof Feature feature) {
-      handleFeatureLabelEdit(label, feature, operation.getText());
-    } else if (uvlObject instanceof Group group) {
-      updateGroupCardinality(label, group, operation.getText());
-    } else {
-      throw new IllegalArgumentException("Parent node does not correspond to a UVL Feature.");
+    switch (uvlObject) {
+      case Feature feature -> handleFeatureLabelEdit(label, feature, operation.getText());
+      case Group group -> updateGroupCardinality(label, group, operation.getText());
+      case Constraint constraint -> updateConstraint(label, constraint, operation.getText());
+      case null, default ->
+          throw new IllegalArgumentException("Parent node does not correspond to a UVL Feature.");
     }
 
     // update the model index
@@ -224,5 +221,42 @@ public class UVLApplyLabelEditOperationHandler extends GModelApplyLabelEditOpera
     // update Group
     Cardinality cardinality = FeatureModelUtil.createCardinality(newName);
     group.setCardinality(cardinality);
+  }
+
+  protected void updateConstraint(GLabel label, Constraint constraint, String newConstraint) {
+    Constraint parsedConstraint = parseConstraint(newConstraint);
+    parsedConstraint.setLineNumber(constraint.getLineNumber());
+
+    if (!replaceConstraintInFeatureModel(
+        modelState.getFeatureModel(), constraint, parsedConstraint)) {
+      throw new IllegalArgumentException("No owning feature model found for constraint edit.");
+    }
+
+    label.setText(parsedConstraint.toString());
+  }
+
+  protected Constraint parseConstraint(String newConstraint) {
+    UVLModelFactory factory = new UVLModelFactory();
+    return factory.parseConstraint(newConstraint, modelState.getFeatureModel());
+  }
+
+  private boolean replaceConstraintInFeatureModel(
+      FeatureModel featureModel, Constraint oldConstraint, Constraint newConstraint) {
+    for (int i = 0; i < featureModel.getOwnConstraints().size(); i++) {
+      if (featureModel.getOwnConstraints().get(i) == oldConstraint) {
+        featureModel.getOwnConstraints().set(i, newConstraint);
+        return true;
+      }
+    }
+
+    for (Import importLine : featureModel.getImports()) {
+      if (importLine.isReferenced()
+          && replaceConstraintInFeatureModel(
+              importLine.getFeatureModel(), oldConstraint, newConstraint)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

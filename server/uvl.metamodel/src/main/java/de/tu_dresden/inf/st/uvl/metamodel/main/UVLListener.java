@@ -44,6 +44,18 @@ public class UVLListener extends UVLJavaParserBaseListener {
         this.fmBuilder = new FeatureModelBuilder(featureModel);
     }
 
+    /**
+     * Constructor that accepts an existing FeatureModel context.
+     * Useful for parsing constraints that reference features from an existing model.
+     * 
+     * @param modelType the model type
+     * @param featureModel an existing feature model to use as context
+     */
+    public UVLListener(ModelType modelType, FeatureModel featureModel) {
+        this.modelType = modelType;
+        this.fmBuilder = new FeatureModelBuilder(featureModel);
+    }
+
     private boolean isBpModel() {
         return modelType == ModelType.BP;
     }

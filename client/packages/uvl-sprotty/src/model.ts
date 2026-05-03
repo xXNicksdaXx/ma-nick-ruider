@@ -14,8 +14,6 @@ import {
     GCompartment,
     GLabel,
     GModelElement,
-    Hoverable,
-    hoverFeedbackFeature,
     Nameable,
     nameFeature,
     RectangularNode,
@@ -94,11 +92,10 @@ export class EditableGLabel extends GLabel implements EditableLabel {
     }
 }
 
-export class EditableGCompartment extends GCompartment implements Selectable, Deletable, Hoverable {
+export class EditableGCompartment extends GCompartment implements Selectable, Deletable {
     selected = false;
-    hoverFeedback = false;
 
     override hasFeature(feature: symbol): boolean {
-        return super.hasFeature(feature) || feature === selectFeature || feature === deletableFeature || feature === hoverFeedbackFeature;
+        return super.hasFeature(feature) || feature === selectFeature || feature === deletableFeature;
     }
 }

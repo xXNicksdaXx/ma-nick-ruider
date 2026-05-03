@@ -11,8 +11,11 @@ import de.tu_dresden.inf.st.uvl.bp.glsp.utils.BTypeUtil;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLApplyLabelEditOperationHandler;
 import de.tu_dresden.inf.st.uvl.glsp.utils.GModelUtil;
 import de.tu_dresden.inf.st.uvl.glsp.utils.TypeCastingUtil;
+import de.tu_dresden.inf.st.uvl.metamodel.main.ModelType;
+import de.tu_dresden.inf.st.uvl.metamodel.main.UVLModelFactory;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Attribute;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -29,6 +32,12 @@ public class BPApplyLabelEditOperationHandler extends UVLApplyLabelEditOperation
       case BPModelTypes.EVENT_PRIORITY -> updateEventPriority(label, feature, newText);
       default -> super.handleFeatureLabelEdit(label, feature, newText);
     }
+  }
+
+  @Override
+  protected Constraint parseConstraint(String newConstraint) {
+    UVLModelFactory factory = new UVLModelFactory();
+    return factory.parseConstraint(newConstraint, modelState.getFeatureModel(), ModelType.BP);
   }
 
   protected void updateEventName(final GLabel label, final Feature feature, final String newText) {

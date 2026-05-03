@@ -64,6 +64,8 @@ public class UVLGModelFactory implements GModelFactory {
         .map(biConstraintFactory::create)
         .forEachOrdered(root.getChildren()::add);
 
-    root.getChildren().add(constraintBoxFactory.create(featureModel));
+    if (featureModel.getRootFeature() != null) {
+      root.getChildren().add(constraintBoxFactory.create(featureModel));
+    }
   }
 }

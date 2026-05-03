@@ -36,18 +36,22 @@ svg {
 
 .selection-feedback {
     fill: none;
-    stroke: grey;
+    stroke: royalblue;
     stroke-width: 0;
 }
 
 .selection-feedback.selected {
-    stroke-width: 0.5;
+    stroke-width: 1;
 }
 
 /* General Edge And Line Styling */
 .sprotty-edge {
     stroke: var(--vscode-editor-foreground) !important;
     stroke-width: 1px;
+}
+
+.sprotty-edge.selected {
+    stroke: royalblue !important;
 }
 
 .separator-line {
@@ -125,6 +129,6 @@ svg {
 
 .sprotty-node.highlight-glow,
 .sprotty-edge.highlight-glow {
-    stroke: #ffc400 !important;
+    stroke: gold !important;
     stroke-width: 2px !important;
 }

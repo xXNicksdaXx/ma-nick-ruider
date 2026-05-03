@@ -85,7 +85,7 @@ public final class ParsingUtilities {
         }
         Feature relevantFeature = fmInConstruction.getFeatureMap().get(bundle.featureName);
         if (bundle.attributeName != null) {
-            if (relevantFeature.getAttributes().containsKey(bundle.attributeName)) {
+            if (relevantFeature != null && relevantFeature.getAttributes().containsKey(bundle.attributeName)) {
                 return relevantFeature.getAttributes().get(bundle.attributeName);
             }
         }

@@ -45,8 +45,9 @@ public class UVLToolPaletteItemProvider implements ToolPaletteItemProvider {
   protected PaletteItem constraints() {
     List<PaletteItem> constraints =
         List.of(
-            edge(UVLModelTypes.EQUIVALENCE, "Equivalence"),
-            edge(UVLModelTypes.IMPLICATION, "Implication"));
+            node(UVLModelTypes.CONSTRAINT, "Constraint"),
+            edge(UVLModelTypes.EXCLUDES, "Excludes"),
+            edge(UVLModelTypes.REQUIRES, "Requires"));
     return PaletteItem.createPaletteGroup(
         "constraints", "Constraints", constraints, "symbol-property", "C");
   }

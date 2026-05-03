@@ -1,6 +1,6 @@
 {
   "name": "uvl-vscode-extension",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": "true",
   "description": "Extension for the Universal Variability Language (UVL), using a GLSP-based diagram editor inside VSCode",
   "categories": [
@@ -220,10 +220,10 @@
     "@types/vscode": "^1.80.0",
     "@vscode/vsce": "^3.7.1",
     "copy-webpack-plugin": "^14.0.0",
-    "sse-command-contribution": "0.4.0",
+    "sse-command-contribution": "0.5.0",
     "ts-loader": "^9.5.4",
-    "uvl-command-contribution": "0.4.0",
-    "uvl-vscode-webview": "0.4.0",
+    "uvl-command-contribution": "0.5.0",
+    "uvl-vscode-webview": "0.5.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2",
     "webpack-merge": "^6.0.1"

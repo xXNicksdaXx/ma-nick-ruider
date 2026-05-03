@@ -111,8 +111,49 @@ public class UVLModelFactory {
         return parse(text, ModelType.BP);
     }
 
+    /**
+     * Parses a constraint string in isolation without a feature model context.
+     * The constraint will be parsed but references to features/attributes may not be fully resolved.
+     * Uses BASE model type by default.
+     * 
+     * @param constraintString the constraint text to parse
+     * @return a Constraint object representing the parsed constraint
+     * @throws ParseError if parsing fails
+     */
     public Constraint parseConstraint(String constraintString) throws ParseError {
+        return parseConstraint(constraintString, new FeatureModel(), ModelType.BASE);
+    }
+
+    /**
+     * Parses a constraint string with a provided feature model context.
+     * This allows the constraint to properly reference features and attributes from the feature model.
+     * Uses BASE model type by default.
+     * 
+     * @param constraintString the constraint text to parse
+     * @param featureModel the feature model containing features/attributes that the constraint references
+     * @return a Constraint object representing the parsed constraint
+     * @throws ParseError if parsing fails
+     */
+    public Constraint parseConstraint(String constraintString, FeatureModel featureModel) throws ParseError {
+        return parseConstraint(constraintString, featureModel, ModelType.BASE);
+    }
+
+    /**
+     * Parses a constraint string with a provided feature model context and model type.
+     *
+     * @param constraintString the constraint text to parse
+     * @param featureModel the feature model containing features/attributes that the constraint references
+     * @param modelType the model type
+     * @return a Constraint object representing the parsed constraint
+     * @throws ParseError if parsing fails
+     */
+    public Constraint parseConstraint(String constraintString, FeatureModel featureModel, ModelType modelType) throws ParseError {
+        // prepare input and reset any previous errors
         constraintString = constraintString.trim();
+        if (!constraintString.endsWith("\n")) {
+            constraintString = constraintString + "\n";
+        }
+        errorList.clear();
         UVLJavaLexer UVLJavaLexer = new UVLJavaLexer(CharStreams.fromString(constraintString));
         CommonTokenStream tokens = new CommonTokenStream(UVLJavaLexer);
         UVLJavaParser UVLJavaParser = new UVLJavaParser(tokens);
@@ -132,11 +173,21 @@ public class UVLModelFactory {
             }
         });
 
-        UVLListener uvlListener = new UVLListener(ModelType.BASE);
+        UVLListener uvlListener = new UVLListener(modelType, featureModel); // Use the provided feature model context and model type
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(uvlListener, UVLJavaParser.constraintLine());
 
-        return uvlListener.getConstraint();
+        if (!errorList.isEmpty()) {
+            ParseErrorList parseErrorList = new ParseErrorList("Multiple Errors occurred during parsing!");
+            parseErrorList.getErrorList().addAll(errorList);
+            throw parseErrorList;
+        }
+
+        try {
+            return uvlListener.getConstraint();
+        } catch (Exception e) {
+            throw new ParseError("Failed to parse constraint: incomplete or malformed expression");
+        }
     }
 
     //TODO If the level set is not consistent e.g. remove SMT_LEVEL but the feature model has AGGREGATE_FUNCTION level? -> remove automatically all related constraints

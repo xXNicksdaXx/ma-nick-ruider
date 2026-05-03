@@ -6,7 +6,7 @@
 
     <groupId>de.tu_dresden.inf.st</groupId>
     <artifactId>uvl.glsp</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
     <description>GLSP server component</description>
     <url>https://git-st.inf.tu-dresden.de/stgroup/student-projects/2026/ma-nick-ruider</url>
 
@@ -56,7 +56,7 @@
         <eclipse.lsp4j.version>1.0.0</eclipse.lsp4j.version>
         <glsp.version>2.6.0</glsp.version>
         <gson.code.version>2.13.2</gson.code.version>
-        <uvl.metamodel.version>1.2.1</uvl.metamodel.version>
+        <uvl.metamodel.version>1.2.2</uvl.metamodel.version>
     </properties>
 
     <dependencies>

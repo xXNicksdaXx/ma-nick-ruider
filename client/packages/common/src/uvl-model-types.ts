@@ -16,7 +16,7 @@ import { DefaultTypes } from '@eclipse-glsp/client';
 export const UVLModelTypes = {
     CONSTRAINT_BOX: `${DefaultTypes.NODE}:constraintBox`,
     CONSTRAINT: `${DefaultTypes.COMPARTMENT}:constraint`,
-    CONSTRAINT_TEXT: `${DefaultTypes.LABEL}:constraint`,
+    CONSTRAINT_TEXT: `${DefaultTypes.LABEL}:constraintText`,
 
     FEATURE: `${DefaultTypes.NODE}:feature`,
     FEATURE_NAME: `${DefaultTypes.LABEL}:feature`,
@@ -31,9 +31,9 @@ export const UVLModelTypes = {
     GROUP_CARDINALITY: `${DefaultTypes.EDGE}:groupCardinality`,
     OR: `${DefaultTypes.EDGE}:or`,
 
-    EQUIVALENCE: `${DefaultTypes.EDGE}:equivalence`,
-    IMPLICATION: `${DefaultTypes.EDGE}:implication`,
+    EXCLUDES: `${DefaultTypes.EDGE}:excludes`,
+    REQUIRES: `${DefaultTypes.EDGE}:requires`,
 
     CARDINALITY_LABEL: `${DefaultTypes.LABEL}:cardinality`,
-    CONSTRAINT_LABEL: `${DefaultTypes.LABEL}:constraint`
+    CONSTRAINT_EDGE_LABEL: `${DefaultTypes.LABEL}:constraint`
 } as const;

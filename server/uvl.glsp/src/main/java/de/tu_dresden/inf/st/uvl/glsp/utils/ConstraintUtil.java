@@ -9,11 +9,12 @@ package de.tu_dresden.inf.st.uvl.glsp.utils;
 import de.tu_dresden.inf.st.uvl.glsp.UVLModelTypes;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.AndConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.Constraint;
-import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.EquivalenceConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ExpressionConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.ImplicationConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.LiteralConstraint;
+import de.tu_dresden.inf.st.uvl.metamodel.model.constraint.NotConstraint;
 import de.tu_dresden.inf.st.uvl.metamodel.model.expression.Expression;
 import de.tu_dresden.inf.st.uvl.metamodel.model.expression.LiteralExpression;
 import java.util.List;
@@ -126,10 +127,74 @@ public final class ConstraintUtil {
   }
 
   public static String convertConstraintTypeToModelType(Constraint constraint) {
-    return switch (constraint) {
-      case ImplicationConstraint _ -> UVLModelTypes.IMPLICATION;
-      case EquivalenceConstraint _ -> UVLModelTypes.EQUIVALENCE;
-      default -> "";
-    };
+    if (isRequiresConstraint(constraint)) {
+      return UVLModelTypes.REQUIRES;
+    }
+    if (isExcludesConstraint(constraint)) {
+      return UVLModelTypes.EXCLUDES;
+    }
+    return "";
+  }
+
+  public static boolean isRequiresConstraint(Constraint constraint) {
+    if (!(constraint instanceof ImplicationConstraint)) {
+      return false;
+    }
+    long literalCount =
+        constraint.getConstraintSubParts().stream()
+            .filter(subConstraint -> subConstraint instanceof LiteralConstraint)
+            .count();
+    return literalCount == 2;
+  }
+
+  public static boolean isExcludesConstraint(Constraint constraint) {
+    if (!(constraint instanceof NotConstraint notConstraint)) {
+      return false;
+    }
+
+    if (!(notConstraint.getContent() instanceof AndConstraint andConstraint)) {
+      return false;
+    }
+
+    return andConstraint.getChildren().size() == 2
+        && andConstraint.getChildren().stream().allMatch(LiteralConstraint.class::isInstance);
+  }
+
+  public static LiteralConstraint getBiConstraintSource(Constraint constraint) {
+    return getBiConstraintLiteral(constraint, true);
+  }
+
+  public static LiteralConstraint getBiConstraintTarget(Constraint constraint) {
+    return getBiConstraintLiteral(constraint, false);
+  }
+
+  private static LiteralConstraint getBiConstraintLiteral(Constraint constraint, boolean source) {
+    if (isRequiresConstraint(constraint)) {
+      ImplicationConstraint implicationConstraint = (ImplicationConstraint) constraint;
+      Constraint subConstraint =
+          source
+              ? implicationConstraint.getConstraintSubParts().getFirst()
+              : implicationConstraint.getConstraintSubParts().getLast();
+      if (subConstraint instanceof LiteralConstraint literalConstraint) {
+        return literalConstraint;
+      }
+      throw new IllegalStateException(
+          "Unsupported bi-constraint literal type: " + subConstraint.getClass().getName());
+    }
+
+    if (isExcludesConstraint(constraint)) {
+      NotConstraint notConstraint = (NotConstraint) constraint;
+      AndConstraint andConstraint = (AndConstraint) notConstraint.getContent();
+      Constraint subConstraint =
+          source ? andConstraint.getChildren().getFirst() : andConstraint.getChildren().getLast();
+      if (subConstraint instanceof LiteralConstraint literalConstraint) {
+        return literalConstraint;
+      }
+      throw new IllegalStateException(
+          "Unsupported excludes literal type: " + subConstraint.getClass().getName());
+    }
+
+    throw new IllegalStateException(
+        "Unsupported bi-constraint type: " + constraint.getClass().getName());
   }
 }

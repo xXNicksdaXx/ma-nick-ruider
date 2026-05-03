@@ -16,6 +16,7 @@ import {
     HandleActionResult,
     IActionHandler,
     ICommandStack,
+    IModelIndex,
     MaybePromise,
     TYPES
 } from '@eclipse-glsp/client';
@@ -161,7 +162,7 @@ function getActiveHighlightsState(root: object): HighlightState {
 
 function clearHighlightElement(
     root: object,
-    index: any,
+    index: IModelIndex,
     state: HighlightState,
     elementId: string
 ): void {

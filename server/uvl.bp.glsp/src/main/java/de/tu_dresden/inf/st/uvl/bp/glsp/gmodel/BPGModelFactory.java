@@ -38,7 +38,9 @@ public class BPGModelFactory extends UVLGModelFactory {
         .map(biConstraintFactory::create)
         .forEachOrdered(root.getChildren()::add);
 
-    root.getChildren().add(constraintBoxFactory.create(featureModel));
+    if (featureModel.getRootFeature() != null) {
+      root.getChildren().add(constraintBoxFactory.create(featureModel));
+    }
 
     if (featureModel instanceof BPFeatureModel bpFeatureModel) {
       root.getChildren().addAll(additionalElementsFactory.createAdditionalElements(bpFeatureModel));

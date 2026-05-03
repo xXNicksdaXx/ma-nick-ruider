@@ -80,14 +80,14 @@ public class UVLDiagramConfiguration extends BaseDiagramConfiguration {
             List.of(UVLModelTypes.FEATURE),
             List.of(UVLModelTypes.FEATURE)),
         new EdgeTypeHint(
-            UVLModelTypes.IMPLICATION,
+            UVLModelTypes.REQUIRES,
             false,
             true,
             true,
             List.of(UVLModelTypes.FEATURE),
             List.of(UVLModelTypes.FEATURE)),
         new EdgeTypeHint(
-            UVLModelTypes.EQUIVALENCE,
+            UVLModelTypes.EXCLUDES,
             false,
             true,
             true,
