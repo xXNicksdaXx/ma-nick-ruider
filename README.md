@@ -34,6 +34,20 @@ The project is organized as follows:
 └── build scripts              Platform-specific build automation
 ```
 
+## Installation
+
+Both profiles are published on the **Open VSX Registry** and can be installed directly from the VS Code Extensions view or via the command line:
+
+* UVL Diagram Editor (Base): [`NickRuider/uvl-vscode-extension`](https://open-vsx.org/extension/NickRuider/uvl-vscode-extension)
+* UVL Diagram Editor with BP Extension: [`NickRuider/uvl-bp-vscode-extension`](https://open-vsx.org/extension/NickRuider/uvl-bp-vscode-extension)
+
+To install via the command line:
+
+```bash
+code --install-extension NickRuider/uvl-vscode-extension
+# OR
+code --install-extension NickRuider/uvl-bp-vscode-extension
+
 ## Prerequisites
 
 Ensure the following are installed on your system:
