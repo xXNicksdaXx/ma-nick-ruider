@@ -48,6 +48,8 @@
         <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
         <spotless.maven.plugin.version>2.46.1</spotless.maven.plugin.version>
         <google.java.format.version>1.31.0</google.java.format.version>
+        <junit.version>5.10.2</junit.version>
+        <mockito.version>5.23.0</mockito.version>
 
         <!-- Dependency Versions -->
         <apache.logging.log4j.version>2.25.3</apache.logging.log4j.version>
@@ -118,6 +120,24 @@
             <artifactId>uvl.glsp</artifactId>
             <version>${uvl.glsp.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -162,6 +182,11 @@
                 <configuration>
                     <release>${maven.compiler.release}</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
