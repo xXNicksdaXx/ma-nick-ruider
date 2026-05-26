@@ -1,0 +1,19 @@
+{
+  "defaultProfile": "uvl",
+  "profiles": [
+        {
+            "id": "uvl",
+            "outFile": "uvl-vscode.vsix",
+            "serverJarPath": "../../server/uvl.glsp/target/uvl.glsp-0.5.1-glsp.jar",
+            "containerModuleIds": ["uvl-core"],
+            "commandContributionIds": ["uvl-default"]
+        },
+        {
+            "id": "uvl-bp",
+            "outFile": "uvl-bp-vscode.vsix",
+            "serverJarPath": "../../server/uvl.bp.glsp/target/uvl.bp.glsp-0.5.0-glsp.jar",
+            "containerModuleIds": ["uvl-core", "uvl-bp"],
+            "commandContributionIds": ["uvl-default", "uvl-bp-sse"]
+        }
+    ]
+}

@@ -1,0 +1,2 @@
+features
+    Feature {type 'BThread', Requested_Event {type 'BEvent', requested true, priority 1}, "Waited-For_Event" {type 'BEvent', waited_for true, priority 2}, Blocked_Event {type 'BEvent', blocked true, priority 3}}

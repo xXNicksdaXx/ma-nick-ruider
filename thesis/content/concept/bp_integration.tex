@@ -1,0 +1,63 @@
+% ==========================================================
+\section{Integrating Behavioral Programming into UVL}
+\label{sec:concept_bp_integration}
+% ==========================================================
+
+This section describes, at a conceptual level, how Behavioral Programming can be integrated into the UVL-based language and its available tooling.
+The objective is to extend the language and tools so that models can express BP event constraints and BP-specific top-level features while preserving UVL's core philosophy and backward compatibility.
+
+% ----------------------------------------------------------
+\subsection{ANTLR grammar extensions: \texttt{uvl-parser}}
+\label{subsec:bp-antlr-extensions}
+% ----------------------------------------------------------
+
+The \texttt{uvl-parser} repository is maintained by the UVL creators and contains the ANTLR4 grammar files that define UVL's concrete syntax~\cite{sundermann_uvlparser_2023, noauthor_universal-variability-languageuvl-parser_2026}.
+ANTLR4 (Another Tool for Language Recognition) is a parser generator that takes a formal grammar as input and produces a parser in a target host language~\cite{parr_definitive_2013, noauthor_antlrantlr4_2026}.
+From these grammars, ANTLR4 generates parsers targeting multiple host languages -- most notably Java -- enabling the toolchain to parse \texttt{.uvl} files into parse trees that downstream components consume.
+Extending this grammar to support BP introduces two concrete mismatches with the existing rules.
+
+According to the ANTLR grammar, UVL permits a single top-level feature at the model root.
+BP models extend this by requiring two additional, named top-level features at the root: \texttt{Env} and \texttt{Config}.
+These features are mandatory for BP models, but they do not fit naturally into the ordinary feature hierarchy.
+Because the existing grammar enforces a fixed single-feature root, it currently rejects models that include \texttt{Env} or \texttt{Config}.
+To support BP while preserving compatibility, the grammar must be extended so these two required top-level features are accepted in a backward-compatible way.
+Importantly, this allowance must be limited to the default single top-level feature plus the two BP-specific sections, and must not permit arbitrary additional top-level features.
+Standard UVL models that do not include these features should continue to parse unchanged when BP parsing is not enabled.
+
+% [listing - ANTLR rules ?]
+
+The existing constraint alternatives are shaped around classical UVL constraint forms: boolean and mathematical combinations, common expressions and functions (e.g., sum aggregates), and cross-tree relations between features.
+Because the base grammar already includes single-reference constraint shapes for these use cases, the same approach can be reused for BP single-reference constraints such as \texttt{requested}, \texttt{waited\_for}, \texttt{blocked}, and \texttt{selected}.
+Reusing that approach may require lexical disambiguation for the event-role names so they can appear unambiguously as attribute identifiers.
+Adding lexer tokens for those names is acceptable solely to aid parsing, but the parsed result should represent them as ordinary attributes rather than special BP operators.
+In contrast, \texttt{conflicting} is a true multi-reference constraint that binds several feature references simultaneously and is not covered by existing single-reference forms.
+To support it, an explicit multi-reference production must be added to the grammar.
+These BP-specific constraints should be grouped as a distinct alternative, accepted only when BP parsing is enabled, so they do not interfere with the existing constraint forms.
+All changes should be implemented as a clearly delimited, opt-in extension so the default UVL grammar remains unchanged unless BP parsing is explicitly enabled.
+B-threads and b-events themselves are already representable in the base grammar as attributes of features and do not require bespoke grammar constructs.
+Their semantics can be handled by the GLSP server or other tooling after successful parsing.
+
+% ----------------------------------------------------------
+\subsection{Java metamodel extensions: \texttt{java-fm-metamodel}}
+\label{subsec:java-fm-metamodel-extensions}
+% ----------------------------------------------------------
+
+The \texttt{java-fm-featuremodel} hosts the Java source model classes and the parser-to-model factories that translate ANTLR4 parse trees into typed feature model objects \cite{noauthor_universal-variability-languagejava-fm-metamodel_2026}.
+It is the central source model for the UVL toolchain: higher-level tools, including the GLSP-based VS Code editor, consume the object graph it produces.
+Supporting BP requires some modifications.
+
+% [IMAGE: class diagram showing FeatureModel as the base class and BPFeatureModel as its extension, with the BP constraint class hierarchy alongside]
+
+The metamodel must distinguish cleanly between a standard \texttt{FeatureModel} and a BP-specific \texttt{BPFeatureModel}.
+This separation is architecturally significant: it allows the VS Code extension to be deployed as two distinct variants, one targeting plain UVL authoring and one targeting BP-enhanced authoring, each activating only the capabilities relevant to its context.
+The \texttt{BPFeatureModel} subclasses the base \texttt{FeatureModel} and is instantiated only when the parser is operating in BP mode.
+Consumers that work exclusively with the base class remain entirely unaware of the BP extension and require no modification.
+
+BP introduces constraint semantics that cannot be represented by the existing constraint classes.
+An abstract \texttt{BPEventConstraint} base class must be introduced, together with concrete subclasses for each constraint type.
+These types correspond directly to the grammar alternatives described in the previous section.
+The \texttt{Conflicting} subclass must additionally support multiple references.
+Besides the new constraint classes, the \texttt{BPFeatureModel} must also include fields for the \texttt{Env} and \texttt{Config} top-level features.
+This should include easy access via the root model object, so that BP-specific tooling can quickly retrieve these features.
+The model factory and parser listener must be extended to instantiate these objects when BP parse nodes are encountered, to attach \texttt{Env} and \texttt{Config} features to the \texttt{BPFeatureModel} root, and to resolve event references to their corresponding feature artifacts or imported placeholders during model construction.
+The existing unit and integration tests for the \texttt{java-fm-metamodel} must be extended to cover the new BP constructs.

@@ -1,0 +1,109 @@
+\section{models@run.time Integration on GLSP}
+\label{sec:models-run-time-glsp}
+
+This section describes how \texttt{models@run.time} is integrated into the GLSP-based BP variant.
+The integration is server-centric: the server owns the SSE connection, processes incoming events, and translates them into GLSP actions that are forwarded to the client.
+The VS~Code extension contributes only the user-facing commands that start and stop the listener.
+Once active, the listener filters received events, applies the necessary model updates, and dispatches corresponding actions to keep the diagram view synchronized with the running system.
+
+\subsection{Server-Side Wiring}
+\label{subsec:bp-server-wiring}
+
+The BP server extends the generic UVL GLSP module and registers the SSE-related services as singletons.
+The resulting control flow is straightforward: \texttt{FMBPEventListenerService} maintains the connection to the external FMBP event stream.
+\texttt{FMBPHighlightActionDispatchService} and \texttt{FMBPContextUpdateService} independently consume parsed events and translate them into the appropriate GLSP action dispatches.
+
+\lstinputlisting[
+    language=java,
+    float,
+    floatplacement=ht,
+    caption={ [\texttt{configureAdditionals}] Eager singleton bindings for SSE integration in the BP server.},
+    label={lst:bp-server-sse-binding}
+]{code/glsp_runtime_integration/bp_server_sse_binding.java}
+
+\subsection{Initiating the Listener from VS~Code}
+\label{subsec:sse-vscode-commands}
+
+The SSE listener is controlled through three VS~Code commands contributed exclusively by the BP build profile: start listening, enable high-frequency polling, and stop listening.
+Each command dispatches its corresponding GLSP action through the diagram connector, decoupling the UI trigger from the server-side implementation.
+
+\lstinputlisting[
+    float,
+    floatplacement=ht,
+    caption={ [\texttt{SSE commands}] SSE command contributions in the VS~Code extension.},
+    label={lst:sse-command-contribution}
+]{code/glsp_runtime_integration/sse_command_contribution.ts}
+
+The commands are gated in the extension manifest so that they appear only when the BP-profile custom editor is active.
+This prevents the SSE controls from being exposed to profiles that do not interact with FMBP, keeping the command palette uncluttered and the extension API surface minimal.
+
+\subsection{SSE Listener and Event Parsing}
+\label{subsec:sse-listener}
+
+The network layer is implemented by \texttt{FMBPEventListenerService}.
+On startup, the service waits for the FMBP health endpoint to become reachable before opening the event stream at \texttt{/events}.
+The stream is consumed in a dedicated background thread, and the service automatically reconnects if the connection is lost.
+
+\lstinputlisting[
+    language=java,
+    float,
+    floatplacement=ht,
+    caption={ [\texttt{FMBPEventListenerService}] Listener startup and stream consumption loop.},
+    label={lst:fmbp-listener-loop}
+]{code/glsp_runtime_integration/fmbp_listener_loop.java}
+
+Each raw payload is parsed into a \texttt{ParsedServerSentEvent}, a normalized record that exposes the event type, source path, timestamp, and structured data map.
+This representation abstracts over the raw JSON lines and allows downstream services to filter and route events without coupling them to the wire format.
+Crucially, the \texttt{source} field identifies the feature model from which an event originates, allowing services to discard events that do not belong to the currently open diagram.
+
+\lstinputlisting[
+    language=java,
+    float,
+    floatplacement=ht,
+    caption={ [\texttt{ParsedServerSentEvent}] Normalized SSE event record.},
+    label={lst:parsed-sse-event}
+]{code/glsp_runtime_integration/ParsedServerSentEvent.java}
+
+\subsection{Translating Events into GLSP Actions}
+\label{subsec:event-to-action}
+
+The listener does not manipulate the diagram directly.
+Instead, services register as data listeners on the \texttt{ServerSentEventsService} and are invoked selectively for the event types they handle.
+This publisher-subscriber design keeps each service focused on a single concern and makes it straightforward to add support for new event types without modifying existing code.
+
+\paragraph{Visual feedback via highlight actions.}
+\texttt{FMBPHighlightActionDispatchService} subscribes to \texttt{requested}, \texttt{blocked}, and \texttt{waited\_for} events.
+When such an event arrives, the service resolves the corresponding GLSP element identifiers from the b-thread and b-event name embedded in the payload, then dispatches a \texttt{HighlightElementAction} to the client.
+
+\lstinputlisting[
+    language=java,
+    float,
+    floatplacement=ht,
+    caption={ [\texttt{FMBPHighlightActionDispatchService}] Highlight action dispatch for execution-state events.},
+    label={lst:fmbp-highlight-dispatch}
+]{code/glsp_runtime_integration/fmbp_highlight_dispatch.java}
+
+This constitutes the primary visual feedback loop of the \texttt{models@run.time} integration.
+The client receives these highlight actions and updates the diagram accordingly, providing an immediate visual indication of the active execution state without any polling.
+
+\paragraph{Environment synchronization via context updates.}
+\texttt{FMBPContextUpdateService} subscribes exclusively to \texttt{context\_update} events.
+On receipt, the service compares the incoming attribute values against those held in the current model state, applies any changes, rebuilds the affected graphical node, and resubmits the updated model.
+The client thereby receives a refreshed diagram representation reactively, again without polling.
+
+\lstinputlisting[
+    language=java,
+    float,
+    floatplacement=ht,
+    caption={ [\texttt{FMBPContextUpdateService}] Incremental context update and model resubmission.},
+    label={lst:fmbp-context-update}
+]{code/glsp_runtime_integration/fmbp_context_update.java}
+
+\subsection{Summary}
+\label{subsec:models-runtime-summary}
+
+The integration follows a well-defined pipeline.
+A VS~Code command dispatches a GLSP action that instructs the server to open the SSE connection, representing the initial client-to-server leg of the flow.
+From that point the data path reverses: the server parses each incoming FMBP event into a normalized record, which is forwarded to the registered data listeners.
+Each listener maps the event to either a \texttt{HighlightElementAction}, which provides immediate visual feedback on the active execution state, or a model resubmission, which reflects updated environment attributes in the diagram.
+The client receives both kinds of update through the existing GLSP action mechanism, requiring no additional communication channel and no polling on the client side.

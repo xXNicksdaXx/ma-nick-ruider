@@ -1,0 +1,19 @@
+\TUDoption{abstract}{section}
+
+\begin{abstract}[english,pagestyle=empty.tudheadings]
+
+This thesis presents two Visual Studio Code extensions based on the Eclipse Graphical Language Server Platform (GLSP).
+The first extension provides a lightweight graphical editor for creating and editing feature models.
+The second extension focuses on behavioral programming (BP) in UVL and visualizes the resulting models in a graphical editor.
+It supports the additional root features \textit{Env} and \textit{Config} as well as the feature types \textit{BThread} and \textit{BEvent} through feature attributes that are integrated directly into the tree structure.
+In addition, the extension supports the \gls{bp}-specific constraints required for this extended model.
+
+To employ the \textit{models@run.time} approach, the already developed FMBP framework was extended in two ways.
+For each triggered \textit{BEvent}, FMBP sends a server-sent event (SSE) that is fetched by the GLSP server instance and visualized in the graphical editor through highlighting.
+Dynamic environment attributes that are not changed in the source model by FMBP are also transmitted via SSE and updated visually on the client without persisting their values.
+
+Together, these extensions provide a graphical and runtime-aware environment for UVL-based behavioral programs.
+The resulting toolchain supports both model editing and runtime visualization to improve comprehension of behavioral programming.
+The developed tools were showcased in a water tank example and in a drones example, which visualizes four drones simultaneously.
+
+\end{abstract}

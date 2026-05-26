@@ -1,0 +1,101 @@
+% GLSP based multi profile VS Code extension section
+% File intended to be included in the main thesis document.
+\section{GLSP-based multi-profile VS Code extensions}
+\label{sec:glsp-multi-profile}
+
+This section shows how multiple VS Code extension variants are derived from one GLSP-based client codebase, as introduced in Section~\ref{subsec:feature_division}.
+The goal is to produce profile-specific products without repository duplication or branch-heavy maintenance.
+
+The section starts with \texttt{profiles.json}, since that manifest is the source of truth for profile selection.
+It then follows the manifest into the GLSP client, where modules are assembled and command exposure is restricted by the active build profile.
+
+The main artifacts are \texttt{profiles.json}, \texttt{package.json}, \texttt{build-profile.js}, and the extension webpack configuration.
+
+The flow is straightforward: the manifest defines the server artifact, container modules, and command contribution identifiers; webpack resolves the selected profile, injects compile-time constants, and copies the matching server JAR; activation stores the selected profile in VS Code context and starts the bundled server; command contributions read the same context and expose only compatible interactions.
+
+\subsection{Build-time profiles and manifest structure}
+
+Profiles are declared in a manifest used by the packaging scripts.
+Each entry pairs an extension identity with a server JAR, container modules, and command contribution modules.
+The split is intentional: container modules contribute GLSP runtime wiring and model-specific services, while command contribution modules provide user-facing commands and editor interactions.
+Keeping them separate lets the build reuse shared runtime plumbing while still composing profile-specific behavior.
+
+\lstinputlisting[
+  float,
+  floatplacement=ht,
+  caption={ [\texttt{profiles.json}] Excerpt from profiles.json.},
+  label={lst:profiles}
+]{code/profiles/profiles.json}
+
+This manifest-driven approach centralizes metadata, making it easier to manage and review.
+It also decouples profile definitions from build logic, which improves maintainability and reduces the risk of divergence between products.
+
+
+\subsection{Build-time injection and packaging}
+
+A VS Code extension is defined by its \texttt{package.json} manifest, which declares contribution points such as commands, custom editors, keybindings, and menus (TODO: https://code.visualstudio.com/api/references/extension-manifest).
+Rather than duplicating that manifest across variants, the implemented approach uses one extension with conditional contributions driven by the selected profile.
+The webpack configuration resolves the selected profile at build time, injects compile-time constants, and copies the matching server JAR into the extension \texttt{dist} directory.
+Each VSIX therefore contains exactly one server artifact.
+
+\lstinputlisting[
+  float,
+  floatplacement=ht,
+  caption={ [\texttt{webpack DefinePlugin}] Define plugin injection (abridged).},
+  label={lst:wpdef}
+]{code/profiles/webpack_define.js}
+
+Because these values are embedded at build time, runtime branching remains minimal and predictable.
+
+\subsection{Client extension points and \texttt{package.json}}
+
+Profile-specific behavior is gated through context keys such as \texttt{uvl.buildProfile}, evaluated in \texttt{enablement} and \texttt{when} expressions.
+This adds a second restriction on top of \texttt{commandContributionIds}: a command must be selected by the manifest and still satisfy the active build profile at runtime.
+
+\lstinputlisting[
+  float,
+  floatplacement=ht,
+  caption={ [\texttt{package.json command}] Command contribution with profile gating.},
+  label={lst:pkgcmd}
+]{code/profiles/package_command.json}
+
+This approach keeps one manifest while selectively exposing UI elements per profile.
+It reduces duplication and keeps variability explicit and reviewable.
+In practice, \texttt{buildProfile} is the final guardrail, preventing a contribution from becoming visible when it belongs to another profile.
+
+
+
+\subsection{Modular command contributions}
+
+Command registration is organized into small contribution modules.
+The build injects an array named \texttt{\_\_UVL\_COMMAND\_CONTRIBUTION\_IDS\_\_}, which the runtime iterates to register only the required contributions.
+
+\lstinputlisting[
+  float,
+  floatplacement=ht,
+  caption={ [\texttt{Contribution registry}] Contribution registry (abridged).},
+  label={lst:registry}
+]{code/profiles/registry.ts}
+
+This registry pattern reuses common wiring while still allowing profile-specific behavior.
+Operationally, it supports RQ3.1 because available user commands are constrained to profile-valid runtime capabilities.
+
+The split between command contributions and container modules also keeps the codebase easier to evolve.
+If the GLSP runtime or server-side model wiring changes, the container modules change without forcing command code to move.
+If only the user-facing workflow changes, the command modules can be updated independently.
+
+\subsection{Critical appraisal of code references and structure}
+
+The current structure is suitable for producing multiple VSIX artifacts from one codebase.
+Centralizing metadata in a manifest improves product governance and lowers divergence risk.
+Embedding profile identifiers at compile time reduces runtime complexity and simplifies test design.
+Three improvements would strengthen reliability and reproducibility.
+
+\begin{itemize}
+  \item Extract the profile selection logic into a testable module with unit tests that validate profile lookup and error handling. Such tests reduce the risk of packaging errors when server artifacts are relocated.
+  \item Consider documenting explicit line ranges in the listings or providing a small appendix that reproduces the exact build and packaging commands for reproducibility. This aids verification by external reviewers.
+  \item Add an integration test that performs a full build for each profile and asserts that the expected server JAR is present in the packaged \texttt{dist} directory and that the emitted \texttt{\_\_UVL\_BUILD\_PROFILE\_ID\_\_} matches the profile manifest.
+\end{itemize}
+
+These recommendations improve packaging reliability and support reproducibility requirements for thesis evaluation.
+The repository files substantiating this build flow are \texttt{client/vscode/profiles.json}, \texttt{client/vscode/extension/package.json}, \texttt{client/vscode/build-profile.js}, and \texttt{client/vscode/extension/webpack.config.js}.

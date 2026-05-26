@@ -1,0 +1,148 @@
+\section{Implementation overview}
+\label{sec:glsp-implementation-overview}
+
+This section provides a structured overview of the UVL GLSP implementation, covering both the server and the client components.
+The server is described first, as it owns the domain model, the GLSP session state, and the operation handlers that implement editing behavior.
+The client is then presented as the VS~Code activation layer responsible for launching the server and connecting the custom editor to it.
+The presented implementation details are reduced to the essentials that demonstrate how the GLSP runtime is extended to support UVL-specific editing logic.
+Some representative code snippets are included to illustrate key points, but the full implementation is available in the accompanying code repository for readers who want to explore further~\cite{TODO_sourcecode}.
+
+\subsection{Server bootstrap}
+
+The server entry point is \texttt{UVLServerLauncher}, which parses command-line arguments, instantiates the diagram module, and starts the socket-based GLSP server.
+The launcher is intentionally minimal as can be seen in Listing~\ref{lst:server-launcher-overview}, delegating all configuration logic to the module system.
+All concrete behavior is assembled through the module system.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={[Server launcher and module bootstrap]Server launcher and module bootstrap.},
+    label={lst:server-launcher-overview}
+]{code/glsp_overview/UVLServerLauncher.java}
+
+\texttt{UVLDiagramModule} serves as the central configuration point of the server.
+It binds the diagram configuration, model state, source model storage, graphical model factory, layout engine, and all operation handlers into the GLSP dependency injection framework.
+In effect, this module is where UVL-specific editing logic is plugged into the generic GLSP runtime.
+In Listing~\ref{lst:diagram-module-overview}, there are examples of bindings for the source model storage, the model state, and the operation handlers.
+The full module contains additional bindings for other components such as the graphical model factory and layout engine~\cite{TODO_sourcecode}.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={[Essential bindings in the diagram module]Essential bindings in the diagram module.},
+    label={lst:diagram-module-overview}
+]{code/glsp_overview/UVLDiagramModule.java}
+
+Each registered handler translates an incoming GLSP operation into a targeted mutation of both the UVL domain model and its graphical representation.
+Handlers that correspond to generic editing actions, such as label editing and deletion, subclass existing GLSP framework classes and augment them to additionally update the UVL feature model.
+For example, \texttt{UVLApplyLabelEditOperationHandler} extends the framework's \texttt{GModelApplyLabelEditOperationHandler}, adding a step that propagates the name change into the domain model.
+Handlers for UVL-specific operations, such as creating features, attributes, and relation edges, implement the handler interface directly and encode entirely UVL-specific creation logic with no framework base class to build on.
+
+\texttt{UVLModelState} is the interface that aggregates the active feature model, the GModel root, and the model index into a single injectable dependency. 
+\texttt{UVLModelStateImpl} is its bound implementation, registered in \texttt{UVLDiagramModule} and injected into every handler that requires access to the model.
+Handlers never receive the index directly, they always obtain it through \texttt{UVLModelState\#getIndex()}, keeping the index lifecycle coupled to the session state.
+
+\subsection{Source model and indexing}
+
+Persistence is managed by \texttt{UVLSourceModelStorage}, which maintains a paired representation of each diagram. 
+On load, it reads the textual \texttt{.uvl} file into an in-memory feature model and simultaneously reads the adjacent notation file, which shares the same base name but carries the extension \texttt{.notation.json}.
+The notation file encodes the GLSP graph state, including element identifiers and layout coordinates, as a JSON document.
+
+As discussed in Section~\ref{sec:concept_glsp}, a UVL file should contain only data relevant to the feature tree or the behavioral program.
+Layout data, such as element positioning, could technically be encoded as feature attributes, but conflating notation with semantics would invalidate the file for any non-GLSP tooling that expects a semantically clean UVL document.
+Therefore, the paired-file design keeps the two concerns strictly separate, ensuring that the \texttt{.uvl} file remains consumable by the broader UVL ecosystem regardless of whether the graphical editor was involved.
+Both files are written together in a single save step so that the user perceives a single coherent artifact.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={[Source model loading and paired notation file]Source model loading and paired notation file.},
+    label={lst:source-model-overview}
+]{code/glsp_overview/UVLSourceModelStorage.java}
+
+Because GLSP graph elements are identified by opaque string IDs while the UVL domain model is a structured object graph, handlers cannot navigate from a selected diagram element to the corresponding feature or constraint without an explicit mapping.
+\texttt{UVLModelIndex} provides this mapping by maintaining a bidirectional association between element IDs and UVL domain objects.
+The index is rebuilt whenever the model root is replaced and cleared when the client session is disposed, preventing stale references.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={[Rebuilding and querying the model index]Rebuilding and querying the model index.},
+    label={lst:model-index-overview}
+]{code/glsp_overview/UVLModelIndex.java}
+
+\subsection{Extensibility example: \texttt{BPDiagramModule}}
+
+The GLSP module system makes it straightforward to provide an alternative diagram configuration for behavioral programming variant by supplying a custom diagram module.
+In a separate package, a \texttt{BPDiagramModule} can simply subclass the existing UVL diagram module and override the same binding points used above.
+The Listing \ref{lst:bp-diagram-module-overview} shows how the BP variant replaces the \texttt{SourceModelStorage} and the \texttt{UVLModelState} implementation while reusing the common bindings from \texttt{UVLDiagramModule}.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={[Example \texttt{BPDiagramModule} overriding core bindings]Example \texttt{BPDiagramModule} overriding core bindings.},
+    label={lst:bp-diagram-module-overview}
+]{code/glsp_overview/BPDiagramModule.java}
+
+In this pattern, \texttt{BPSourceModelStorage} applies the parsing logic using the BP grammar variant, while \texttt{BPModelStateImpl} can extend \texttt{UVLModelStateImpl} to use the \texttt{BPFeatureModel} metamodel class.
+Addionally, the operation handlers are overridden to implement BP-specific editing logic, as well as adding new handlers for BP-specific operations such as creating b-threads and b-events.
+Because all bindings are resolved through the module, the replacement is localised to the module class and requires no invasive changes to the GLSP framework or to existing handlers.
+
+\subsection{Client integration via VS~Code}
+
+As described in Section~\ref{sec:glsp}, the standard GLSP approach separates client rendering functionality from IDE-specific integration code, so that the rendering package can be reused across different IDE frontends.
+This separation is applied here as well.
+The VS~Code integration package depends on \texttt{uvl-sprotty} as a shared rendering library, and its sole responsibility is to establish the connection between the VS~Code webview runtime and that shared package.
+The main entry point of the VS~Code integration is \texttt{UvlDiagramStarter}, which initializes the shared \texttt{UvlDiagramContainer} with all relevant rendering configuration.
+
+\lstinputlisting[
+  language=Java,
+  float,
+  floatplacement=ht,
+  caption={[VS~Code webview integration and container setup]VS~Code webview integration and container setup.},
+  label={lst:client-integration-overview}
+]{code/glsp_overview/UvlDiagramStarter.ts}
+
+The \texttt{resolveWebviewPluginModules} function collects all additional container modules declared under \texttt{containerModules} in the \texttt{profiles.json} configuration file.
+These plugin modules extend the base container with supplementary packages from \texttt{uvl-sprotty}.
+Command contributions, by contrast, are injected at a separate point in the activation code.
+
+\subsection{Client rendering package: \texttt{uvl-sprotty}}
+
+The rendering logic shared across all UVL GLSP client variants is contained in \texttt{client/packages/uvl-sprotty}.
+Its central file, \texttt{uvl-diagram-module.ts}, is the single location where all UVL-specific UI behavior is bound into the runtime.
+
+\lstinputlisting[
+  language=Java,
+  float,
+  floatplacement=ht,
+  caption={[Excerpt from \texttt{uvl-diagram-module.ts} showing the registered UVL UI elements]Excerpt from \texttt{uvl-diagram-module.ts} showing the registered UVL UI elements.},
+  label={lst:uvl-diagram-module-overview}
+]{code/glsp_overview/uvl-diagram-module.ts}
+
+Comparing this listing with the server-side \texttt{UVLDiagramModule} shown earlier reveals a structural symmetry that is intentional.
+The GLSP framework applies an inversion of control pattern based on dependency injection on both sides of the client--server boundary.
+On the server, bindings are managed by Google Guice~\cite{noauthor_googleguice_2026}.
+On the client, the same pattern is realised through InversifyJS~\cite{noauthor_inversifymonorepo_2026}.
+In both cases, every service and component is registered in a global DI container and can be straightforwardly extended or replaced with a custom implementation, making the architecture uniformly composable across the full stack.
+
+This composability is expressed concretely through the element registrations in the module.
+Each call to \texttt{configureModelElement} associates a UVL type constant with a model class and a view class.
+When the container receives a model element of type \texttt{UVLModelTypes.FEATURE}, for instance, it instantiates a \texttt{FeatureNode} as the model object and delegates rendering to \texttt{FeatureNodeView}, which produces the corresponding SVG output.
+The same pattern applies uniformly to attributes, relation edges, and other model elements, keeping the registration declarative and the mapping between type, model, and view explicit.
+
+Beyond element registration, the module also wires interaction and layout behavior into the container.
+For example, the \texttt{CenteredAnchor} overrides the default anchor computation to center edge connections between parent and child features.
+The \texttt{HighlightElementsActionHandler} receives highlight actions dispatched from the server and applies them to the graphical view.
+Although the handler is implemented generically and could be reused by other server components, in this implementation it is primarily used to highlight b-events selected in the behavioral program view.
+
+Overall, the implementation tries to apply the principle of separation of concerns consistently at every level of the architecture.
+At the framework level, the shared DI container model means that both the server and the client are uniformly composable.
+Individual services can be replaced or extended without restructuring the surrounding system.
+At the component level, all modeling logic is concentrated on the server, leaving the client as a thin wiring layer that could be substituted with any other GLSP-compatible frontend without affecting the server.
+At the file level, layout data is kept out of the \texttt{.uvl} file, ensuring that the source model remains valid for the broader UVL ecosystem independently of the graphical editor.

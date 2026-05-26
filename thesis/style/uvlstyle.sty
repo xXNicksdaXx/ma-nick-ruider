@@ -1,0 +1,37 @@
+% uvl.sty
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{uvlstyle}[UVL Syntax Highlighting Package]
+
+\RequirePackage{xcolor}
+\RequirePackage{listings}
+
+% 1. Define colors
+\definecolor{keywordcolor}{RGB}{0, 0, 180}
+\definecolor{stringcolor}{RGB}{0, 120, 0}
+\definecolor{bgcolor}{RGB}{250, 250, 250}
+
+% 2. Custom language definition
+\lstdefinelanguage{UVL}{
+    morekeywords={features, mandatory, optional, alternative, or, constraints},
+    sensitive=true,
+    morecomment=[l]{//},
+    morestring=[b]",
+    morestring=[b]',
+}
+
+% 3. Global settings
+\lstset{
+    language=UVL,
+    backgroundcolor=\color{bgcolor},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{keywordcolor}\bfseries,
+    stringstyle=\color{stringcolor},
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=none,               
+    captionpos=b,             
+    abovecaptionskip=10pt
+}

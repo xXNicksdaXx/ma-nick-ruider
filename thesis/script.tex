@@ -1,0 +1,109 @@
+\documentclass[english,BCOR=6mm,cdgeometry=no,parskip=half,DIV=13]{tudscrreprt}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{babel}
+\usepackage[babel]{csquotes}
+
+\usepackage{isodate}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{tudcolors}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amsmath}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{style/uvlstyle}
+
+\usepackage{setspace}
+\setstretch{1.15}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=tudaccent1,
+    menucolor=black,
+    urlcolor=tudaccent5
+}
+
+% Glossary / acronym support (auto-managed abbreviations)
+\usepackage[acronym]{glossaries}
+\makeglossaries
+\glsdisablehyper
+
+\usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+\addbibresource{references.bib}
+
+
+\begin{document}
+
+\faculty{Faculty of Computer Science}
+\institute{Institute of Software- and Multimedia-Technology}
+\chair{Chair of Software Technology}
+
+\title{Graphical Management of Multiple Runtime Models to Improve the Comprehension of Contextual Behavioral Programs}
+
+\thesis{master}
+\graduation[M.Sc.]{Master of Science}
+
+\author{Nick Ruider}
+\dateofbirth{27.09.2001}       % Optional
+\placeofbirth{Dresden}         % Optional
+\matriculationnumber{4935137}  % Optional
+
+
+\referee{Dr.-Ing. Sebastian Götz
+   \and  Prof. Dr. rer. nat. habil. Uwe Aßmann}
+
+\supervisor{Dr.-Ing. Sebastian Götz}
+
+\place{Dresden}
+\date*{28.05.2026}
+%\defensedate{24.06.2026}  % Optional
+
+\maketitle
+
+%% Intro pages
+\input{content/x_statement-of-authorship}
+\input{content/x_acknowledgements}
+\input{content/0_abstract}
+
+%% Table of contents
+\break
+{\hypersetup{linkcolor=black}
+\tableofcontents
+\break
+
+\listoffigures
+\lstlistoflistings
+\input{content/x_abbreviations}
+
+\break
+}
+
+%% Chapters
+\input{content/1_intro}
+
+\input{content/2_background}
+
+\input{content/3_state_of_the_art}
+
+\input{content/4_concept}
+
+\input{content/5_implementation}
+
+\input{content/6_evaluation}
+
+\input{content/7_conclusion}
+
+\printbibliography
+
+\input{content/x_appendix}
+
+\end{document}
