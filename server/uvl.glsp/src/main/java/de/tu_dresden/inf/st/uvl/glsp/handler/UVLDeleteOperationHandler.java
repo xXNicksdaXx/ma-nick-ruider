@@ -61,6 +61,7 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
 
     Set<UVLObject> objectsToDelete = new LinkedHashSet<>();
     collectUvlDependents(objectsToDelete, element.get());
+    excludeRootFeatureFromDeletion(objectsToDelete);
 
     objectsToDelete.forEach(this::deleteUvlObject);
 
@@ -170,6 +171,13 @@ public class UVLDeleteOperationHandler extends GModelOperationHandler<DeleteOper
     }
 
     dependents.add(objectToDelete);
+  }
+
+  protected void excludeRootFeatureFromDeletion(final Set<UVLObject> dependents) {
+    Feature rootFeature = modelState.getFeatureModel().getRootFeature();
+    if (rootFeature != null) {
+      dependents.remove(rootFeature);
+    }
   }
 
   protected void collectGModelDependents(

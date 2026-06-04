@@ -53,5 +53,5 @@ export function getWorkspaceRoot(): vscode.Uri {
 }
 
 export function getUvlTemplate(): string {
-    return `features\n\t\nconstraints\n\t\n`;
+    return `features\n\tRoot\n`;
 }

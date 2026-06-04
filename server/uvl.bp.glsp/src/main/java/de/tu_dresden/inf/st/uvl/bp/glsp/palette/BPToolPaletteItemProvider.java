@@ -28,7 +28,8 @@ public class BPToolPaletteItemProvider extends UVLToolPaletteItemProvider {
             node(BPModelTypes.B_THREAD, "B-Thread"),
             node(BPModelTypes.REQUESTED_EVENT, "Requested Event"),
             node(BPModelTypes.BLOCKED_EVENT, "Blocked Event"),
-            node(BPModelTypes.WAITED_FOR_EVENT, "Waited-for Event"));
+            node(BPModelTypes.WAITED_FOR_EVENT, "Waited-for Event"),
+            node(BPModelTypes.BP_CONTEXT, "BP Context"));
     return PaletteItem.createPaletteGroup(
         "bpElements", "BP Elements", bpElements, "symbol-property", "AA");
   }

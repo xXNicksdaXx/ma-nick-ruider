@@ -28,7 +28,7 @@ public class BPDiagramConfiguration extends UVLDiagramConfiguration {
                 false,
                 false,
                 false,
-                List.of(UVLModelTypes.FEATURE, BPModelTypes.B_THREAD)),
+                List.of(UVLModelTypes.FEATURE, BPModelTypes.B_THREAD, BPModelTypes.BP_CONTEXT)),
             new ShapeTypeHint(
                 UVLModelTypes.FEATURE,
                 true,
@@ -75,7 +75,11 @@ public class BPDiagramConfiguration extends UVLDiagramConfiguration {
                 true,
                 false,
                 false,
-                List.of(BPModelTypes.REQUESTED_EVENT, BPModelTypes.BLOCKED_EVENT))));
+                List.of(BPModelTypes.REQUESTED_EVENT, BPModelTypes.BLOCKED_EVENT)),
+            new ShapeTypeHint(
+                BPModelTypes.BP_CONFIG, true, true, false, true, List.of(UVLModelTypes.ATTRIBUTE)),
+            new ShapeTypeHint(
+                BPModelTypes.BP_ENV, true, true, false, true, List.of(UVLModelTypes.ATTRIBUTE))));
     return shapeTypeHints;
   }
 }

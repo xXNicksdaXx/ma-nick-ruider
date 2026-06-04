@@ -11,6 +11,7 @@ import de.tu_dresden.inf.st.uvl.bp.glsp.actions.SSEControlActionHandler;
 import de.tu_dresden.inf.st.uvl.bp.glsp.gmodel.BPGModelFactory;
 import de.tu_dresden.inf.st.uvl.bp.glsp.handler.BPApplyLabelEditOperationHandler;
 import de.tu_dresden.inf.st.uvl.bp.glsp.handler.BPCreateBThreadOperationHandler;
+import de.tu_dresden.inf.st.uvl.bp.glsp.handler.BPCreateContextFeaturesOperationHandler;
 import de.tu_dresden.inf.st.uvl.bp.glsp.handler.BPCreateEventOperationHandler;
 import de.tu_dresden.inf.st.uvl.bp.glsp.handler.BPDeleteOperationHandler;
 import de.tu_dresden.inf.st.uvl.bp.glsp.layout.BPTreeLayoutEngine;
@@ -81,6 +82,7 @@ public class BPDiagramModule extends UVLDiagramModule {
     binding.rebind(UVLDeleteOperationHandler.class, BPDeleteOperationHandler.class);
     binding.add(BPCreateBThreadOperationHandler.class);
     binding.add(BPCreateEventOperationHandler.class);
+    binding.add(BPCreateContextFeaturesOperationHandler.class);
   }
 
   @Override

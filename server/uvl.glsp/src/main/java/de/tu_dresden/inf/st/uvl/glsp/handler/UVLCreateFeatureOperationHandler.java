@@ -14,7 +14,6 @@ import de.tu_dresden.inf.st.uvl.metamodel.model.FeatureModel;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.glsp.graph.DefaultTypes;
 import org.eclipse.glsp.graph.GNode;
@@ -65,27 +64,22 @@ public class UVLCreateFeatureOperationHandler
                     new IllegalStateException(
                         "No GNode found for parent feature: " + parentFeature.getFeatureName()));
 
-    // create new GNode based on parent position
-    GPoint location = calculateNewFeatureLocation(parentNode.getPosition());
-    GNode featureNode = createGNode(location);
-    modelState.getRoot().getChildren().add(featureNode);
-
     // create and add new Feature to the model
-    createFeature(parentFeature);
-
-    // select the new feature node
-    selectElement(featureNode);
+    Feature feature = createFeature(parentFeature);
 
     // update the model index
     modelState.updateIndex();
+
+    // create new GNode based on parent position
+    GPoint location = calculateNewFeatureLocation(parentNode.getPosition());
+    GNode featureNode = createGNode(location, feature);
+    modelState.getRoot().getChildren().add(featureNode);
+
+    // select the new feature node
+    selectElement(featureNode);
   }
 
   protected void createRootFeature(CreateNodeOperation operation) {
-    // create root GNode
-    GPoint location = operation.getLocation().orElse(null);
-    GNode rootNode = createGNode(location);
-    modelState.getRoot().getChildren().add(rootNode);
-
     // create root Feature
     String featureName = getFeatureName();
     Feature rootFeature = new Feature(featureName);
@@ -95,9 +89,6 @@ public class UVLCreateFeatureOperationHandler
     featureModel.getFeatureMap().put(featureName, rootFeature);
     featureModel.setRootFeature(rootFeature);
     modelState.setFeatureModel(featureModel);
-
-    // select the new root node
-    selectElement(rootNode);
 
     // update the model index
     modelState.updateIndex();
@@ -122,8 +113,12 @@ public class UVLCreateFeatureOperationHandler
         });
   }
 
-  protected GNode createGNode(GPoint location) {
-    String id = UUID.randomUUID().toString();
+  protected GNode createGNode(GPoint location, Feature feature) {
+    String id =
+        modelState
+            .getIndex()
+            .getIdFor(feature)
+            .orElseThrow(() -> new IllegalStateException("Feature not indexed in the model"));
 
     // generate a new GNode with a label containing the feature name
     GNodeBuilder nodeBuilder =
@@ -146,7 +141,7 @@ public class UVLCreateFeatureOperationHandler
     return nodeBuilder.build();
   }
 
-  protected void createFeature(Feature parentFeature) {
+  protected Feature createFeature(Feature parentFeature) {
     // create new Feature
     Feature feature = new Feature(getFeatureName());
 
@@ -164,6 +159,7 @@ public class UVLCreateFeatureOperationHandler
     }
 
     modelState.getFeatureModel().getFeatureMap().put(feature.getFeatureName(), feature);
+    return feature;
   }
 
   protected String getFeatureName() {
@@ -172,7 +168,7 @@ public class UVLCreateFeatureOperationHandler
   }
 
   protected GPoint calculateNewFeatureLocation(GPoint parentPosition) {
-    final double verticalSpacing = 80.0;
+    final double verticalSpacing = 96.0;
     double randomOffset = Math.random() * 256 - 128;
     double x = parentPosition.getX() + randomOffset;
     double y = parentPosition.getY() + verticalSpacing;

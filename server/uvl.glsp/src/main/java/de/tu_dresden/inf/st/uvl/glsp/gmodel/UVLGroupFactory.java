@@ -84,7 +84,8 @@ public class UVLGroupFactory extends AbstractCollectedGModelFactory<Group, GEdge
                 .edgePlacement(
                     new GEdgePlacementBuilder()
                         .side(GConstants.EdgeSide.LEFT)
-                        .position(0.1d)
+                        .position(0.2d)
+                        .offset(-8d)
                         .rotate(false)
                         .build())
                 .build());

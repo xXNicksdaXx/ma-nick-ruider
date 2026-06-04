@@ -29,10 +29,15 @@
   },
   "main": "dist/uvl-extension",
   "activationEvents": [
-    "onStartupFinished"
+    "workspaceContains:**/*.uvl"
   ],
   "contributes": {
     "commands": [
+      {
+        "command": "uvl.newDiagram",
+        "title": "New UVL file",
+        "category": "uvl"
+      },
       {
         "command": "uvl.fit",
         "title": "Fit to Screen",
@@ -55,12 +60,6 @@
         "command": "uvl.exportAsSVG",
         "title": "Export as SVG",
         "category": "Diagram",
-        "enablement": "activeCustomEditorId == 'uvl.glspDiagram'"
-      },
-      {
-        "command": "uvl.newDiagram",
-        "title": "New UVL file",
-        "category": "uvl",
         "enablement": "activeCustomEditorId == 'uvl.glspDiagram'"
       },
       {

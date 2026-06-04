@@ -10,8 +10,6 @@ import de.tu_dresden.inf.st.uvl.bp.glsp.BPModelTypes;
 import de.tu_dresden.inf.st.uvl.glsp.handler.UVLCreateFeatureOperationHandler;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Attribute;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
-import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
-import java.util.List;
 
 public class BPCreateBThreadOperationHandler extends UVLCreateFeatureOperationHandler {
 
@@ -25,23 +23,10 @@ public class BPCreateBThreadOperationHandler extends UVLCreateFeatureOperationHa
   }
 
   @Override
-  protected void createFeature(final Feature parentFeature) {
-    // create new BThread feature and mark it via type attribute
-    Feature bThread = new Feature(getFeatureName());
+  protected Feature createFeature(final Feature parentFeature) {
+    Feature bThread = super.createFeature(parentFeature);
     bThread.getAttributes().put("type", new Attribute<>("type", "BThread", bThread));
-
-    List<Group> children = parentFeature.getChildren();
-    if (children.isEmpty()) {
-      Group newGroup = new Group(Group.GroupType.OPTIONAL);
-      newGroup.setParentFeature(parentFeature);
-      newGroup.getFeatures().add(bThread);
-      parentFeature.getChildren().add(newGroup);
-    } else {
-      Group firstGroup = children.getFirst();
-      firstGroup.getFeatures().add(bThread);
-    }
-
-    modelState.getFeatureModel().getFeatureMap().put(bThread.getFeatureName(), bThread);
+    return bThread;
   }
 
   @Override

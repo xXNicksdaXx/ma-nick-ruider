@@ -77,8 +77,8 @@ public class UVLBiConstraintFactory extends AbstractSingleGModelFactory<Constrai
                         new GEdgePlacementBuilder()
                             .side(GConstants.EdgeSide.TOP)
                             .position(0.5d)
-                            .offset(1.5d)
-                            .rotate(false)
+                            .offset(8d)
+                            .rotate(true)
                             .build())
                     .build());
 
@@ -120,8 +120,8 @@ public class UVLBiConstraintFactory extends AbstractSingleGModelFactory<Constrai
                         new GEdgePlacementBuilder()
                             .side(GConstants.EdgeSide.TOP)
                             .position(0.5d)
-                            .offset(1.5d)
-                            .rotate(false)
+                            .offset(8d)
+                            .rotate(true)
                             .build())
                     .build());
 

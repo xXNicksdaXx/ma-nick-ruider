@@ -195,11 +195,18 @@ public class UVLSourceModelStorage extends GModelStorage implements SourceModelS
   }
 
   private static Path getBaseDirFromSourceUri(String sourceUri) {
-    Path sourcePath = Paths.get(URI.create(sourceUri)).toAbsolutePath().normalize();
+    Path sourcePath = toSourcePath(sourceUri);
     Path parent = sourcePath.getParent();
     if (parent == null) {
       throw new GLSPServerException("Invalid source URI for model path validation: " + sourceUri);
     }
     return parent;
+  }
+
+  static Path toSourcePath(String sourceUri) {
+    if (sourceUri.startsWith("file:")) {
+      return Paths.get(URI.create(sourceUri.replace(" ", "%20"))).toAbsolutePath().normalize();
+    }
+    return Paths.get(sourceUri).toAbsolutePath().normalize();
   }
 }

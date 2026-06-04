@@ -101,7 +101,7 @@ svg {
 }
 
 .alternative .sector {
-    fill: transparent;
+    fill: white;
 }
 
 .or .sector {
@@ -111,6 +111,10 @@ svg {
 .arc {
     stroke: black;
     stroke-width: 1px;
+}
+
+.alternative .arc {
+    fill: white;
 }
 
 .or .arc {

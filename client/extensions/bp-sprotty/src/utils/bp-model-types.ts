@@ -14,6 +14,7 @@ import { DefaultTypes } from '@eclipse-glsp/client';
  * For corresponding server-side types, see <code>BPModelTypes.java</code>.
  */
 export const BPModelTypes = {
+    BP_CONTEXT: `${DefaultTypes.NODE}:bp-context`,
     BP_ENV: `${DefaultTypes.NODE}:env`,
     BP_CONFIG: `${DefaultTypes.NODE}:config`,
 

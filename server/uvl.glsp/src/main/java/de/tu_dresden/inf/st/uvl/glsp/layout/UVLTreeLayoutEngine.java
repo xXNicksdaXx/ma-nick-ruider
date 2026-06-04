@@ -12,7 +12,6 @@ import de.tu_dresden.inf.st.uvl.glsp.model.UVLModelState;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Feature;
 import de.tu_dresden.inf.st.uvl.metamodel.model.Group;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -26,12 +25,12 @@ import org.eclipse.glsp.server.operations.LayoutOperation;
 public class UVLTreeLayoutEngine implements LayoutEngine {
 
   // Configuration for the layout
-  private static final double LEVEL_SPACING = 80.0; // Vertical gap between levels
-  private static final double SIBLING_GAP = 20.0; // Horizontal gap between nodes
+  private static final double LEVEL_SPACING = 64.0; // Vertical gap between levels
+  private static final double SIBLING_GAP = 24.0; // Horizontal gap between nodes
   private static final double EXTRA_LEVEL_PADDING = 8.0; // Extra padding added to each level height
 
   // Computed per-layout run: cumulative Y offsets for each level (level -> Y)
-  private List<Double> levelOffsets = new ArrayList<>();
+  private final List<Double> levelOffsets = new ArrayList<>();
 
   @Inject protected UVLModelState modelState;
 
@@ -349,7 +348,7 @@ public class UVLTreeLayoutEngine implements LayoutEngine {
       List<WalkersNode> nodes = e.getValue();
       if (nodes.size() < 2) continue;
       // Sort by their temporary absolute X to enforce left-to-right ordering
-      Collections.sort(nodes, Comparator.comparingDouble(this::getAbsoluteX));
+      nodes.sort(Comparator.comparingDouble(this::getAbsoluteX));
 
       double prevRight = Double.NEGATIVE_INFINITY;
       for (WalkersNode node : nodes) {
@@ -377,7 +376,7 @@ public class UVLTreeLayoutEngine implements LayoutEngine {
 
   private void collectNodesByLevel(
       WalkersNode node, int depth, Map<Integer, List<WalkersNode>> map) {
-    map.computeIfAbsent(depth, k -> new ArrayList<>()).add(node);
+    map.computeIfAbsent(depth, _ -> new ArrayList<>()).add(node);
     for (WalkersNode child : node.children) {
       collectNodesByLevel(child, depth + 1, map);
     }
