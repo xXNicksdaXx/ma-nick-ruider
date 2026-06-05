@@ -1,0 +1,97 @@
+% ==========================================================
+\section{Tooling Support for UVL-Based Feature Models}
+\label{sec:sota_uvl_tools}
+% ==========================================================
+
+As the Universal Variability Language has established itself as a common exchange format for feature models across research and industry, a growing ecosystem of tools has emerged to support model authoring, visualization, and automated analysis~\cite{benavides_uvl_2025}.
+The following subsections survey the most prominent solutions currently available, covering both dedicated language-server extensions for text-based editing and fully \gls{ide} that combine editing with graphical exploration and automated reasoning.
+
+% ----------------------------------------------------------
+\subsection{Universal Variability Language Server}
+\label{subsec:uvls}
+% ----------------------------------------------------------
+ 
+The \gls{uvls} is a \gls{lsp} implementation specifically designed for \gls{uvl}, providing editing assistance for the manual authoring of large feature models.
+Conforming to the \gls{lsp} protocol, \gls{uvls} integrates easily into any compatible editor.
+Integrations for Visual Studio Code and NeoVim are already available~\cite{loth_uvls_2023, noauthor_universal-variability-languageuvl-lsp_2025}.
+
+\gls{uvls} performs multi-level static analysis as the user types, providing immediate feedback without requiring explicit validation steps.
+Syntactic validation leverages a tree-sitter-based parser~\cite{loth_uvls_2023} to detect grammar violations and pinpoint exact error locations.
+For semantic analysis, \gls{uvls} integrates the SMT solver Z3~\cite{noauthor_z3proverz3_2026} to identify modeling anomalies such as void models, dead features, contradictions, and redundant tautologies~\cite{loth_uvls_2023}.
+ 
+To further support model authoring, \gls{uvls} provides context-sensitive auto-completion that suggests valid group types, numerical attributes, and importable submodels based on the \gls{uvl} grammar.
+Advanced syntax highlighting differentiates grouping keywords, feature identifiers, types, attributes, and constants, enhancing code readability.
+Reference handling enables users to locate all usages of a feature or attribute across cross-tree constraints and perform synchronized renames~\cite{loth_uvls_2023}.
+ 
+For interactive product configuration, \gls{uvls} provides a dedicated editor that supports decisions across all UVL domains and provides real-time validity feedback.
+Configuration choices can be rendered as inline code annotations within the source model, improving traceability~\cite{loth_uvls_2023}.
+Finally, \gls{uvls} can generate a Graphviz~\cite{noauthor_graphviz_nodate} \texttt{.dot} file from the feature model, which in environments such as VS~Code is rendered and refreshed in real time as the user edits the source~\cite{loth_uvls_2023}.
+
+% ----------------------------------------------------------
+\subsection{FeatureIDE}
+\label{subsec:featureide}
+% ----------------------------------------------------------
+ 
+FeatureIDE is an open-source, Eclipse-based framework for Feature-Oriented Software Development (FOSD) that has become the de facto standard in both academic research and industrial practice.
+It supports multiple composition paradigms and implementation languages, including FeatureHouse, FeatureC++, Java, C++, Haskell, and XML, making it adaptable to diverse development contexts~\cite{kastner_featureide_2009, noauthor_featureidefeatureide_2026}.
+ 
+The framework supports the complete FOSD workflow end-to-end.
+A graphical editor enables engineers to construct and maintain feature models, which are persisted in machine-readable formats suitable for automated analysis~\cite{kastner_featureide_2009}.
+Figure~\ref{fig:featureide_mobile_phone} shows the mobile phone feature model introduced in Section~\ref{subsec:bg_feature_modeling_feature_trees}.
+For configuration, a dedicated user interface allows users to select features for specific product variants, providing immediate validation of conflicting specifications.
+Background composition assembles program artifacts automatically as feature selections or implementations change.
+Compilation errors are propagated and annotated directly in the affected source files.
+FeatureIDE's extensible architecture enables researchers to integrate custom format parsers, type-checkers, and refactoring tools~\cite{kastner_featureide_2009}.
+The effort required for advanced components often varies because they are not always generalizable across implementation strategies~\cite{meinicke_mastering_2017}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/featureide_mobile_phone.png}
+    \caption{Graphical representation of mobile phone feature model rendered by FeatureIDE~\cite{noauthor_featureidefeatureide_2026}.}
+    \label{fig:featureide_mobile_phone}
+\end{figure}
+ 
+FeatureIDE supports \gls{uvl} natively as an alternative textual format through a Clojure-based parser library and a thin integration layer that translates \gls{uvl} elements into FeatureIDE's internal model representation~\cite{sundermann_integration_2021}.
+Parsing errors are reported with precise line and column information, including semantic validation such as constraint reference checking handled by FeatureIDE itself.
+\gls{uvl}'s composition mechanism is fully leveraged: features from referenced submodels are visually distinguished by a sky-blue border and alias prefix.
+They remain read-only in composed views while being editable in their source submodels.
+However, \gls{uvl} cardinalities (e.g., \texttt{[0..3]}) are not yet supported, requiring tool-specific metadata to be stored as generic feature attributes as a workaround~\cite{sundermann_integration_2021}.
+
+% ----------------------------------------------------------
+\subsection{flamapy.ide}
+\label{subsec:flamapy_ide}
+% ----------------------------------------------------------
+
+\texttt{flamapy.ide}~\cite{benitez_uvl_2025, noauthor_flamapyflamapy-ide_2026} is a browser-based IDE built on the open-source \texttt{flamapy} framework~\cite{galindo_flama_2023, noauthor_flamapyflamapy_2026}.
+Rather than requiring users to install native applications or Python environments, the tool uses a fully client-side architecture, compiling \texttt{flamapy} to WebAssembly via Pyodide~\cite{noauthor_pyodidepyodide_2026}.
+All computations execute directly in the user's browser.
+There is no dependency-management overhead, and sensitive feature models remain client-side without being transmitted to remote servers~\cite{benitez_uvl_2025}.
+ 
+The \gls{ide} embeds a Monaco-based code editor with full \gls{uvl} support.
+As users type, the editor automatically parses the document, providing syntax highlighting and error detection so that modeling mistakes surface immediately rather than being deferred to an explicit validation step.
+The user interface of \texttt{flamapy.ide} is illustrated in 
+Figure~\ref{fig:flamapy_ide_ui}~\cite{benitez_uvl_2025}.
+
+Additionally, feature models can be rendered as interactive tree graphs using D3.js~\cite{noauthor_d3d3_2026}, enabling intuitive navigation through the feature hierarchy.
+This tight coupling between textual and graphical representations ensures that any valid edit to the \gls{uvl} source is immediately reflected in the diagram~\cite{benitez_uvl_2025}.
+For comparison, the mobile phone feature tree is shown in Figure~\ref{fig:flamapy_ide_mobile_phone} using \texttt{flamapy.ide}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/flamapy_ide_ui.png}
+    \caption{The \texttt{flamapy.ide} user interface with the UVL code editor~\cite{noauthor_flamapyflamapy-ide_2026}.}
+    \label{fig:flamapy_ide_ui}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/flamapy_ide_mobile_phone.png}
+    \caption{Graphical representation of mobile phone feature model rendered by \texttt{flamapy.ide}~\cite{noauthor_flamapyflamapy-ide_2026}.}
+    \label{fig:flamapy_ide_mobile_phone}
+\end{figure}
+
+Beyond editing and visualization, \texttt{flamapy.ide} exposes automated reasoning through dedicated analysis backends.
+SAT-based routines use propositional satisfiability solvers to check model satisfiability and to count valid configurations.
+BDD-based operations implement Binary Decision Diagrams for efficient reasoning over feature models.
+These support configuration counting, core feature detection, and feature-inclusion probability estimation.
+An interactive product configurator guides feature selection step by step and validates each choice against model constraints, providing real-time feedback on configuration validity~\cite{benitez_uvl_2025}.

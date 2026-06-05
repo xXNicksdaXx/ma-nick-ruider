@@ -1,0 +1,220 @@
+% ==========================================================
+\section{Extending FMBP}
+\label{sec:impl_fmbp}
+% ==========================================================
+ 
+In this section, we implement the conceptually defined extension of FMBP described in Section~\ref{sec:concept_fmbp}.
+The additional components for \gls{sse} transport are the \texttt{EventStreamServer} and \texttt{EventStreamFactory}.
+\texttt{ContextSourceStreamDecorator} and \texttt{BEventStreamerExtension} are responsible for event production.
+
+% ----------------------------------------------------------
+\subsection{SSE Transport}
+\label{subsec:impl_fmbp_sse}
+% ----------------------------------------------------------
+
+To send runtime information to the \gls{glsp} server, we extend FMBP with a transport layer based on \gls{sse}.
+Events are published over a single \gls{sse} stream exposed by a Flask application that runs on a background daemon thread~\cite{noauthor_palletsflask_2026}.
+The \texttt{EventStreamServer} class encapsulates the Flask application, the event queue, and the background thread, as shown in \autoref{lst:event-stream-server-constructor}.
+Clients probe the service using \texttt{/health} and consume the stream using \texttt{/events}.
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={Constructor of \texttt{EventStreamServer}.},
+    label={lst:event-stream-server-constructor}
+]{code/fmbp/event_stream_server_constructor.py}
+
+The \texttt{/events} handler waits on the event queue with a fifteen-second timeout.
+On timeout, the handler yields a keep-alive comment in order to prevent proxies from closing the connection.
+Listing~\ref{lst:events-endpoint} shows this implementation.
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={SSE endpoint with keep-alive handling.},
+    label={lst:events-endpoint}
+]{code/fmbp/events_endpoint.py}
+
+The \texttt{publish} method is the sole entry point for producers.
+The method enforces a bounded queue by dropping the oldest entry when the queue is full.
+Each payload must include a \texttt{source} key that clients can use to differentiate events from multiple publishers.
+Figure~\ref{lst:publish-method} shows an excerpt of this method.
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption= {Queue-based \texttt{publish} method.},
+    label={lst:publish-method}
+]{code/fmbp/publish_method.py}
+
+% ----------------------------------------------------------
+\subsection{Extension Components}
+\label{subsec:impl_fmbp_components}
+% ----------------------------------------------------------
+ 
+As described in Section~\ref{subsec:concept_fmbp_extensions}, we implement two complementary extension components to produce the runtime information for the \gls{glsp} server.
+The context source decorator sends environment snapshots, while the configurator extension sends b-event selection details.
+
+% ----------------------------------------------------------
+\subsubsection{Context Source Decorator}
+\label{subsubsec:impl_fmbp_components_context}
+% ----------------------------------------------------------
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={\texttt{ContextSourceStreamDecorator} for publishing context snapshots.},
+    label={lst:context-source-stream-decorator}
+]{code/fmbp/context_source_stream_decorator.py}
+
+The \texttt{ContextSourceStreamDecorator} wraps a \texttt{ContextSource}, applying the \textit{Decorator} design pattern~\cite{gamma_design_1993}.
+On each call to \texttt{get\_data()}, it publishes a \texttt{context\_update} message and returns the original result unchanged to the caller.
+Listing~\ref{lst:context-source-stream-decorator} presents the straightforward implementation.
+ 
+Additionally, the decorator performs deduplication by comparing the current snapshot with the previously published one and emitting an event only if they differ, as shown in the project's source code~\cite{ruider_xxnicksdaxxma-nick-ruider_2026}.
+The original context source is unaware of the decorator and requires no modification, making this extension fully opt-in and non-invasive.
+
+% ----------------------------------------------------------
+\subsubsection{B-Event Streamer Extension}
+\label{subsubsec:impl_fmbp_components_event_streamer}
+% ----------------------------------------------------------
+ 
+We extend \texttt{BPConfigurator} through the \texttt{BPConfiguratorExtension} protocol to enable b-event streaming.
+This protocol mirrors the listener hooks that \texttt{BPConfigurator} already uses during execution.
+The protocol definition and the exposed hooks are shown in Listing~\ref{lst:bpconfigurator-extension-protocol}.
+ 
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={\texttt{BPConfigurator} extension protocol with listener hooks.},
+    label={lst:bpconfigurator-extension-protocol}
+]{code/fmbp/bpconfigurator_extension_protocol.py}
+ 
+We pass the extensions to the \texttt{BPConfigurator} at construction time.
+During execution, the configurator invokes all registered extensions with failure isolation, so that a single faulty extension cannot interrupt the runtime.
+Listing~\ref{lst:bpconfigurator-constructor} shows the constructor-based integration.
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={\texttt{BPConfigurator} constructor accepting extensions.},
+    label={lst:bpconfigurator-constructor}
+]{code/fmbp/bpconfigurator_constructor.py}
+
+\texttt{BEventStreamerExtension} is a concrete implementation of \texttt{BPConfiguratorExtension}.
+It initializes the \gls{sse} server in \texttt{starting} and handles selected events in \texttt{event\_selected}.
+For each selected event, it derives the relation to each ticket, transforms the data into a JSON payload, and publishes the payload as an SSE message.
+This mapping and publication logic is implemented in Listing~\ref{lst:bevent-streamer-extension}.
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={\texttt{BEventStreamerExtension} publishing event selection data.},
+    label={lst:bevent-streamer-extension}
+]{code/fmbp/bevent_streamer_extension.py}
+
+% ----------------------------------------------------------
+\subsection{EventStreamFactory}
+\label{subsec:impl_fmbp_factory}
+% ----------------------------------------------------------
+ 
+The \texttt{EventStreamFactory} serves as the public wiring API.
+The factory returns a context source decorator or a b-event stream extension configured with a shared \gls{sse} server.
+ 
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={\texttt{EventStreamFactory} for shared streaming setup.},
+    label={lst:event-stream-factory}
+]{code/fmbp/event_stream_factory.py}
+ 
+As shown in Listing~\ref{lst:event-stream-factory}, \texttt{EventStreamFactory} binds all generated decorators and extensions to one shared \texttt{EventStreamServer} instance.
+This keeps concurrent runtime models on a single SSE endpoint, while the \texttt{source} parameter preserves model-specific routing on the \gls{glsp} side.
+To add streaming to a scenario, we create a factory and request the decorator and the extension for the appropriate \texttt{source} path.
+
+% ----------------------------------------------------------
+\subsection{Example Usage}
+\label{subsec:impl_fmbp_examples}
+% ----------------------------------------------------------
+ 
+In the following examples, we show how the introduced extensions to FMBP can be used.
+The water tank example covers the basic wiring pattern.
+The drones example shows how the same pattern scales to multiple concurrent instances that share a single stream.
+
+% ----------------------------------------------------------
+\subsubsection{Water Tank}
+\label{subsubsec:impl_fmbp_examples_water_tank}
+% ----------------------------------------------------------
+ 
+The water tank scenario publishes context updates, such as water level and temperature, along with b-event selections.
+A dedicated \texttt{ContextSource} reads from the shared tank state, as shown in Listing~\ref{lst:water-tank-context-source}.
+ 
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={Context source reading the shared tank state.},
+    label={lst:water-tank-context-source}
+]{code/fmbp/water_tank_context_source.py}
+ 
+In the first step, we keep the configuration provider setup.
+The \texttt{WaterTankContextSource()} is replaced by a wrapped instance from the factory.
+The call to \texttt{context\_source(...)} on the factory returns a decorated source that publishes snapshots while the provider chain remains unchanged.
+Listing~\ref{lst:water-tank-configuration-provider} shows the new instantiation.
+We pass the \gls{uvl} file path as the source value so that emitted context updates can be mapped to the corresponding editor.
+ 
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={Configuration provider with wrapped \texttt{WaterTankContextSource()}.},
+    label={lst:water-tank-configuration-provider}
+]{code/fmbp/water_tank_configuration_provider.py}
+
+In the second step, we pass the preconfigured instances to the behavioral program.
+The \texttt{BPConfigurator} injects the object through its \texttt{extensions} parameter.
+The method call \texttt{b\_event\_stream(...)} receives the \gls{uvl} file path as the source value.
+Listing~\ref{lst:water-tank-program-instantiation} shows the extended \texttt{FMBProgram}.
+ 
+From this point onward, the endpoint at \texttt{http://localhost:8099/events} delivers a single aggregated stream that carries both context update and b-event selection messages.
+Each message is tagged with the \gls{uvl} file path that identifies its source.
+
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={Program instantiation with injected streaming extension.},
+    label={lst:water-tank-program-instantiation}
+]{code/fmbp/water_tank_program_instantiation.py}
+
+% ----------------------------------------------------------
+\subsubsection{Drones}
+\label{subsubsec:impl_fmbp_examples_drones}
+% ----------------------------------------------------------
+ 
+The drones scenario runs four instances concurrently.
+We create the factory once and reuse it for multiple instances.
+Each one wraps its own \texttt{DroneContextSource} and registers its own \texttt{BEventStreamerExtension} while targeting the shared server, as underlined in Listing~\ref{lst:drones-example}.
+ 
+\lstinputlisting[
+    language=Python,
+    float,
+    floatplacement=ht,
+    caption={Four drones sharing one \texttt{EventStreamFactory}.},
+    label={lst:drones-example}
+]{code/fmbp/drones_example.py}
+ 
+Each drone publishes events with a distinct source value that equals its \gls{uvl} file path.
+The single aggregated stream at \texttt{/events} therefore remains separable by clients even when multiple publishers are active.
+
+Taken together, these examples demonstrate that we can extend the existing FMBP structure without major changes to the framework.
+The streaming components and extension hooks transmit runtime data to the \gls{glsp} server, enabling the graphical \gls{uvl} editor to implement the \textit{models@run.time} approach.
+Further integration details involving the receiving side of the stream in the form of the \gls{glsp} server appear in Section~\ref{sec:impl_glsp_models_runtime}.

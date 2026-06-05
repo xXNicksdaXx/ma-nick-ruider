@@ -1,0 +1,119 @@
+% ==========================================================
+\section{ANTLR Parser Integration and Metamodel Extensions for BP}
+\label{sec:impl_uvl_metamodel}
+% ==========================================================
+
+This section describes the concrete realization of the conceptual \gls{bp} integration we introduce in Section~\ref{sec:concept_bp_integration}.
+It covers the grammar extensions, parser adaptations, and metamodel classes that constitute the implementation.
+
+% ----------------------------------------------------------
+\subsection{ANTLR Grammar Extensions}
+\label{subsec:impl_uvl_metamodel_antlr}
+% ----------------------------------------------------------
+
+The grammar modifications are confined to \texttt{UVLParser.g4} in the \gls{antlr} grammar module of the \gls{uvl} metamodel component.
+They realize the opt-in \gls{bp} extension described at the concept level while leaving all remaining productions unchanged, thereby preserving backward compatibility.
+The extensions comprise three targeted additions, shown in Listing~\ref{lst:antlr-extension}.
+First, we augment the \texttt{features} rule to allow up to two additional top-level features, \texttt{Env} and \texttt{Config}.
+Second, we extend the \texttt{constraint} rule with a new labeled alternative \texttt{bpConstraint}, which groups all \gls{bp}-specific constraint types under a single production to maintain an organized grammar structure.
+Third, within \texttt{bpConstraint}, a dedicated \texttt{conflictingConstraint} production handles the multi-reference case of mutually conflicting b-events.
+To ensure deterministic lexing, we introduce a dedicated keyword token for each \texttt{bp} construct, as shown in Listing~\ref{lst:bp-lexer-extension}.
+
+\lstinputlisting[
+    float,
+    floatplacement=ht,
+    caption={ANTLR grammar extensions for BP integration.},
+    label={lst:antlr-extension}
+]{code/metamodel/uvl_bp_grammar_snippet.g4}
+
+\lstinputlisting[
+    float,
+    floatplacement=ht,
+    caption={ANTLR lexer extensions for BP integration.},
+    label={lst:bp-lexer-extension}
+]{code/metamodel/bp_lexer_extensions.g4}
+
+% ----------------------------------------------------------
+\subsection{Parser and Factory Adaptations}
+\label{subsec:impl_uvl_metamodel_parser}
+% ----------------------------------------------------------
+
+We adapt the parsing logic in two places: the \gls{antlr} listener and the model factory.
+The \texttt{ModelType} enumeration controls model variant selection, introduced to support distinct parsing strategies under a single parser entry point, and may be extended to accommodate additional model variants in the future.
+When \texttt{ModelType.BP} is active, the \texttt{UVLListener} constructor instantiates a \texttt{BPFeatureModel}.
+Otherwise, it falls back to the standard \texttt{FeatureModel}, as shown in Listing~\ref{lst:uvl-listener-constructor}.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={\texttt{UVLListener} constructor with model type selection.},
+    label={lst:uvl-listener-constructor}
+]{code/metamodel/UVLListener_constructor.java}
+
+\gls{antlr} generates paired \texttt{enterX} and \texttt{exitX} callbacks for each grammar rule.
+A so-called \texttt{ParseTreeWalker} invokes \texttt{enterX} before visiting a node's children and \texttt{exitX} after all child callbacks have completed.
+The \texttt{enter} methods initialize objects and push them onto a stack, while \texttt{exit} methods finalize those objects using data populated by child callbacks~\cite{parr_definitive_2013}.
+
+The additional top-level feature rule illustrates this pattern concretely.
+Its grammar production is \texttt{reference attributes? NEWLINE}, meaning that when the walker enters the rule, the \texttt{reference} and \texttt{attributes} subtrees are accessible but not yet resolved.
+Both listener methods begin with a call to \texttt{rejectIfBaseModel}, which enforces the opt-in nature of \gls{bp} parsing.
+When the active model type is not \texttt{ModelType.BP}, any \gls{bp}-specific construct encountered in the listener is rejected with a parse error, and the method returns immediately.
+
+Accordingly, \texttt{enterEnvConfigFeature} creates a \texttt{Feature} and pushes it onto the \texttt{featureStack}.
+Child listeners populate the feature instance from its child parse nodes, namely the \texttt{reference} and optional \texttt{attributes} subtrees.
+When we invoke \texttt{exitEnvConfigFeature}, the \texttt{Feature} is popped from the stack and assigned to either the \texttt{Env} or \texttt{Config} field.
+Any feature name other than these two gets rejected.
+Listing~\ref{lst:bp-top-level-listener} shows the corresponding listener methods.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={Listener methods for BP top-level features (Env / Config).},
+    label={lst:bp-top-level-listener}
+]{code/metamodel/BP_top_level_listener.java}
+
+\gls{bp} constraints follow a similar enter/exit pattern.
+The enter method instantiates the appropriate constraint object, and the exit method finalizes it and registers it with the model.
+For \texttt{ConflictingConstraint}, which carries multiple references, the listener accumulates all reference objects into a list during child callbacks and passes that list to the constructor upon exit.
+The full implementations are available in the accompanying source code~\cite{ruider_xxnicksdaxxma-nick-ruider_2026}.
+
+% ----------------------------------------------------------
+\subsection{Metamodel Extensions}
+\label{subsec:impl_uvl_metamodel_java_extension}
+% ----------------------------------------------------------
+
+The metamodel classes introduced in this subsection are the same ones instantiated by the listener described in the previous Section~\ref{subsec:impl_uvl_metamodel_parser}.
+They provide the structural definitions that the listener populates during parsing.
+
+The central addition is \texttt{BPFeatureModel}, which extends \texttt{FeatureModel} and introduces two dedicated fields for the \texttt{Env} and \texttt{Config} top-level features.
+Both are represented as standard \texttt{Feature} objects and are distinguished semantically by their type attribute definition.
+Listing~\ref{lst:bp-feature-model} shows an excerpt of the class structure.
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={\texttt{BPFeatureModel} class with \texttt{Env} and \texttt{Config} top-level features.},
+    label={lst:bp-feature-model}
+]{code/metamodel/BPFeatureModel.java}
+
+\lstinputlisting[
+    language=Java,
+    float,
+    floatplacement=ht,
+    caption={\texttt{ConflictingConstraint} class for multi-reference BP constraints (excerpt).},
+    label={lst:conflicting-constraint}
+]{code/metamodel/ConflictingConstraint.java}
+
+Another example of a metamodel addition is the new \texttt{ConflictingConstraint}.
+Rather than holding a single reference, it manages an ordered list of \texttt{VariableReference} objects.
+The class is shown in Listing~\ref{lst:conflicting-constraint}.
+
+All remaining \gls{bp}-specific constraint additions follow the same structural pattern: a grammar production, a listener that constructs the constraint object, and registration with the model upon exit.
+Single-reference \gls{bp} constraints extend \texttt{AbstractBPEventConstraint}, which is a shared base class that encapsulates the common single-event reference structure.
+Further implementation details are available in the source code~\cite{ruider_xxnicksdaxxma-nick-ruider_2026}.
+
+In summary, we realize the \gls{bp} integration through targeted extensions at each layer.
+All changes are strictly additive with respect to the standard \gls{uvl} pipeline, yielding a \gls{bp}-capable parsing infrastructure that is backward-compatible with existing \gls{uvl} models and structurally aligned with the conceptual architecture developed in this thesis.

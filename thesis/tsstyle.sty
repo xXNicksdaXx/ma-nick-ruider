@@ -1,0 +1,44 @@
+% tsstyle.sty
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tsstyle}[TypeScript Syntax Highlighting Package]
+
+\RequirePackage{xcolor}
+\RequirePackage{listings}
+
+% Colors are defined centrally in the main document (script.tex):
+% codekeyword, codebuiltin, codestring, codecomment, codebg, codenumber
+
+% TypeScript language definition (listings)
+\lstdefinelanguage{TypeScript}{
+    morekeywords={abstract,any,as,async,await,boolean,break,case,catch,class,const,continue,declare,default,delete,do,else,enum,export,extends,false,finally,for,from,function,get,if,implements,import,in,instanceof,interface,let,namespace,never,new,null,number,of,object,package,private,protected,public,readonly,return,set,static,string,super,switch,symbol,this,throw,true,try,type,typeof,undefined,var,void,while,with,yield,keyof,unknown},
+    morekeywords=[2]{Promise,Map,Set,Record,Partial,Readonly,Array,Console,Math,JSON,RegExp,Date},
+    sensitive=true,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[b]'
+}
+
+% Global settings
+\lstset{
+    language=TypeScript,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codekeyword}\bfseries,
+    keywordstyle=[2]\color{codebuiltin},
+    stringstyle=\color{codestring},
+    commentstyle=\color{codecomment}\itshape,
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=none,
+    captionpos=b,
+    abovecaptionskip=10pt,
+    columns=fullflexible
+}
+
+% Convenience: a short environment for inline TypeScript snippets
+\lstnewenvironment{tscode}[1][]
+{\lstset{#1}}{}

@@ -1,0 +1,223 @@
+% ==========================================================
+\section{Feature Model Visualization}
+\label{sec:concept_visualization}
+% ==========================================================
+ 
+This section defines the visual conventions for representing \gls{uvl}-based feature models in the proposed editor.
+Each decision is motivated using the Physics of Notations~\cite{moody_physics_2009} and, where instructive, contrasted with the conventions established by FeatureIDE~\cite{kastner_featureide_2009}.
+The goal is to preserve the notation familiarity that domain experts bring from FeatureIDE while making the semantics specific to \gls{uvl}-\gls{bp}, namely behavioral elements, root contexts, and rich attributes, directly visible in the diagram.
+
+% ----------------------------------------------------------
+\subsection{Canonical node structure}
+\label{subsec:vis_nodes}
+% ----------------------------------------------------------
+ 
+Feature model editors have converged on a labeled-node tree as their canonical representation, and FeatureIDE exemplifies this convention.
+A labeled node maps unambiguously to a single feature, and parent-child edges represent the decomposition.
+Small decorators at the edge ends encode \textit{mandatory} and \textit{optional} relations.
+A set of edges that are part of an \textit{alternative} or \textit{or}-relation is grouped with a distinct circle sector.
+This one-symbol-per-construct mapping satisfies \textit{Semiotic Clarity} and produces a layout that is immediately legible to practitioners trained on any standard notation.
+Departing from this topology without a strong semantic justification would violate \textit{Cognitive Fit}.
+Such deviation would also alienate the target audience.
+
+We therefore retain the node-and-edge structure shown in Figure~\ref{fig:mobile_phone_feature_tree}.
+\textit{Graphic Economy} is maintained by using a single node shape for all ordinary features.
+Additional visual channels, such as color, icons, and compartments, are reserved for element types whose semantics genuinely differ from a plain feature.
+Overloading the base symbol with decorative variation would reduce \textit{Perceptual Discriminability}.
+It would also unnecessarily inflate the sign inventory.
+This canonical structure supports RQ1 by preserving a familiar and immediately legible basis for visualizing \gls{uvl} feature models.
+
+% ----------------------------------------------------------
+\subsection{Attribute visibility: UML-style compartments}
+\label{subsec:vis_attributes}
+% ----------------------------------------------------------
+
+The representation of feature attributes in feature models lacks a unified standard across the literature and tools.
+Extended feature models vary widely in their approach.
+Some embed attributes directly within the feature node itself~\cite{karatas_attribute-based_2016}, as shown in Figure~\ref{fig:feature_model_attributes}, while others place attributes in separate external nodes that are then linked to their representative features~\cite{benavides_automated_2010}.
+This diversity reflects the absence of consensus on the trade-off between notational economy and semantic transparency.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{figures/extended-feature-model-1.png}
+	\caption{Example of feature model with attributes. Taken from \cite{karatas_attribute-based_2016}.}
+    \label{fig:feature_model_attributes}
+\end{figure}
+ 
+FeatureIDE externalizes attributes entirely.
+They are accessible only through a separate property view and invisible in the diagram itself.
+This can be seen in Figure~\ref{fig:featureide_attributes}.
+For a general-purpose feature model, this is a reasonable trade-off for diagram compactness.
+For \gls{uvl}-\gls{bp}, however, attributes are semantically load-bearing.
+They parameterize behavioral definitions and directly influence runtime behavior.
+Hiding them behind a panel severs the spatial connection between a feature and its behavioral configuration.
+This weakens \textit{Semantic Transparency} and forces the user to reconcile two disconnected views mentally.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/featureide_attributes.png}
+	\caption{Feature Attributes View in FeatureIDE. Taken from \cite{bossert_andre_add_2018}.}
+    \label{fig:featureide_attributes}
+\end{figure}
+ 
+We adopt a \gls{uml}-style compartmental node form to address this.
+Each node consists of a header row and a lower compartment.
+The header row displays the feature name and an optional type glyph, which will be used in the following section.
+The lower compartment lists attributes one per line in a compact typeface.
+To preserve \textit{Graphic Economy}, the attribute list uses reduced line spacing and a smaller font to conserve space.
+Attributes are shown directly in the diagram at all times, except where an attribute is explicitly represented in another form, as described in Section~\ref{subsec:vis_attributes}.
+Attribute lists are not dynamically collapsed or truncated.
+The diagram presents them plainly so users can read and act on them without opening secondary controls.
+All attribute modifications are made directly within the graphical view using inline editing tools.
+There is no separate property palette for attribute editing.
+The graphical representation therefore serves as the single authoritative editing surface, keeping model structure and attribute values co-located for clear \textit{Cognitive Integration}.
+This compartment-based attribute view advances RQ1 by keeping semantically relevant data visible within the diagram itself.
+
+% ----------------------------------------------------------
+\subsection{Behavioral element types: b-thread and b-event}
+\label{subsec:vis_bp-elements}
+% ----------------------------------------------------------
+ 
+FeatureIDE's symbol vocabulary already distinguishes certain feature types through visual encoding.
+Abstract and concrete features, for instance, use different shades of color and border styles.
+This approach satisfies \textit{Semiotic Clarity} by making semantic differences immediately visible without expanding the node-shape vocabulary.
+For \gls{bp}, we must represent two new element types: b-threads and b-events.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/bp-feature-tree-generic.png}
+        \caption{Generic feature tree}
+        \label{fig:bp-tree-generic}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/bp-feature-tree-tic-tac-toe.png}
+        \caption{Tic-tac-toe Example}
+        \label{fig:bp-tree-tic-tac-toe}
+    \end{subfigure}
+    \caption{Different examples of feature trees with b-threads and b-events. Taken from~\cite{felber_behavioral_2025}.}
+    \label{fig:bp-representation}
+\end{figure}
+
+Felber and Götz present two example visualizations of \gls{bp}-augmented feature models~\cite{felber_behavioral_2025}, as shown in Figure~\ref{fig:bp-representation}.
+In the generic example (Figure~\ref{fig:bp-tree-generic}), b-threads are represented explicitly as blue circles attached to the tree.
+In the Tic-Tac-Toe example (Figure~\ref{fig:bp-tree-tic-tac-toe}), no separate visual distinction for b-threads is made.
+Hence, the two images show that a consistent semantic convention for representing b-threads in feature trees has not yet been established.
+In both examples, b-events are displayed as symbols attached to their parent feature.
+Green circles denote requested events, yellow squares represent waited-for events, and red triangles indicate blocked events.
+These event symbols are placed attached to the feature node to show the event-role relationship spatially.
+ 
+We introduce b-threads to the editor as a feature with distinct runtime semantics.
+It is rendered as a standard compartmental node with an additional type label affixed to the header.
+This header decoration clearly marks the behavioral role without introducing a new node shape.
+The type reference thus provides \textit{Perceptual Discriminability} while preserving the familiar node topology.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/b_thread_concept.png}
+    \caption{Conceptual depiction of a b-thread with all three b-event types included in the attribute compartment.}
+    \label{fig:b_thread_concept}
+\end{figure}
+ 
+By contrast, we model a b-event as a specialized attribute within a feature rather than as a standalone feature node.
+Each b-event carries sub-attributes, such as name and priority, which would be difficult to display if events were represented only as attached symbols on the tree.
+Treating events as attributes allows the diagram to show event names and priorities inline in the attribute compartment while still using the distinctive icons (green circle, yellow square, red triangle) to indicate the event type.
+This keeps behavioral specifications spatially co-located with their owning feature and preserves \textit{Semantic Transparency} without sacrificing the expressive detail of event parameters.
+A sample b-thread with all possible b-event types is presented in Figure~\ref{fig:b_thread_concept}.
+
+% ----------------------------------------------------------
+\subsection{Constraint representation}
+\label{subsec:vis_constraints}
+% ----------------------------------------------------------
+ 
+FeatureIDE renders cross-tree constraints in a dedicated textual table below the diagram.
+This approach provides no spatial cue about which features are involved.
+Users must manually cross-reference the table with the tree.
+This weakens \textit{Dual Coding} and increases cognitive overhead for constraint-heavy models.
+ 
+We introduce a \emph{binary constraint rule} as an explicit design boundary.
+Only binary relations ($n = 2$) are mapped to directed diagram edges.
+Constraints involving more than two features ($n > 2$) and complex mathematical expressions are offloaded to a supplementary textual list.
+This process of \emph{symbolic offloading} keeps diagrammatic complexity bounded.
+Binary constraints get a direct visual representation that leverages spatial cognition, while the tool retains full expressive power in the textual form.
+The combination of both channels improves comprehension beyond what either representation achieves alone.
+
+Concretely, we render binary \textit{requires} and \textit{excludes} relations in the diagram as dashed, directed cross-tree edges.
+Each relation involves exactly two identifiable nodes, and both types appear pervasively across use cases, making them ideal candidates for direct visual encoding.
+We collect all remaining constraints in a floating constraint list.
+This list is part of the graphical canvas and can be repositioned freely.
+Users who need close cross-reference with the tree can place the panel nearby.
+Others can move it aside when the focus is on the tree structure itself.
+This arrangement preserves \textit{Graphic Economy} for the primary tree view while all constraints remain immediately accessible without leaving the editor.
+\textit{Complexity Management} is achieved through spatial arrangement rather than through hiding.
+This avoids the information loss that a purely collapsible panel would introduce.
+
+% ----------------------------------------------------------
+\subsection{Root contexts: \texttt{Env} and \texttt{Config}}
+\label{subsec:vis_env-config}
+% ----------------------------------------------------------
+ 
+Standard \gls{uvl} feature models have a single root feature from which all other features descend.
+The proposed tool extends this to the \gls{bp}-specific environment by adding two additional top-level elements, \texttt{Env} and \texttt{Config}.
+These elements exist outside the main feature tree, and neither is a parent of nor a child of any feature.
+Instead, both hold attributes that represent global context variables.
+Constraints and behavioral definitions throughout the model may reference these variables, making it a priority to integrate them into the current structure.
+Forcing them into the tree layout would misrepresent their semantics and distort the hierarchy.
+For comparison, their role is analogous to that of the constraint list.
+Both represent globally relevant information that supplements the feature tree without being part of it in a structural sense.
+ 
+The proposed design therefore treats \texttt{Env} and \texttt{Config} consistently with the constraint list.
+Both are rendered as floating, repositionable panels on the canvas.
+They use the same compartmental node form as ordinary features.
+The header row shows the element name and a type glyph, whereas the lower compartment lists attributes.
+Users can position these panels anywhere on the canvas, allowing them to be visually associated with the parts of the tree that reference their attributes or to be set apart when the focus is on the tree structure itself.
+This consistent treatment satisfies \textit{Semiotic Clarity} because ancillary, globally scoped artifacts receive the same visual form.
+It supports \textit{Cognitive Integration} by keeping the full model on a single canvas.
+No structural layout is imposed that the semantics do not warrant.
+At the same time, the distinct type glyphs in each header ensure \textit{Perceptual Discriminability} between the two contexts.
+The encoding of \gls{bp}-specific elements supports RQ1 and RQ2 by making behavioral concepts visible without abandoning the familiar feature model notation.
+
+% ----------------------------------------------------------
+\subsection{Runtime visualization and SSE handling}
+\label{subsec:vis_runtime_sse}
+% ----------------------------------------------------------
+
+The editor must be able to visualize runtime updates emitted by the FMBP runtime as \gls{sse}, as described in Section~\ref{sec:concept_fmbp}.
+These payloads are consumed by the editor extension and translated into transient updates on the canvas.
+There are two complementary handling strategies for incoming \glspl{sse}.
+
+First, the integration of context updates is a straightforward refresh of the affected node with the new attribute values.
+Second, we map selected b-events to a visual highlight on the owning b-thread feature node.
+When the \gls{sse} indicates that a b-event was selected, the server maps it to the owning feature and the b-thread feature that handles the event.
+The affected b-thread feature node receives a temporary highlight effect triggered by the client to draw the user's attention, for example by adding a glowing border to the node.
+These visual cues are transient and driven by the live event stream, so they communicate runtime activity without altering model contents.
+Both types conform to \textit{Semiotic Clarity} by using distinct visual channels to provide runtime feedback.
+This runtime visualization advances RQ1 by making \gls{bp} activity visible in the editor, and it supports RQ3.1 by allowing users to observe runtime updates in the graphical representation.
+
+% ----------------------------------------------------------
+\subsection{Multi-model views and VS~Code integration}
+\label{subsec:vis_multi_models}
+% ----------------------------------------------------------
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/vscode-spliteditor.png}
+    \caption{VS~Code with four independent text editor instances.}
+    \label{fig:vscode_spliteditor}
+\end{figure}
+
+We leverage Visual Studio Code's multi-pane user interface to display multiple models simultaneously.
+Formally, VS~Code exposes this capability through \textit{Editor Groups} and the \textit{Split Editor} command (\texttt{workbench.action.splitEditor})~\cite{microsoft_default_nodate}.
+Editor Groups allow users to arrange editors into multiple panes and view several files side by side or in a grid.
+
+For example, four independent model canvases can be arranged in a two-by-two grid, allowing the user to inspect multiple models in parallel.
+Each canvas instance binds to a single model file and maintains its own runtime overlay state for visualization.
+In Figure~\ref{fig:vscode_spliteditor}, four different \texttt{drones.uvl} files are displayed simultaneously using this feature.
+We use a similar setup for the graphical editor.
+To guarantee correct event routing in multi-model layouts, \gls{sse} messages must include the file path of the affected model.
+When the active view for that file is visible, transient updates like \texttt{Env} attribute updates and b-event highlighting are applied to that view only.
+This VS~Code integration thus enables coordinated multi-model inspection while preserving provenance for \gls{bp}-specific runtime updates.
+This multi-model arrangement refines RQ1 by keeping several visualized models inspectable at once.

@@ -1,0 +1,72 @@
+% ==========================================================
+\chapter{Conclusion}
+\label{chapter:conclusion}
+% ==========================================================
+
+In this thesis, we introduce a graphical editor based on the \gls{glsp} framework for \gls{uvl} feature models and extend it to support \gls{bp}-enriched \gls{uvl} feature models.
+The toolchain aims to enhance the comprehension of contextual behavioral programs across multiple runtimes. 
+In this chapter, we summarize the main contributions of this thesis with regard to the research questions.
+Additionally, we outline potential avenues for future work, which could further enhance the capabilities and performance of the developed graphical editor for \gls{uvl} feature models and its integration with behavioral programming concepts.
+
+% ----------------------------------------------------------
+\section{Contributions}
+\label{sec:conclusion_contributions}
+% ----------------------------------------------------------
+
+We present a graphical editor for \gls{uvl} feature models, implemented on top of the \gls{glsp} framework.
+The editor supports \gls{bp}-enriched \gls{uvl} feature models and synchronizes model changes with running behavioral programs.
+The implementation includes VS~Code extensions that enable users to author and edit \gls{uvl} feature models in the editor.
+The toolchain supports \textit{models@run.time} for behavioral programs and allows runtime modifications of feature models to be reflected in the running system.
+The repository publishes two separate extensions on \textit{OpenVSX}~\cite{efftinge_eclipse_2020} with one extension targeting base \gls{uvl} models~\cite{ruider_uvl_nodate} and the other targeting \gls{uvl} models enriched with \gls{bp} annotations~\cite{ruider_uvlbp_nodate}.
+
+The contributions of this thesis are relevant to the research questions posed in Section~\ref{sec:intro_goals}.
+
+\begin{description}[leftmargin=1.5cm, labelwidth=1.3cm, labelsep=0.2cm]
+    \item[\textbf{RQ1:}]
+    The editor demonstrates the feasibility of graphical visualization for \gls{uvl} feature models by providing an interactive visual representation built on \gls{glsp}.
+    The editor's design allows users to visually explore the structure and relationships of feature models.
+    To improve comprehension of contextual \gls{bp}, we provide visual cues and annotations that help users understand how features relate to behavioral programming concepts.
+     
+    \item[\textbf{RQ2:}]
+    We integrate \gls{bp} concepts into an extensible graphical tool using the \gls{glsp} framework.
+    The editor's architecture is designed to separate the core \gls{uvl} modeling concerns from the \gls{bp} extensions, enabling future enhancements.
+    It uses a profile-based approach to package two separate VS~Code extensions.
+    
+    \item[\textbf{RQ3.1:}]
+    We extend FMBP to provide runtime information about the executing behavioral program using \gls{sse}.
+    The \gls{glsp} server consumes the events and updates the graphical model accordingly.
+    This includes transient modifications to the \texttt{Env} attributes and highlights to b-threads when certain b-events are selected in the behavioral program.
+    
+    \item[\textbf{RQ3.2}]
+    We use the \gls{glsp} editor in combination with Felber's FMBP to run behavioral programs.
+    Because they operate on the same underlying \gls{uvl} model, user interactions that modify the feature model in the editor can be directly translated into changes in the running behavioral program.
+    Primarily, we can modify the constraints and \texttt{Config} attributes of the feature model, thereby altering the runtime behavior of the executed behavioral program.
+\end{description}
+
+% ----------------------------------------------------------
+\section{Future Work}
+\label{sec:conclusion_future_work}
+% ----------------------------------------------------------
+
+\textbf{Performance and Scalability.}
+Further engineering effort is required to improve the editor's performance for larger and concurrent feature models.
+This includes implementing incremental update strategies for the most expensive operations and introducing selective environment modifications that avoid full model refreshes, reducing synchronization overhead and improving perceived responsiveness.
+
+\textbf{Architecture and Maintainability.}
+The current \gls{uvl} metamodel and parser would benefit from a refactor to separate grammar concerns from metamodel concerns.
+A clearer separation would ease maintenance and enable more modular parsing approaches for future language features.
+On the client side, smaller package modularization, similar to BigUML~\cite{metin_developing_2023}, combined with a broader client refactor would simplify reuse and enable deeper integration with the VS~Code platform.
+
+\textbf{Visualization and Interaction.}
+The visual presentation could be enhanced by adopting advanced interaction techniques that improve scalability.
+Semantic zooming and off-screen representations for less relevant details are promising directions for reducing visual clutter and supporting focus-plus-context interactions~\cite{de_carlo_advanced_2022}.
+Interaction feedback should also be strengthened by adding element highlighting and tighter selection feedback; for example, selecting a complex constraint should highlight related features and attributes.
+The existing infrastructure already supports highlight dispatching and only requires the corresponding actions and style rules to be completed.
+
+\textbf{Editor Views and Usability.}
+Additional editor views would make the tool more flexible for different tasks.
+For example, a compact tree view without attributes and a dedicated property panel for constraints would help users who prefer structured or textual representations.
+
+\paragraph{Testing and Evaluation.}
+Automated unit and end-to-end tests implemented with Playwright~\cite{noauthor_eclipse-glspglsp-playwright_2026} would increase reliability and enable early detection of regressions.
+A user study should also be conducted to assess the editor both as a modeling tool and as a means to improve comprehension of behavioral programming concepts.

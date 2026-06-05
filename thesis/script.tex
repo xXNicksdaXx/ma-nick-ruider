@@ -1,0 +1,126 @@
+\documentclass[english,BCOR=6mm,cdgeometry=no,parskip=half,DIV=13]{tudscrreprt}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{babel}
+\usepackage[babel]{csquotes}
+
+\usepackage{isodate}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{tudcolors}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\usepackage{listings}
+\lstset{
+    basicstyle=\scriptsize\ttfamily
+}
+
+\usepackage{xcolor}
+\usepackage{tudscrcolor}
+
+% Shared code listing colors — define once here and reuse in style packages
+\definecolor{codekeyword}{RGB}{0,0,180}
+\definecolor{codebuiltin}{RGB}{120,0,120}
+\definecolor{codestring}{RGB}{163,21,21}
+\definecolor{codecomment}{RGB}{0,128,0}
+\definecolor{codebg}{RGB}{250,250,250}
+\definecolor{codenumber}{RGB}{128,128,128}
+
+\usepackage{uvlstyle}
+\usepackage{tsstyle}
+
+\usepackage{setspace}
+\setstretch{1.15}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    pdftitle={Graphical Management of Multiple Runtime Models to Improve the Comprehension of Contextual Behavioral Programs}
+}
+
+\usepackage[acronym]{glossaries}
+\makeglossaries
+\glsdisablehyper
+
+\usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+\addbibresource{references.bib}
+
+\begin{document}
+
+\faculty{Faculty of Computer Science}
+\institute{Institute of Software- and Multimedia-Technology}
+\chair{Chair of Software Technology}
+
+\title{Graphical Management of Multiple Runtime Models to Improve the Comprehension of Contextual Behavioral Programs}
+
+\thesis{master}
+\graduation[M.Sc.]{Master of Science}
+
+\author{Nick Ruider}
+\dateofbirth{27.09.2001}       % Optional
+\placeofbirth{Dresden}         % Optional
+\matriculationnumber{4935137}  % Optional
+
+
+\referee{Dr.-Ing. Sebastian Götz
+   \and  Prof. Dr. rer. nat. habil. Uwe Aßmann}
+
+\supervisor{Dr.-Ing. Sebastian Götz}
+
+\place{Dresden}
+\date*{05.06.2026}
+% \defensedate{25.06.2026}    % Optional
+
+\maketitle
+
+{\hypersetup{
+    linkcolor=black,
+    citecolor=black,
+    menucolor=black,
+    urlcolor=black,
+}
+%% Intro pages
+\input{content/x_statement-of-authorship}
+\input{content/x_acknowledgements}
+\input{content/0_abstract}
+
+%% Table of contents
+\break
+\tableofcontents
+\break
+
+\input{content/x_abbreviations}
+
+\break
+
+%% Chapters
+\input{content/1_intro}
+
+\input{content/2_background}
+
+\input{content/3_state_of_the_art}
+
+\input{content/4_concept}
+
+\input{content/5_implementation}
+
+\input{content/6_evaluation}
+
+\input{content/7_conclusion}
+}
+
+{\hypersetup{
+    linkcolor=cdblue,
+    citecolor=cdblue,
+    urlcolor=cdblue
+}
+\printbibliography
+}
+
+\end{document}

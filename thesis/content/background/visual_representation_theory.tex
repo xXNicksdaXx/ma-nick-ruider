@@ -1,0 +1,32 @@
+% ==========================================================
+\section{Visual Representation Theory}
+\label{sec:bg_visual}
+% ==========================================================
+
+The choice between textual and graphical representation has measurable consequences for human comprehension and problem-solving efficiency.
+Textual representations are inherently one-dimensional and processed serially by the auditory-linguistic system~\cite{larkin_why_1987}.
+This requires the reader to hold multiple, potentially distant elements in working memory while searching linearly through the representation.
+By contrast, graphical representations are two-dimensional and processed in parallel by the visual system to which approximately a quarter of the brain's total capacity is devoted~\cite{moody_physics_2009}.
+
+The concept of \textit{computational offloading}~\cite{larkin_why_1987} formalizes this distinction.
+Diagrams index information by spatial location rather than sequential position, allowing elements that must be reasoned about together to be grouped physically.
+Spatial, topological, and geometric relationships can thereby be perceived directly, whereas equivalent inferences drawn from text require explicit and effortful computation.
+This reduces extraneous cognitive load as identified by Cognitive Load Theory and frees working memory for substantive reasoning tasks~\cite{sweller_cognitive_2020}.
+
+Despite the well-established advantages of graphical representation, the design of visual notations in software engineering has historically been treated as secondary to semantic concerns.
+Often it is driven by intuition rather than principled theory~\cite{moody_physics_2009}.
+The \textit{Physics of Notations} addresses this deficit by establishing a prescriptive, empirically grounded framework for designing cognitively effective visual languages~\cite{moody_physics_2009}.
+The theory derives nine principles from cognitive science and visual perception research~\cite{moody_physics_2009}:
+\begin{itemize}
+	\item \textbf{Semiotic Clarity:} Each semantic construct should map to one distinct graphical symbol; violations produce redundancy, overload, excess, or deficit.
+	\item \textbf{Perceptual Discriminability:} Symbols must be easy to tell apart; discriminability depends on the "visual distance" across variables such as shape, color, and size.
+	\item \textbf{Semantic Transparency:} Symbols should visually suggest their meaning so that appearance provides intuitive cues and reduces learning effort.
+	\item \textbf{Complexity Management:} Notations should offer mechanisms (for example, modularization, hierarchical grouping, or layered views) to present information incrementally and avoid cognitive overload.
+	\item \textbf{Cognitive Integration:} Provide contextual anchors, overview maps, and cross-references so readers can relate individual diagrams to the larger system of representations.
+	\item \textbf{Visual Expressiveness:} Leverage multiple visual channels (color, size, brightness, texture, position, etc.) so the notation can encode information across a richer perceptual space.
+	\item \textbf{Dual Coding:} Combine concise textual labels or annotations with graphics to leverage both verbal and visual cognitive systems and improve comprehension and retention.
+	\item \textbf{Graphic Economy:} Keep the visual vocabulary compact so distinct symbols remain within human discriminative abilities, especially for novice users.
+	\item \textbf{Cognitive Fit:} Tailor the notation to task and audience, offering simplified and expert variants so the representation matches users' goals and skills.
+\end{itemize}
+
+These principles interact in practice: increasing Visual Expressiveness (e.g., adding color) can improve Perceptual Discriminability and support offset problems introduced by a large graphic vocabulary~\cite{moody_physics_2009}.

@@ -1,0 +1,31 @@
+% ==========================================================
+\section{Drones Example}
+\label{sec:bg_drones_example}
+% ==========================================================
+
+In the previous sections, we used the mobile phone \gls{uvl} model and the water tank \gls{bp} model as examples.
+The drones example, introduced in FMBP~\cite{felber_comprehensible_2025}, serves as a core evaluation use case for the thesis.
+It requires interacting with multiple concurrent runtime models, represented by several instances of behavioral programs running simultaneously, which is a key aspect of the thesis.
+
+\lstinputlisting[
+    language=UVL, 
+    float,
+    floatplacement=ht,
+    caption={UVL specification of a single drone's feature model. Taken from~\cite{felber_tfelbrfmbp_2025}.}, 
+    label={lst:drone_uvl}
+]{code/drone.uvl}
+
+The scenario models a small surveillance deployment consisting of four autonomous drones, whose spatial movements and interactions are visualized in real time using an \textit{Alchemist} simulation environment~\cite{pianini_chemical-oriented_2013}.
+The swarm's logic is governed entirely by behavioral programming.
+Each drone possesses an identical individual feature model represented in \gls{uvl}, which allows capabilities, assignments, and operational parameters to be defined within the model and dynamically applied to each drone at runtime.
+Listing~\ref{lst:drone_uvl} shows an example of the \gls{uvl} model for a single drone.
+Role assignment is managed through dedicated \textit{Patrol} and \textit{Follow} b-threads, which enforce mutually exclusive behavioral modes.
+Drones designated as leaders autonomously navigate and patrol a configurable set of target locations.
+In contrast, drones designated as followers are assigned to track a specific other drone, maintaining a configurable separation distance throughout operation~\cite{felber_comprehensible_2025}.
+
+Independently of their assigned role, all drones continuously monitor their internal energy levels through a context-aware energy management mechanism.
+When the remaining charge drops below a set threshold, a high-priority 	\textit{Charge} b-thread is activated by a complex constraint.
+It overrides the drone's current role and guides it to a designated charging station until its energy is fully replenished.
+This mechanism ensures that energy-critical behavior takes precedence over mission-specific tasks across all drone instances at all times~\cite{felber_comprehensible_2025}.
+
+The three used examples, the mobile phone, the water tank, and the drones scenario, are revisited in the evaluation chapter to demonstrate how the proposed toolchain can be applied in practice.

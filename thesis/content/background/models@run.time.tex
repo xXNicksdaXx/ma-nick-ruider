@@ -1,0 +1,26 @@
+% ==========================================================
+\section{Models@run.time}
+\label{sec:bg_models_at_runtime}
+% ==========================================================
+
+\textit{Models@run.time} extend the principles of Model-Driven Engineering from the traditional development phase into the active execution environment of a software system.
+By definition, they are causally connected self-representations of a software system that emphasize its structure, behavior, or goals from a high-level problem-space perspective~\cite{blair_models_2009, bencomo_modelsruntime_2019}.
+Traditional models are commonly used for documentation, communication, and initial code generation prior to deployment.
+In contrast, \textit{models@run.time} act as active abstractions during system execution.
+They enable developers or the system itself to monitor, reason about, and reconfigure the software without interrupting execution~\cite{blair_models_2009}.
+
+The fundamental mechanism that enables this continuous execution support is computational reflection, which establishes a bidirectional causal connection between the runtime model and the underlying software system.
+This link keeps the internal representation aligned with the domain.
+As a result, changes in the system's state or behavior are automatically captured and reflected in the runtime model.
+Conversely, adaptations performed on the model at the problem-space level are propagated down to the executing system~\cite{bencomo_modelsruntime_2019}.
+
+This causal relationship is an important prerequisite for building dynamic, self-adaptive, and long-term operating software systems.
+It ensures that adaptation engines and human operators receive an accurate, up-to-date view of the system's state.
+Furthermore, it allows safe adaptations to be enacted at the high level of the problem-space model, mitigating the risks associated with direct, low-level manipulations of executing code~\cite{blair_models_2009, bencomo_modelsruntime_2019}.
+
+Despite its advantages, maintaining a continuous causal connection introduces substantial research challenges, particularly when applied to fine-grained, code-level artifacts such as abstract syntax trees~\cite{schone_incremental_2016}.
+First, traditional compiler artifacts are usually discarded after compilation.
+They must therefore be kept ``alive'' and enriched with runtime-specific knowledge.
+Second, novel synchronization techniques are required to handle temporary synchronization lags and race conditions.
+The latter occurs when multiple runtime models attempt to control the same underlying system concurrently.
+Additionally, transaction-safe connections are needed to allow safe rollbacks upon failure~\cite{bencomo_modelsruntime_2019}.

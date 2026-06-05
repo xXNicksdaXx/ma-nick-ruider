@@ -1,0 +1,5 @@
+{
+    "command": "uvl.sse.startListening",
+    "title": "Start listening for FMBP",
+    "enablement": "uvl.buildProfile == 'uvl-bp' && activeCustomEditorId == 'uvl.glspDiagram'"
+}

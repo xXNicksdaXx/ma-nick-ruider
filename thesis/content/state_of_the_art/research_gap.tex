@@ -1,0 +1,34 @@
+% ==========================================================
+\section{Research Gap}
+\label{sec:research_gap}
+% ==========================================================
+ 
+The preceding survey reveals three critical gaps that emerge precisely where Behavioral Programming, feature modeling, and graphical editor frameworks intersect.
+While each domain has matured significantly in isolation, the integration of formal architectural specification with visual modeling and runtime comprehensibility has received limited attention.
+The following open problems, derived directly from the state-of-the-art analysis, motivate our research contributions presented in this thesis.
+ 
+\textbf{Extensible GLSP architecture for UVL.}
+BigUML demonstrates that \gls{glsp} can support multiple diagram types within a single tool, but achieves this by bundling all diagram types into one monolithic extension.
+As a result, individual diagram types cannot be developed or deployed independently of one another.
+How to design a modular \gls{glsp}-based architecture that permits a core diagram extension to be augmented by separately developed domain-specific extensions remains unexplored.
+ 
+\textbf{Graphical tooling for extended UVL.}
+The graphical tools currently available for \gls{uvl}, such as \texttt{flamapy.ide} and FeatureIDE, are built around the standard feature-modeling use case.
+Domain-specific extensions to \gls{uvl}, such as those introduced by FMBP for Behavioral Programming, add new language constructs, types, and semantic constraints that go beyond what these general-purpose tools support.
+Whether such extensions can be integrated into existing tooling without causing incompatibilities with the broader \gls{uvl} ecosystem remains an open question.
+ 
+\textbf{Runtime integration of FMBP.}
+FMBP extends \gls{uvl} to provide formal architectural comprehension of Behavioral Programming at the design phase, a valuable contribution addressed by none of the runtime comprehensibility tools surveyed in Section~\ref{sec:sota_bp_comprehension}.
+However, FMBP in its current form operates entirely at the textual level and provides no visual representation of the architectural models.
+Moreover, the framework only partially employs the \textit{models@run.time} paradigm because synchronization is strictly unidirectional.
+Changes to the textual \gls{uvl} model are directly reflected in the running behavioral program, whereas propagating runtime state back into the static architectural model is not supported.
+Therefore, the gap between the static architectural model and the dynamic behavior of the running program remains open.
+
+\textbf{Runtime integration of GLSP for model synchronization.}
+Existing \gls{glsp}-based collaborative work focuses on enabling multiple users to edit the same diagram in real time by proxying interactive client edits through a host.
+This real-time collaborative approach does not apply to the intended use case of programmatic runtime model synchronization, as it relies on interactive client edits rather than on automated, server-side synchronization with a running system.
+Consequently, it remains to be investigated how \gls{glsp}'s protocol and server architecture can support runtime integration patterns that enable continuous synchronization between \gls{uvl} models and the live execution state.
+
+\textbf{Thesis Contributions.}
+We propose a modular, extensible \gls{glsp}-based graphical editor for the extended \gls{uvl} together with a runtime integration mechanism to explore synchronization between \gls{uvl} models and executing Behavioral Programs.
+In the following chapters, we will address the process of designing, implementing, and evaluating this tool.

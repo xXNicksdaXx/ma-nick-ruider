@@ -1,0 +1,13 @@
+{
+  "defaultProfile": "uvl",
+  "profiles": [
+        {
+            "id": "uvl",
+            "outFile": "uvl-vscode.vsix",
+            "serverJarPath": "../../server/uvl.glsp/target/uvl.glsp-0.5.1-glsp.jar",
+            "containerModuleIds": ["uvl-core"],
+            "commandContributionIds": ["uvl-default"]
+        },
+        ...
+    ]
+}
