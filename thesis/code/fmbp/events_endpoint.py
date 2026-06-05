@@ -8,9 +8,6 @@ def __events_endpoint(self) -> Response:
                 yield _format_sse(payload)
             except Empty:
                 yield ": keep-alive\n\n"
- 
     response = Response(generate(), mimetype="text/event-stream")
-    ...
-    response.headers["Access-Control-Allow-Origin"] = "*"
     ...
     return response

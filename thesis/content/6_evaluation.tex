@@ -1,5 +1,227 @@
+% ==========================================================
 \chapter{Evaluation}
+\label{chapter:evaluation}
+% ==========================================================
 
+In the evaluation chapter, we demonstrate the practical application of the proposed toolchain through concrete example scenarios.
+The examples illustrate how the editor can be used to model feature trees, integrate behavioral programming concepts, and synchronize with runtime models.
+It concludes with a summary of the overall results of this thesis.
+
+% ==========================================================
 \section{Examples}
+\label{sec:eval_examples}
+% ==========================================================
 
-\section{Discussion}
+The following examples revisit the three domains used throughout the thesis, each highlighting a different aspect of the toolchain.
+Taken together, we show how the proposed VS~Code extensions behave in practice.
+
+% ----------------------------------------------------------
+\subsection{Mobile Phone}
+\label{subsec:eval_examples_mobile_phone}
+% ----------------------------------------------------------
+
+As a first example, we address the mobile phone example shown in Figure~\ref{fig:mobile_phone_feature_tree} and recreate it in the base \gls{uvl} \gls{glsp} editor.
+It provides a compact but representative baseline for checking whether the tool can model feature trees as intended.
+The example is particularly useful because it combines the core editing operations with a familiar structure that can be verified against the textual \gls{uvl} representation in Listing~\ref{lst:mobile_phone_uvl}.
+
+We start a new \gls{uvl} model using the command contribution and create a root feature using the tool palette on the right, as shown in Figure~\ref{fig:glsp-tool-palette}.
+New features are then added by selecting the feature element in the palette and clicking the intended parent feature.
+In this workflow, the editor appends a child feature to the root and, by default, assigns an \textit{optional} relation.
+To change the relation type between two elements, we select the desired relation type, such as \textit{mandatory}, and then click on the parent and child features.
+The editor updates the parent-child relationship immediately and stores this change in the \gls{uvl} file upon saving.
+
+A feature name can be changed by double-clicking the corresponding node.
+A text box overlay appears, allowing the user to enter a new name.
+The editor then resizes the feature element automatically so that the new label still fits.
+The same interaction pattern is also available for other labels, including feature and group cardinalities.
+Although the mobile phone example does not include attributes, the editor supports them as well via the tool palette and by clicking the target feature.
+Figure~\ref{fig:uvl-small-sample} shows a sample of the described actions.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[t]{0.65\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/uvl-glsp-small-sample.png}
+        \caption{Feature nodes with relations and an attribute}
+        \label{fig:uvl-small-sample}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.27\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/glsp_tool_palette.png}
+        \caption{Tool palette}
+        \label{fig:glsp-tool-palette}
+    \end{subfigure}
+    \caption{Working with the UVL GLSP extension.}
+    \label{fig:working-uvl-extension}
+\end{figure}
+
+When a feature node has exactly one child of a given relation type, newly appended children inherit that relation as the default value.
+This is useful for repeated \textit{alternative} and \textit{or} structures, because it reduces repetitive editing.
+
+We define complex constraints directly in the constraint box, provided they form a valid expression for the current feature model.
+For the commonly used \textit{requires} and \textit{excludes} constraints, a more convenient alternative is available.
+They can be added directly via the tool palette and are rendered as cross-tree constraints within the tree, with routing points to preserve layout clarity.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/uvl-glsp-mobile-phone.png}
+	\caption{Mobile Phone example modeled in VS~Code with UVL GLSP extension.}
+    \label{fig:mobile_phone_uvl_glsp}
+\end{figure}
+
+The capabilities of the \gls{uvl}-\gls{glsp} VS~Code extension described above allow us to recreate the full mobile phone example.
+This can be achieved either by building the model from scratch or by opening the existing \gls{uvl} file from Listing~\ref{lst:mobile_phone_uvl} in the editor
+Through changes to the positions of the nodes, the feature tree of Figure~\ref{fig:mobile_phone_feature_tree} can be recreated, as seen in Figure~\ref{fig:mobile_phone_uvl_glsp}.
+
+% ----------------------------------------------------------
+\subsection{Water Tank}
+\label{subsec:eval_examples_water_tank}
+% ----------------------------------------------------------
+
+The water tank example shifts the focus from structural editing to behavioral programming and \textit{models@run.time}.
+First, we show how the editor can add \gls{bp}-specific elements to the feature model to recreate the water tank example of Section~\ref{subsec:bg_bp_water-tank}.
+Then, using FMBP as the framework for running the behavioral program, the \gls{uvl}-\gls{bp} VS~Code extension demonstrates how the editor can receive updates from the running system and keep the model synchronized in the graphical view.
+
+% ----------------------------------------------------------
+\subsubsection{Integration of BP Elements}
+\label{subsubsec:eval_examples_water_tank_bp}
+% ----------------------------------------------------------
+
+\lstinputlisting[
+    language=UVL, 
+    float,
+    floatplacement=ht,
+    caption={UVL specification of the water tank feature model. Taken from~\cite{felber_tfelbrfmbp_2025}.}, 
+    label={lst:water_tank_uvl}
+]{code/water_tank.uvl}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{figures/uvl-bp-water-tank.png}
+	\caption{Water Tank example modeled in VS~Code with UVL-BP GLSP extension.}
+    \label{fig:water-tank-uvl}
+\end{figure}
+
+To model the water tank example described in Section~\ref{subsec:bg_bp_water-tank}, we deactivate the base \gls{uvl} extension and enable the \gls{uvl}-\gls{bp} VS~Code extension.
+Listing~\ref{lst:water_tank_uvl} shows the \gls{uvl} file used to represent the water tank example~\cite{felber_comprehensible_2025, felber_tfelbrfmbp_2025}.
+
+When copying the \gls{uvl} file into the editor's workspace and opening it, the extension renders the feature tree including the new \textit{b-thread} and \textit{b-event} elements.
+Additionally, the editor displays both context features, \texttt{Config} and \texttt{Env}, next to the default constraint list.
+The visual representation of these \gls{bp}-specific elements is aligned with the concept introduced in Section~\ref{sec:concept_visualization}.
+If the water tank example is extended with additional b-threads and b-events, the user can use the new elements in the tool palette to add them to the model.
+A b-thread can be added by selecting the palette element and clicking on the intended parent feature.
+B-events can be added similarly to attributes, by selecting the tool palette element and clicking on the target feature.
+This creates a sub-compartment for attributes and b-events.
+The water tank example is visually represented in the editor in Figure~\ref{fig:water-tank-uvl}.
+Updating the \gls{bp}-specific elements is done through the same interactions as the base \gls{uvl} elements, such as double-clicking a b-thread to change its name or changing the value of a \texttt{Config} variable.
+
+% ----------------------------------------------------------
+\subsubsection{Runtime Synchronization}
+\label{subsubsec:eval_examples_water_tank_runtime}
+% ----------------------------------------------------------
+
+In Section~\ref{subsubsec:impl_fmbp_examples_water_tank}, we extend FMBP to support \textit{models@run.time} in the \gls{glsp} editor.
+We use the same setup here to run the water tank example.
+The implementation details are available in the source code~\cite{ruider_xxnicksdaxxfmbp-sse_2026}.
+
+We open the \gls{uvl} file with the \gls{bp} VS~Code extension and start the high-polling command for a short period.
+This makes the extension poll the FMBP \gls{sse} endpoint at an increased frequency until the behavioral program is started.
+Once the program is running, the \gls{glsp} server connects to it and listens for incoming events.
+The server parses the received events and forwards the corresponding actions to the \gls{glsp} client.
+As a result, the \texttt{Env} feature updates continuously, and the b-threads are highlighted based on the behavioral program's current state.
+Figure~\ref{fig:water-tank-runtime} illustrates this behavior, showing both the highlighted b-thread and the changed \texttt{Env} context feature.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{figures/uvl-bp-water-tank-finished.png}
+	\caption{Water Tank example showing runtime synchronization; compare to Figure~\ref{fig:water-tank-uvl}.}
+    \label{fig:water-tank-runtime}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Drones}
+\label{subsec:eval_examples_drones}
+% ----------------------------------------------------------
+
+An essential example for evaluating this thesis is the use of the proposed tool across multiple concurrent runtime models.
+For this purpose, we use the drones example from FMBP~\cite{felber_comprehensible_2025} to demonstrate how the editor can handle several concurrent instances of a behavioral program.
+
+% ----------------------------------------------------------
+\subsubsection{Setup of the Drones Example}
+\label{subsubsec:eval_examples_drones_setup}
+% ----------------------------------------------------------
+
+Similar to the water tank example, we implement the behavioral program for the drones in FMBP.
+Section~\ref{subsubsec:impl_fmbp_examples_drones} describes a snapshot of the implementation.
+The setup of the drones example requires running the behavioral program in FMBP and initializing the \textit{Alchemist} simulation environment to visualize the drones' movements.
+The instructions for the setup are available in the source code and won't be addressed here for brevity~\cite{ruider_xxnicksdaxxfmbp-sse_2026}.
+
+In addition to setting up the behavioral program, we use the \gls{uvl}-\gls{bp} VS~Code extension to open the \gls{uvl} files for the drones example.
+In this case, we open four separate \gls{uvl} files, each representing the feature model of one drone.
+To gain insights into the concurrent execution of these drones, we arrange the editor windows in a two-by-two grid, allowing all four models to be visible simultaneously.
+Each model includes three b-threads, each with one b-event, as well as the context feature \texttt{Env}, which displays the drone's current energy level.
+The editor allows the user to change each drone's settings via the \texttt{Config} feature and the constraints.
+Section~\ref{sec:bg_drones_example} provides more details on the configuration.
+In this demonstration, drone~0 is configured as the leader, while the other three drones are set as followers.
+Also, drone~3 is configured with a low energy threshold to trigger charging behavior early.
+
+% ----------------------------------------------------------
+\subsubsection{Demonstration in VS Code}
+\label{subsubsec:eval_examples_drones_demo}
+% ----------------------------------------------------------
+
+To establish the connection between the running behavioral program and the editor, we start the high-polling command in the VS~Code client.
+This call initiates the connection to FMBP \gls{sse} and starts receiving updates from all four drones.
+As described in Section~\ref{subsubsec:impl_fmbp_examples_drones}, the \gls{sse} are mapped through the respective \gls{uvl} file path.
+Initially, the views display the selected b-events for each drone.
+Drone~0 shows the active b-event for the \textit{Patrol} b-thread, while drones 1 to 3 show the active b-event for the \textit{Follow} b-thread.
+As the simulation progresses, the energy level of drone~3 drops below the configured threshold, which triggers the \textit{Charge} b-thread and highlights the corresponding b-event in the editor.
+In Figure~\ref{fig:drones-demo}, the state of all four drones is shown in the editor, with drone~3 highlighted for charging and the other three drones highlighted for their respective roles.
+Additionally, the energy levels of all drones are visible in the \texttt{Env} feature.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{figures/uvl-bp-drones.png}
+	\caption{Drones example demonstration showing the runtime synchronization.}
+    \label{fig:drones-demo}
+\end{figure}
+
+During the evaluation of the drones example, we identified several performance limitations.
+The concurrent execution of FMBP, \textit{Alchemist}, and four \gls{glsp} instances demands substantial computational resources, resulting in degraded responsiveness and unstable rendering.
+It is important to emphasize that the developed tool serves as a proof of concept, demonstrating the technical feasibility of visualizing a running behavioral program in real time.
+However, to achieve production-level reliability, we require further optimization of both the \gls{glsp} implementation and the backend infrastructure.
+
+% ==========================================================
+\section{Results}
+\label{sec:eval_results}
+% ==========================================================
+
+The results of this thesis can be summarized along three main contributions.
+We develop two VS~Code extensions based on the \gls{glsp} framework.
+The base extension supports \gls{uvl} feature modeling and provides a graphical editor for creating, updating, and serializing feature trees.
+The second extension builds on the same foundation and adds \gls{bp}-specific elements, allowing behavioral programming concepts to be represented directly within the same editor.
+The thesis extends Felber's FMBP implementation with runtime integration capabilities.
+This addition enables the editor to exchange runtime information with a running behavioral program and makes the graphical view reactive to the current execution state.
+Although we use this integration within the \gls{uvl}-\gls{bp} extension, the implementation is structured to support other environments in the future.
+
+The examples demonstrate that these contributions work together as a coherent toolchain.
+The mobile phone example shows that the base editor can model feature trees, capture change relations, update labels, and keep the textual \gls{uvl} representation synchronized with the graphical state.
+Afterward, the water tank example shows how the same environment can represent \gls{bp}-specific elements and synchronize the editor with runtime updates from the behavioral program.
+Finally, the drones example extends this setup to multiple concurrent instances, showing that the approach remains usable when several models are active simultaneously.
+
+At the same time, the implementation should be viewed as a proof of concept rather than a finished product.
+Several design choices are guided by established \gls{glsp} examples, such as the workflow example and BigUML, mentioned in Section~\ref{sec:sota_glsp}, as they provide proven interaction patterns for editor development.
+Those choices are reasonable for a first implementation, but we can still refine them to better suit the specific needs of the \gls{uvl} environment.
+In addition, some capabilities already available in FeatureIDE for \gls{uvl} are not yet implemented.
+Submodels are one important example.
+The three examples presented do not require them, yet they would be valuable for other \gls{uvl} models and future \gls{uvl}-\gls{bp} scenarios.
+
+Performance remains another limitation of the runtime integration.
+The current solution is adequate for the water tank and, in part, for the drones examples, but larger models may cause noticeable delays during synchronization.
+The lack of performance is already irregularly visible in the presented scenarios.
+For that reason, further work should focus on reducing overhead in the runtime communication path and on making the editor more robust for larger models.
+
+Overall, we show that a \gls{glsp}-based \gls{uvl} editor can be extended into a combined modeling and runtime environment.
+We also show that the same architecture can integrate feature modeling and behavioral programming into a single workflow.
+The resulting system is sufficient to demonstrate the concept and support the three examples, while leaving ample room for future improvements in completeness, scalability, and runtime performance.

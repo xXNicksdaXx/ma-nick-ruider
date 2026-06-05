@@ -9,13 +9,12 @@ public synchronized void start() {
 
 protected void runStreamLoop() {
     while (running.get()) {
-    waitForHealthyEndpoint();
-    HttpRequest request = HttpRequest.newBuilder(resolveEventsEndpoint())
-        .header("Accept", "text/event-stream")
-        .GET()
-        .build();
-    HttpResponse<Stream<String>> response =
-        httpClient.send(request, HttpResponse.BodyHandlers.ofLines());
-    consumeResponse(response.body());
+        waitForHealthyEndpoint();
+        HttpRequest request = HttpRequest.newBuilder(resolveEventsEndpoint())
+            .header("Accept", "text/event-stream")
+            .GET()
+            .build();
+        HttpResponse<Stream<String>> response = httpClient.send(request, HttpResponse.BodyHandlers.ofLines());
+        consumeResponse(response.body());
     }
 }

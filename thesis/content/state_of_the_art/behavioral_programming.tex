@@ -6,28 +6,27 @@
 As Behavioral Programming applications grow in size, understanding why certain events are selected while others are blocked becomes increasingly difficult.
 The parallel execution of multiple b-threads, combined with complex event interaction rules, makes it difficult for developers to reason about program behavior or diagnose failures.
 To address this comprehensibility challenge, three distinct tools have emerged.
-Each targets a different phase of the development lifecycle and offering complementary capabilities for understanding \gls{bp} systems.
+Each targets a different phase of the development lifecycle and offers complementary capabilities for understanding \gls{bp} systems.
 
 % ----------------------------------------------------------
 \subsection{Trace Visualization}
 \label{subsec:tracevis}
 % ----------------------------------------------------------
  
-TraceVis~\cite{eitan_visualization_2011} was proposed by Eitan et al.\ 
-The tool was already featured alongside the original Behavioral Programming paper~\cite{harel_behavioral_2012}.
+TraceVis was proposed by Eitan et al.\ ~\cite{eitan_visualization_2011} and featured alongside the original Behavioral Programming paper~\cite{harel_behavioral_2012}.
 It is a web-based, interactive grid display that shows the state of a behavioral program over time (Figure~\ref{fig:tracevis}).
 Synchronization points are organized along the rows, while b-threads are organized along the columns, ordered by priority.
 Each cell represents the state of a b-thread at a given synchronization point, indicating which b-events are requested, waited-for, or blocked.
 Visual cues, such as green stars for selected events and red squares for blocked ones, help developers track the execution flow.
-To handle larger applications, TraceVis provides grouping by a b-thread class and filtering mechanisms that allow inactive threads to be hidden.
-The tool was designed for the Java implementation of \gls{bp}, BPJ~\cite{harel_programming_2010}, which generates an XML trace file at the end of a run.
-Based on the import of this trace file, TraceVis reconstructs the execution history and visualizes it in the browser.
-As a result, TraceVis is strictly a post-execution analysis tool with no ability to control or interrupt a live program.
+To handle larger applications, TraceVis provides grouping by b-thread class and filtering mechanisms that hide inactive threads.
+The tool is designed for the Java implementation of \gls{bp}, BPJ~\cite{harel_programming_2010}, which generates a trace file at the end of a run.
+Upon importing this file, TraceVis reconstructs the execution history and visualizes it in the browser~\cite{eitan_visualization_2011}.
+As a result, TraceVis is strictly a post-execution analysis tool and cannot control or interrupt a live program.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/tracevis.png}
-	\caption[Trace Visualization]{Showcase of TraceVis using a Tic-Tac-Toe game. Taken from \cite{eitan_visualization_2011}.}
+	\caption{Showcase of TraceVis using a Tic-Tac-Toe game. Taken from \cite{eitan_visualization_2011}.}
     \label{fig:tracevis}
 \end{figure}
  
@@ -37,19 +36,19 @@ As a result, TraceVis is strictly a post-execution analysis tool with no ability
 % ----------------------------------------------------------
  
 To address the limitations of TraceVis, a runtime debugger for \gls{bp} was subsequently proposed~\cite{felber_debugging_2024}.
-It is a web application with a table-like structure for visualising the system state, which is illustrated in Figure~\ref{fig:bp_debugger}.
+It is a web application with a table-like structure for visualizing the system state, which is illustrated in Figure~\ref{fig:bp_debugger}.
 Rather than consuming a post-run trace file, it hooks directly into the executing program and streams state data to the browser at every synchronization point.
-This includes b-threads, b-events, and additional parameters.
-The approach provides runtime controls similar to those in symbolic debuggers, including pausing execution and setting conditional breakpoints.
+The data includes b-threads, b-events, and additional parameters.
+The approach provides runtime controls similar to those in symbolic debuggers, including the ability to pause execution and set conditional breakpoints.
 These breakpoints can be chained to halt execution only if a specific sequence of conditions occurs across consecutive synchronization points.
-Additionally, the debugger adopts a \textit{models@run.time} approach to incrementally construct an abstracted runtime model in memory~\cite{felber_debugging_2024}.
+Additionally, the debugger adopts a \textit{models@run.time} approach to incrementally construct an abstracted runtime model in memory.
 This model enables time-travel debugging, allowing developers to navigate to arbitrary past system states and trace a bug's origin.
-Recorded traces can be exported and re-imported for side-by-side comparison with a live run.
+Recorded traces can be exported and re-imported for side-by-side comparison with a live run~\cite{felber_debugging_2024}.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/bp_debugger.png}
-	\caption[BP Runtime Debugger]{Main UI of the BP Runtime Debugger. Taken from \cite{felber_debugging_2024}.}
+	\caption{User Interface of the BP Runtime Debugger. Taken from \cite{felber_debugging_2024}.}
     \label{fig:bp_debugger}
 \end{figure}
 
@@ -58,22 +57,22 @@ Recorded traces can be exported and re-imported for side-by-side comparison with
 \label{subsec:fmbp}
 % ----------------------------------------------------------
  
-FMBP~\cite{felber_comprehensible_2025} addresses comprehensibility at the architectural design phase, before any behavioral code is written.
+The framework FMBP~\cite{felber_comprehensible_2025} addresses comprehensibility at the architectural design phase before writing any behavioral code.
 Rather than analyzing a running or completed program, it provides a formal model of the expected system structure.
-FMBP is a Python framework that extends \gls{uvl} to represent \gls{bp} as an architecture description language, modeling b-threads as structural features and their events as feature attributes.
+FMBP is a Python framework that extends \gls{uvl} to represent \gls{bp} as an Architecture Description Language, modeling b-threads as structural features and their events as feature attributes.
 This formal representation enables automated SMT-checking and type verification before implementation, surfacing logical contradictions and constraint violations early.
 At runtime, FMBP connects the feature model to the executing program through two components.
 The \texttt{ConsistencyChecker} compares the live system state against the expected model structure, while the \texttt{BPConfigurator} reconfigures the behavioral layout in response to dynamic environmental context~\cite{felber_comprehensible_2025}.
 Together, these mechanisms provide an overview of expected system interactions across the entire development lifecycle.
  
-As part of FMBP, the \gls{uvls} was extended to support \gls{bp}.
-B-threads are represented as features, while b-events are modelled as composite feature attributes nested within their respective b-thread features.
+As part of the framework, FMBP extends the \gls{uvls} to support \gls{bp}~\cite{felber_tfelbruvl-bp-lsp_2025}.
+B-threads are represented as features, while b-events are modeled as composite feature attributes nested within their respective b-thread features.
 Each event attribute carries explicit properties for \texttt{requested}, \texttt{blocked}, \texttt{waited\_for}, and a \texttt{priority} value~\cite{felber_comprehensible_2025}.
 
 Explicit type annotations are required throughout the model to prevent ambiguity and ensure consistency.
 A b-thread feature must contain an attribute \texttt{type 'BThread'} to indicate its role, while event attributes must be tagged with \texttt{type 'BEvent'}.
-The extended \gls{uvls} enforces strict name-type consistency, ensuring that any parameter passed into a constraint function carries a \texttt{BEvent} type annotation wherever it appears~\cite{felber_comprehensible_2025}.
-Semantic errors, such as an event nested inside another event, are surfaced as immediate IDE errors.
+The extended \gls{uvls} enforces strict name-type consistency, ensuring that any parameter passed into a constraint function carries a \texttt{BEvent} type annotation wherever it appears.
+Semantic errors, such as an event nested inside another event, are surfaced as immediate \gls{ide} errors~\cite{felber_comprehensible_2025}.
  
 The extension also defines aggregate constraint functions that translate into SMT-solver expressions for automated verification.
 Three basic functions are \texttt{requested()}, \texttt{blocked()}, and \texttt{waited\_for()}.

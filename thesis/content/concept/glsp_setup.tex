@@ -3,71 +3,101 @@
 \label{sec:concept_glsp}
 % ==========================================================
 
-This section explains the architectural choices and framework selections made for implementing the graphical UVL editor.
-It connects those choices to the thesis goal of providing a GLSP-based editor extended for contextual behavioral programs.
-It outlines the separation of responsibilities between server and client components, the role of the graphical model used for client-server communication, and the rationale behind selecting the server and client technologies described in the following subsections.
+This section explains the architectural choices and framework selections made for implementing the graphical \gls{uvl} editor.
+It connects those choices to the thesis goal of providing a \gls{glsp}-based editor extended for context-oriented behavioral programs.
+It outlines the separation of responsibilities between server and client components, the role of the graphical model in client-server communication, and the rationale for selecting the server and client technologies.
 
 % ----------------------------------------------------------
 \subsection{Server Framework Selection: Java}
-\label{subsec:glsp_selection_server}
+\label{subsec:concept_glsp_server}
 % ----------------------------------------------------------
 
-GLSP provides two production-ready server implementations, one in Java and one in TypeScript.
-The Java GLSP server supports multiple source-model strategies.
-Besides producing and consuming the native graphical model (GModel) used for client rendering, it integrates directly with Eclipse Modeling Framework (EMF)-based semantic models, optionally retaining both the semantic model and layout data so that visual information can be persisted alongside semantic content.
-It can also be configured to use an external EMF repository for centralized persistence, letting the server act as the canonical semantic authority.
+\gls{glsp} provides two production-ready server framework implementations~\cite{bork_vision_2024}, one in Java~\cite{noauthor_eclipse-glspglsp-server_2026} and one in TypeScript~\cite{noauthor_eclipse-glspglsp-server-node_2026}.
+The Java server framework supports multiple source model strategies.
+The most common strategy is to use the \gls{glsp}-native graphical model (GModel) as the primary data structure for both semantic and visual information.
+The \gls{glsp} maintainers demonstrate this approach in the workflow example~\cite{noauthor_eclipse-glspglsp-examples_2026}.
+An alternative is to integrate an \gls{emf}-based semantic model directly into the server.
+The Java framework provides several variants of \gls{emf}-based integration: direct \gls{emf} model integration, \gls{emf} integration paired with a separate notation model, and integration with an EMF.cloud model server for centralized persistence and external semantic authority~\cite{bork_vision_2024}.
 The Java server further benefits from a mature ecosystem of multiple examples, reducing implementation friction and providing proven patterns for complex model operations.
-The TypeScript server framework, while offering a homogeneous full-stack development experience, lacks the same depth of source model support and is a relatively newer technology platform within the GLSP ecosystem.
+The TypeScript server framework, while offering a homogeneous full-stack development experience, lacks the same depth of support for source models.
+It supports only a single source model strategy in which the GModel serves as the primary data structure for both semantic and visual information~\cite{noauthor_eclipse-glspglsp-server-node_2026}.
 
-The Java server framework is chosen for this work based on the following considerations.
-The Universal Variability Language does not provide an existing Ecore metamodel for EMF integration.
-However, the UVL creators provide the \texttt{java-fm-metamodel} package, a Java library that parses UVL files using the \texttt{uvl-parser} and materializes them into structured Java objects suitable for programmatic manipulation.
-This library enables the GLSP server to load UVL models directly, modify them during editing operations, and re-serialize them back to UVL files, providing a stable foundation for model manipulation.
-This is an advantage over the TypeScript server, which would require re-implementing UVL parsing and model manipulation logic from scratch.
+We choose the Java server framework for this work, although it does not adopt the \gls{emf}-based source model.
+The Universal Variability Language does not provide an \gls{emf} domain model (an \textit{Ecore} model).
+The framework's \gls{emf}-based source model strategies require such an \textit{Ecore} model.
+However, the \gls{uvl} maintainers have developed the \texttt{java-fm-metamodel} package~\cite{noauthor_universal-variability-languagejava-fm-metamodel_2026}.
+It is a Java library that parses \gls{uvl} files using the \texttt{uvl-parser} and materializes them into structured Java objects suitable for programmatic manipulation~\cite{sundermann_uvlparser_2023}.
+This library enables the \gls{glsp} server to load \gls{uvl} models directly, modify them during editing operations, and re-serialize them back to UVL files, providing a stable foundation for model manipulation.
+This is an advantage over the TypeScript server, which would require re-implementing the parsing and model-manipulation logic from scratch.
+This server-side foundation supports RQ1 by making graphical visualization of \gls{uvl} feature models technically feasible within the editor architecture.
 
-Rather than integrating directly with EMF, this work adopts a custom dual-model approach in which the server maintains two parallel representations.
-The semantic layer consists of \texttt{java-fm-metamodel} objects that faithfully represent the UVL model and serve as the authoritative source for validation, constraint checking, and model modification.
-The visual layer consists of a GModel derived from this semantic representation, which is transmitted to the client and encodes not only model structure but also layout information such as node positions, dimensions, and visual groupings.
-Since this layout information is essential for rendering but absent from the UVL source format, the server computes it during the transformation from semantic to visual representation.
+This work adopts a custom dual-model approach in which the server maintains two parallel representations.
+The semantic layer consists of \texttt{java-fm-metamodel} objects that represent the \gls{uvl} source model and serve as the authoritative source for model modification.
+The visual layer consists of a GModel derived from this semantic representation.
+The server is responsible for transforming any source model into a GModel that contains the visual information transmitted to the client~\cite{bork_vision_2024}.
+To persist notational information across editing sessions, the server serializes the GModel to JSON, saving node positions, dimensions, and visual groupings in a separate file alongside the \gls{uvl} source file.
+When a model is loaded, the server reads both the \gls{uvl} source file and the corresponding GModel file, reconstructing the previous visual representation.
+Changes made by the user in the client are translated into semantic modifications on the \texttt{java-fm-metamodel} objects, which are then reflected in the GModel and persisted back to both the \gls{uvl} source file and the GModel JSON file.
 
-By using the GModel as the communication medium, the architecture decouples the semantic representation from its visual counterpart.
-The server retains authority over semantic concerns, while the client controls visual rendering, including CSS styling, SVG customization, and interaction handlers.
-This division simplifies the client-server protocol and reduces synchronization complexity, as both components operate on well-defined data structures without direct coupling to each other's internal representations.
-
-% RQ2: trade-offs noted for implementation evidence
-
-% ----------------------------------------------------------
-\subsection{Client Framework Selection: VS Code}
-\label{subsec:glsp_selection_client}
-% ----------------------------------------------------------
-
-GLSP provides platform integration packages for multiple integrated development environments, namely Eclipse RCP, Eclipse Theia, and Visual Studio Code (VS Code).
-VS Code is selected for client deployment for several reasons.
-It is the most widely adopted IDE in contemporary software development practice, reducing adoption barriers for end users.
-The platform also supports creating and distributing extensions via the \texttt{.vsix} format, enabling a clean separation between the base UVL tool and the UVL-BP extension as distinct, independently distributed packages.
-Finally, the GLSP integration for VS Code is stable, well-documented, and actively maintained, providing a reliable foundation for implementation.
-As this work focuses on establishing a proof of concept, a single environment is sufficient; broader IDE support may be explored in future work.
+Layout metadata, such as element positions and sizes, could potentially be encoded as feature attributes.
+The downside of embedding notation into the semantic \texttt{.uvl} file is that it would conflate the two concerns.
+This would invalidate the file for any non-\gls{glsp} tooling and include attributes that do not belong in other use cases.
 
 % ----------------------------------------------------------
-\subsection{Feature Division: UVL Base vs.\ UVL-BP Extension}
-\label{subsec:feature_division}
+\subsection{Client Framework Selection: VS~Code}
+\label{subsec:concept_glsp_client}
 % ----------------------------------------------------------
 
-A central architectural decision is to separate base UVL functionality from UVL-BP-specific features into two distinct, independently distributed packages.
-The base UVL tool is delivered as a standalone \texttt{.vsix} extension providing general-purpose feature modeling capabilities, while the UVL-BP extension builds upon it by adding behavioral programming semantics.
-This separation ensures that users who work exclusively with UVL have no dependency on BP-specific tooling, and that the UVL-BP extension can evolve independently without affecting the base editor.
+\gls{glsp} provides platform integration packages for multiple integrated development environments as described in Section~\ref{subsec:glsp_examples}.
+We select VS~Code for client deployment for several reasons.
+It is the most widely adopted \gls{ide} in contemporary software development practice, reducing adoption barriers for end users~\cite{noauthor_technology_nodate}.
+The platform also supports creating and distributing extensions via the \texttt{.vsix} format, enabling a clean separation between the base \gls{uvl} tool and its \gls{bp}-specific extension~\cite{schrepfer_what_nodate}.
+Finally, the \gls{glsp} integration for VS~Code is stable, well-documented, and actively maintained, providing a reliable foundation for implementation~\cite{noauthor_eclipse-glspglsp-vscode-integration_2026}.
+As this work focuses on establishing a proof of concept, a single environment is sufficient.
+Broader \gls{ide} support may be explored in future work.
+
+% ----------------------------------------------------------
+\subsection{Feature Division}
+\label{subsec:concept_glsp_feature_division}
+% ----------------------------------------------------------
+
+A central architectural decision is to separate base \gls{uvl} functionality from \gls{bp}-specific features into two distinct, independently distributed packages.
+The base \gls{uvl} tool delivers a standalone \texttt{.vsix} extension providing general-purpose feature modeling capabilities, while the \gls{uvl}-\gls{bp} extension builds upon it by adding behavioral programming semantics.
+The separation ensures that users who work exclusively with \gls{uvl} have no dependency on \gls{bp}-specific tooling, and that the \gls{uvl}-\gls{bp} extension can evolve independently without affecting the base editor.
+The package structure that realizes this separation is described in the following Section~\ref{subsec:concept_glsp_package_structure}.
 
 \paragraph{Base UVL tool.}
-The base tool renders the feature tree hierarchy with feature names, attributes, parent-child relationships, cardinalities, and constraints.
-It displays group relationships like \textit{alternative}, \textit{or} and \textit{group cardinalities} that structure feature relationships and support common cross-tree constraints such as requires and excludes.
-Features may be annotated with attributes (arbitrary key-value metadata), and feature-level and group-level cardinalities (e.g., \texttt{[1..3]}) are supported.
-Core editing operations include creating and deleting features, modifying relations and constraints, as well as editing attributes.
-The graphical representation adheres to the design requirements established in Section~\ref{sec:concept_visualization}.
+The base tool visualizes the feature hierarchy by presenting feature names, parent-child relations, and constraints in a structured tree view.
+It renders group relations such as \textit{alternative} and \textit{or}, and it supports common cross-tree constraints such as \textit{requires} and \textit{excludes}.
+Features may carry arbitrary key-value attributes, and the editor also supports feature-level and group-level cardinalities.
+Its core editing capabilities cover creating, updating, and deleting features, relations, constraints, and attributes.
+The graphical representation adheres to the design requirements outlined in Section~\ref{sec:concept_visualization}.
 
 \paragraph{UVL-BP extension.}
-The UVL-BP extension depends on the base UVL tool and introduces additional model elements and runtime capabilities specific to behavioral programming.
-It adds two special root features, \texttt{Env} and \texttt{Config}, which represent the context of the model.
-A new BThread feature type is introduced to represent behavioral threads as first-class model elements.
-Different kinds of behavioral events, namely \textit{requested}, \textit{waited-for}, and \textit{blocked} events, may be attached to a BThread as attributes, encoding the event coordination logic of the behavioral program.
-BP-specific constraints as defined by Felber and Götz~\cite{felber_behavioral_2025} are supported through the existing constraint representation of the base tool, extending its semantics without requiring additional model structure.
-Finally, the extension realizes a \textit{models@run.time} approach by linking the graphical model to a live behavioral program, reflecting its execution state directly within the editor; this integration is discussed in detail in the following section.
+The \gls{uvl}-\gls{bp} extension depends on the base \gls{uvl} tool and introduces additional model elements and runtime capabilities specific to behavioral programming.
+It adds two root features, \texttt{Env} and \texttt{Config}, that represent the model's context.
+A new b-thread feature type is introduced to represent behavioral threads as first-class model elements.
+Different kinds of b-events, namely \textit{requested}, \textit{waited-for}, and \textit{blocked}, may be attached to a b-thread.
+\gls{bp}-specific constraints, as defined by Felber and Götz~\cite{felber_behavioral_2025}, are supported via the existing constraint representation of the base tool, thereby extending its semantics without requiring additional model structure.
+Finally, the extension realizes a \textit{models@run.time} approach by linking the graphical model to a live behavioral program, reflecting its execution state directly within the editor.
+We discuss this integration in detail in the following Sections~\ref{sec:concept_bp_integration} and \ref{sec:concept_fmbp}.
+This feature split supports RQ2 by separating the base visualization from \gls{bp} extensions while maintaining an extensible architecture.
+
+% ----------------------------------------------------------
+\subsection{Intended Package Structure}
+\label{subsec:concept_glsp_package_structure}
+% ----------------------------------------------------------
+
+We intend to realize the described separation through a layered package structure that keeps the \gls{uvl} core reusable while isolating \gls{bp}-specific extensions.
+On the server side, three main packages are intended.
+The \texttt{uvl.metamodel} package contains the adapted parser and metamodel for loading and materializing \gls{uvl} source files.
+The \texttt{uvl.glsp} package provides the base \gls{glsp} infrastructure for \gls{uvl} and concentrates all reusable tools, bindings, and shared editor logic.
+The \texttt{uvl.bp.glsp} package extends this infrastructure for behavioral programs and adds only the \gls{bp}-specific model elements, constraints, and runtime interactions.
+This structure is designed to minimize code duplication by letting the package reuse as much of the common server implementation as possible.
+
+On the client side, we maintain a similar separation.
+There are packages for the base \gls{uvl} and for the \gls{bp} extension, each containing the client-side logic relevant to its context.
+The VS~Code integration code is shared and not duplicated between both variants.
+Instead, profile-specific packaging assembles generated VS~Code extensions from the shared client modules and includes the package set that matches the selected profile.
+This allows the repository to produce multiple \texttt{.vsix} artifacts from one codebase while keeping the common integration and rendering code in a single place.
+This package structure advances RQ2 by making it possible to add new variants and analyses without duplicating the shared editor foundation.

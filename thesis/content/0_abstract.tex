@@ -2,18 +2,21 @@
 
 \begin{abstract}[english,pagestyle=empty.tudheadings]
 
-This thesis presents two Visual Studio Code extensions based on the Eclipse Graphical Language Server Platform (GLSP).
-The first extension provides a lightweight graphical editor for creating and editing feature models.
-The second extension focuses on behavioral programming (BP) in UVL and visualizes the resulting models in a graphical editor.
-It supports the additional root features \textit{Env} and \textit{Config} as well as the feature types \textit{BThread} and \textit{BEvent} through feature attributes that are integrated directly into the tree structure.
-In addition, the extension supports the \gls{bp}-specific constraints required for this extended model.
+Behavioral Programming (BP) is a scenario-based paradigm in which programs become increasingly difficult to comprehend at scale, yet existing tooling lacks intuitive graphical support.
+We present two Visual Studio Code extensions built on the Eclipse Graphical Language Server Platform (GLSP) that address this gap through graphical management of multiple runtime models for contextual behavioral programs.
 
-To employ the \textit{models@run.time} approach, the already developed FMBP framework was extended in two ways.
-For each triggered \textit{BEvent}, FMBP sends a server-sent event (SSE) that is fetched by the GLSP server instance and visualized in the graphical editor through highlighting.
-Dynamic environment attributes that are not changed in the source model by FMBP are also transmitted via SSE and updated visually on the client without persisting their values.
+The first extension provides a lightweight graphical editor for feature models expressed in the Universal Variability Language (UVL).
+The second enriches UVL with BP-specific constructs.
+It introduces two new root features, \textit{Env} and \textit{Config}, to capture the contextual aspects of a behavioral program.
+To represent BP concepts within the feature model, we model \textit{b-threads} as a dedicated feature type, while \textit{b-events} are expressed as feature attributes directly embedded in the tree structure.
+The extension further supports the BP-specific constraints required by this enriched model defined by Felber and Götz.
 
-Together, these extensions provide a graphical and runtime-aware environment for UVL-based behavioral programs.
-The resulting toolchain supports both model editing and runtime visualization to improve comprehension of behavioral programming.
-The developed tools were showcased in a water tank example and in a drones example, which visualizes four drones simultaneously.
+For runtime monitoring, we adopt the \textit{models@run.time} paradigm by extending Felber's FMBP framework.
+During execution, FMBP emits server-sent events for each selected \textit{b-event}, which the GLSP server reflects in the editor via live highlighting.
+Dynamic environment attributes are similarly transmitted and rendered on the client side.
+Crucially, the toolchain supports simultaneous visualization of multiple runtime models, enabling several independent behavioral programs to be observed and compared within a single graphical environment.
+
+We demonstrate the tools with a water-tank scenario and a multi-drone example featuring four concurrent runtime models.
+Both extensions are published on \textit{OpenVSX} with source code available on GitHub.
 
 \end{abstract}

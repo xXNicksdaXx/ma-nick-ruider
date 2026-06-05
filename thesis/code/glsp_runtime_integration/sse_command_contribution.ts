@@ -5,11 +5,6 @@ export function configureSSECommandContributions(context: CommandContext): void 
         vscode.commands.registerCommand(`${diagramPrefix}.sse.startListening`, () => {
             connector.dispatchAction(SSEStartListeningAction.create());
         }),
-        vscode.commands.registerCommand(`${diagramPrefix}.sse.highFrequencyPolling`, () => {
-            connector.dispatchAction(SSEHighFrequencyPollingAction.create());
-        }),
-        vscode.commands.registerCommand(`${diagramPrefix}.sse.stopListening`, () => {
-            connector.dispatchAction(SSEStopListeningAction.create());
-        })
+        ...
     );
 }

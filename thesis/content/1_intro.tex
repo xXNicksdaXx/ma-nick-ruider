@@ -1,20 +1,66 @@
+% ==========================================================
 \chapter{Introduction}
+\label{chapter:intro}
+% ==========================================================
 
+% ----------------------------------------------------------
 \section{Motivation}
+\label{sec:intro_motivation}
+% ----------------------------------------------------------
 
-- OpenVSX
+Specifying the requirements of a software system is one of the most challenging tasks in software engineering.
+Despite decades of research, capturing the intended behavior of a system in a complete, consistent, and comprehensible manner remains an open problem.
+One well-established strategy to address this challenge is the use of use cases and scenarios to express requirements, allowing stakeholders to describe system behavior from a user-centric perspective.
+\gls{bp} builds directly on this idea by elevating scenarios from mere documentation artifacts to first-class implementation constructs.
+In \gls{bp}, a program is composed of individual behavioral threads (\textit{b-threads}), each encoding a scenario that specifies which events to request, which to wait for, and which to block.
+Together, these \textit{b-threads} execute concurrently and coordinate, employing a shared event mechanism to produce the overall system behavior~\cite{harel_behavioral_2012}.
 
+While this paradigm offers notable advantages, it introduces a serious challenge as programs grow in size and complexity.
+The interplay between \textit{b-threads} and the events they select becomes increasingly difficult to reason about, both at the modeling stage before any code is executed and at runtime when the system is live.
+Understanding how multiple \textit{b-threads} interact with one another, and how their collective behavior emerges from their individual specifications, quickly exceeds the cognitive capacity of a developer relying on source code alone.
+
+Prior work by Felber and Götz has begun to address these challenges.
+They introduced a novel runtime debugger for behavioral programs that collects \gls{bp}-specific execution information and presents it via a web-based frontend, helping developers understand program behavior at runtime and identify bugs~\cite{felber_debugging_2024}.
+However, the high-level architecture of a behavioral program remains difficult to grasp through this lens alone.
+To address the modeling dimension of the problem, Felber and Götz further proposed an Architecture Description Language (ADL) for context-aware behavioral programs, grounded in the \gls{uvl}~\cite{felber_behavioral_2025}.
+\gls{uvl} is a formalism commonly used for feature modeling in the field of Software Product Lines.
+Their approach augments an existing \gls{uvl} language server with \gls{bp}-specific semantics and introduces a Python backend called FMBP~\cite{felber_comprehensible_2025}.
+Together, these components allow developers to model a behavioral program using \gls{uvl} and to enforce dynamic changes to the feature model at runtime, bridging the gap between static architectural modeling and dynamic program execution.
+Yet, both the runtime debugger and the \gls{uvl}-based modeling approach lack a graphical representation that would allow developers to intuitively inspect and interact with the architectural model of a behavioral program.
+
+% ----------------------------------------------------------
 \section{Goals of the thesis}
+\label{sec:intro_goals}
+% ----------------------------------------------------------
 
-Research questions:
+In this thesis, we aim to improve the comprehension of contextual behavioral programs by introducing a graphical management layer.
+Building on \gls{uvl} with \gls{bp} semantics contributed by Felber and Götz, we propose an interactive graphical editor that allows developers to visualize and manipulate the feature model of a behavioral program at runtime.
+We use the \gls{glsp} as the implementation framework, as it provides a proven foundation for building language-specific graphical editors that integrate into various development environments~\cite{bork_vision_2024}
 
+The \gls{uvl} feature model serves as the central artifact.
+The graphical editor should be able to project the \gls{uvl} model as in other feature modeling tools, such as FeatureIDE~\cite{sundermann_integration_2021}.
+Although the focus is on the comprehension of behavioral programs, we should design the editor with extensibility in mind, separating the core graphical representation of base \gls{uvl} models from the specific \gls{bp} semantics.
+
+A major concern of this thesis is the \textit{models@run.time} approach~\cite{blair_models_2009}.
+Changes made graphically by the developer must be translated into valid modifications of the live behavioral program, while changes arising from program execution must be automatically reflected in the visual representation.
+Additionally, the proposed editor should support multiple runtime instances, enabling simultaneous visualization and interaction with multiple behavioral programs within a single graphical interface.
+
+The following research questions frame the thesis.
 \begin{description}[leftmargin=1.5cm, labelwidth=1.3cm, labelsep=0.2cm]
-    \item[\textbf{RQ1:}]
-    How feasible is the graphical visualization of UVL feature models for improving the comprehension of contextual behavioral programs?
-    \item[\textbf{RQ2:}]
-    How can Behavioral Programming concepts be integrated into the graphical tool while maintaining extensibility for future features?
-    \item[\textbf{RQ3.1:}]
-    How can user interactions with the graphical model be translated into valid runtime modifications of the underlying behavioral program?
-    \item[\textbf{RQ3.2:}]
+    \item[\textbf{RQ1}]
+    How feasible is the graphical visualization of \gls{uvl} feature models for improving the comprehension of contextual \gls{bp}?
+    \item[\textbf{RQ2}]
+    How can \gls{bp} concepts be integrated into a graphical tool while maintaining extensibility for future features and analyses?
+    \item[\textbf{RQ3.1}]
     How can changes to the feature model during the execution of a behavioral program be automatically reflected in the graphical representation?
+    \item[\textbf{RQ3.2}]
+    How can user interactions with the graphical model be translated into valid runtime modifications of the underlying behavioral program?
 \end{description}
+
+The remainder of this thesis is structured as follows.
+Chapter \ref{chapter:background} establishes the theoretical foundations underlying this work, covering feature modeling, the principles of \gls{bp}, and the \gls{glsp} framework as the technical basis for the graphical editor.
+Chapter \ref{chapter:state_of_the_art} surveys the state of the art in those domains, identifying existing tools and approaches that relate to the goals of this thesis and highlighting the research gap that this work aims to fill.
+Chapter \ref{chapter:concept} presents the conceptual design of the proposed graphical editor, detailing the mapping from \gls{uvl} constructs to graphical notation and the architectural decisions that govern the bidirectional relationship between the diagram and the live model.
+Chapter \ref{chapter:implementation} describes the realization of the design, covering the integration points between the graphical editor and the underlying extension to FMBP.
+Chapter \ref{chapter:evaluation} applies the tool to three representative examples.
+Finally, Chapter \ref{chapter:conclusion} summarizes the main contributions of this thesis and outlines directions for future work.

@@ -1,14 +1,12 @@
-% uvl.sty
+% uvlstyle.sty
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{uvlstyle}[UVL Syntax Highlighting Package]
 
 \RequirePackage{xcolor}
 \RequirePackage{listings}
 
-% 1. Define colors
-\definecolor{keywordcolor}{RGB}{0, 0, 180}
-\definecolor{stringcolor}{RGB}{0, 120, 0}
-\definecolor{bgcolor}{RGB}{250, 250, 250}
+% Colors are defined centrally in the main document (script.tex):
+% codekeyword, codebuiltin, codestring, codecomment, codebg, codenumber
 
 % 2. Custom language definition
 \lstdefinelanguage{UVL}{
@@ -22,10 +20,11 @@
 % 3. Global settings
 \lstset{
     language=UVL,
-    backgroundcolor=\color{bgcolor},
+    backgroundcolor=\color{codebg},
     basicstyle=\ttfamily\small,
-    keywordstyle=\color{keywordcolor}\bfseries,
-    stringstyle=\color{stringcolor},
+    keywordstyle=\color{codekeyword}\bfseries,
+    stringstyle=\color{codestring},
+    commentstyle=\color{codecomment}\itshape,
     showstringspaces=false,
     tabsize=4,
     numbers=left,

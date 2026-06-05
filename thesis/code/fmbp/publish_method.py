@@ -1,6 +1,5 @@
 def publish(self, payload: dict[str, Any]) -> None:
-    if not self.__started:
-        return
+    ...
     serialized = json.dumps(payload, default=str)
     try:
         self.__events.put_nowait(serialized)

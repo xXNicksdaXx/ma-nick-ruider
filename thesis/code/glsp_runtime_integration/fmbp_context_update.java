@@ -5,19 +5,16 @@ protected void registerDataListener() {
 
 protected void updateContextEnv(final ParsedServerSentEvent event) {
     Feature envFeature = modelState.getFeatureModel().getEnv();
-    boolean hasChanges = false;
-
+    ...
     for (Map.Entry<String, ?> entry : event.data().entrySet()) {
-    if (envFeature.getAttributes().containsKey(entry.getKey())) {
-        Attribute attribute = envFeature.getAttributes().get(entry.getKey());
-        if (!Objects.equals(attribute.getValue(), entry.getValue())) {
-            attribute.setValue(entry.getValue());
-            hasChanges = true;
+        if (envFeature.getAttributes().containsKey(entry.getKey())) {
+            Attribute attribute = envFeature.getAttributes().get(entry.getKey());
+            if (!Objects.equals(attribute.getValue(), entry.getValue())) {
+                attribute.setValue(entry.getValue());
+                hasChanges = true;
+            }
         }
     }
-    }
 
-    if (hasChanges) {
-        actionDispatcher.dispatchAll(submitModel(envFeature));
-    }
+    if (hasChanges) actionDispatcher.dispatchAll(submitModel(envFeature));
 }

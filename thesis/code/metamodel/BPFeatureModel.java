@@ -8,9 +8,5 @@ public class BPFeatureModel extends FeatureModel {
     public Feature getConfig() { return config; }
     public void setConfig(Feature config) { this.config = config; }
 
-    @Override
-    protected void appendAdditionalTopLevelFeatures(StringBuilder result, boolean withSubmodels, String currentAlias) {
-        if (env != null) result.append(Util.indentEachLine(env.toString(withSubmodels, currentAlias)));
-        if (config != null) result.append(Util.indentEachLine(config.toString(withSubmodels, currentAlias)));
-    }
+    ...
 }
